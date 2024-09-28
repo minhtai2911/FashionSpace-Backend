@@ -27,8 +27,8 @@ const createReview = asyncHandler(async (req, res, next) => {
   try {
     await newReview.save();
     res.status(201).json(newReview);
-  } catch {
-    throw new Error("Invalid new review");
+  } catch(err) {
+    res.status(500).json({message: err.message});
   }
 });
 
@@ -41,14 +41,23 @@ const getReviewById = asyncHandler(async (req, res, next) => {
 });
 
 const updateReviewById = asyncHandler(async (req, res, next) => {
-    const review = await Review.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const review = Review.findById(req.params.id);
 
     if (!review) return res.status(404).json({ message: "Review not found" });
 
-    res.status(200).json(review);
+    const { user_id, product_id, rating, content } = req.body;
+    
+    review.user_id = user_id || review.user_id;
+    review.product_id = product_id || review.product_id;
+    review.rating = rating || review.rating;
+    review.content = content || review.content;
+
+    try {
+      await review.save();
+      res.status(200).json(review);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
 });
 
 const deleteReviewById = asyncHandler(async (req, res, next) => {

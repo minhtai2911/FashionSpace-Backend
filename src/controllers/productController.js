@@ -28,7 +28,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
     await newProduct.save();
     res.status(201).json(newProduct);
   } catch (err) {
-    throw new Error("Invalid new product");
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -41,18 +41,25 @@ const getProductById = asyncHandler(async (req, res, next) => {
 });
 
 const updateProductById = asyncHandler(async (req, res, next) => {
-  const updateProduct = await Product.findByIdAndUpdate(
-    req.params.id,
-    req.body,
-    {
-      new: true,
-      runValidators: true,
-    }
-  );
+  const updateProduct = await Product.findById(req.params.id);
 
-  if (!updateProduct) return res.status(404).json({ message: "Product not found" });
+  if (!updateProduct)
+    return res.status(404).json({ message: "Product not found" });
 
-  res.status(200).json(updateProduct);
+  const { name, description, category_id, price, rating } = req.body;
+
+  updateProduct.name = name || updateProduct.name;
+  updateProduct.description = description || updateProduct.description;
+  updateProduct.category_id = category_id || updateProduct.category_id;
+  updateProduct.price = price || updateProduct.price;
+  updateProduct.rating = rating || updateProduct.rating;
+
+  try {
+    await updateProduct.save();
+    res.status(200).json(updateProduct);
+  } catch {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 const deleteProductById = asyncHandler(async (req, res, next) => {

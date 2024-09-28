@@ -37,33 +37,31 @@ const signup = asyncHandler(async (req, res, next) => {
   if (exists) return res.status(400).json({ message: "Email already exists" });
 
   const user = new User({ email, full_name, phone, role_id, password });
-  
+
   try {
     await user.save();
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "3d",
+      }
+    );
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: { refreshToken: refreshToken },
+    });
+
+    user.refreshToken = refreshToken;
+
+    return res.status(201).json({ ...user._doc, accessToken });
   } catch (err) {
-    res.status(400);
-    throw new Error("Invalid user data");
+    res.status(500).json({ message: err.message });
   }
-
-  const accessToken = jwt.sign(
-    { id: user._id },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "3d",
-    }
-  );
-  const refreshToken = jwt.sign(
-    { id: user._id },
-    process.env.REFRESH_TOKEN_SECRET,
-  );
-
-  await User.findByIdAndUpdate(user._id, {
-    $set: { refreshToken: refreshToken },
-  });
-
-  user.refreshToken = refreshToken;
-
-  return res.status(201).json({ ...user._doc, accessToken });
 });
 
 const logout = asyncHandler(async (req, res, next) => {

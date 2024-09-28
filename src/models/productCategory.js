@@ -5,22 +5,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  description: {
-    type: String,
-  },
-  category_id: {
+  parent_id: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "product_categories",
   },
-  price: {
-    type: Number,
-    required: true,
-  },
-  rating: {
-    type: Number,
-    required: true,
-  },
 });
 
-export default mongoose.model("products", userSchema);
+export default mongoose.model("product_categories", userSchema);

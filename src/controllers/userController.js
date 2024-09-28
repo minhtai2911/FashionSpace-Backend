@@ -28,7 +28,6 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
 const updateUserById = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
-  console.log(user);
   if (!user) return res.status(404).json({ message: "User not found" });
 
   user.name = req.body.full_name || user.name;
@@ -39,11 +38,10 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   //user.refreshToken = req.body.refreshToken || user.refreshToken;
 
   try {
-    const updateUser = await user.save();
-    res.status(200).json(updateUser);
-  } catch (err) { 
-    res.status(400);
-    throw new Error("Invalid user data");
+    await user.save();
+    res.status(200).json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
 });
 
