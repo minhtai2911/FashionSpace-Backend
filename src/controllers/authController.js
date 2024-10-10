@@ -70,18 +70,6 @@ const logout = asyncHandler(async (req, res, next) => {
 
 const refreshToken = asyncHandler(async (req, res, next) => {
   const refreshToken = req.body.refreshToken;
-  const email = req.body.email;
-  const password = req.body.password;
-
-  if (!refreshToken) {
-    return res.status(401).json({ message: "Unauthorized!" });
-  }
-
-  const user = await User.login(email, password);
-
-  if (!refreshToken.includes(user.refreshToken)) {
-    return res.status(403).json({ message: "Invalid refresh token!" });
-  }
 
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
     if (err) {
@@ -94,7 +82,7 @@ const refreshToken = asyncHandler(async (req, res, next) => {
         expiresIn: "30s",
       }
     );
-    return res.json(accessToken);
+    return res.json({accessToken: accessToken});
   });
 });
 
