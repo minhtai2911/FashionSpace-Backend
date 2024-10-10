@@ -11,6 +11,7 @@ import productRoute from "./routes/productRoute.js";
 import reviewRoute from "./routes/reviewRoute.js";
 import userRoleRoute from "./routes/userRoleRoute.js";
 import userAddressRoute from "./routes/userAddressRoute.js";
+import productImageRoute from "./routes/productImageRoute.js";
 
 
 const app = express();
@@ -41,3 +42,4 @@ app.use("/api/v1/product", productRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/userRole", userRoleRoute);
 app.use("/api/v1/userAddress", userAddressRoute);
+app.use("/api/v1/productImage", productImageRoute);

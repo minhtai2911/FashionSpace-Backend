@@ -16,9 +16,21 @@ const login = asyncHandler(async (req, res, next) => {
     { id: user._id },
     process.env.ACCESS_TOKEN_SECRET,
     {
-      expiresIn: "3d",
+      expiresIn: "30s",
     }
   );
+
+  const refreshToken = jwt.sign(
+    { id: user._id },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: "365d" }
+  );
+
+  await User.findByIdAndUpdate(user._id, {
+    $set: { refreshToken: refreshToken },
+  });
+
+  user.refreshToken = refreshToken;
 
   const { password, ...data } = user._doc;
 
@@ -40,25 +52,10 @@ const signup = asyncHandler(async (req, res, next) => {
 
   try {
     await user.save();
-    const accessToken = jwt.sign(
-      { id: user._id },
-      process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: "3d",
-      }
-    );
-    const refreshToken = jwt.sign(
-      { id: user._id },
-      process.env.REFRESH_TOKEN_SECRET
-    );
 
-    await User.findByIdAndUpdate(user._id, {
-      $set: { refreshToken: refreshToken },
-    });
+    const { password, ...data } = user._doc;
 
-    user.refreshToken = refreshToken;
-
-    return res.status(201).json({ ...user._doc, accessToken });
+    return res.status(201).json({ data });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -94,7 +91,7 @@ const refreshToken = asyncHandler(async (req, res, next) => {
       { id: data._id },
       process.env.ACCESS_TOKEN_SECRET,
       {
-        expiresIn: "3d",
+        expiresIn: "30s",
       }
     );
     return res.json(accessToken);
