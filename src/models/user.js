@@ -9,14 +9,10 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     unique: true,
     validate: (value) => {
-      return validator.isEmail(value)
-    }
+      return validator.isEmail(value);
+    },
   },
   full_name: {
-    type: String,
-    required: true,
-  },
-  phone: {
     type: String,
     required: true,
   },
@@ -32,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   refreshToken: {
     type: String,
-  }
+  },
 });
 
 userSchema.pre("save", async function (next) {
@@ -42,7 +38,7 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.statics.login = async function (email, password) {
-  const user = await this.findOne({ email});
+  const user = await this.findOne({ email });
   if (user) {
     const auth = await bcrypt.compare(password, user.password);
     if (auth) {
