@@ -32,7 +32,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
 
   user.name = req.body.full_name || user.name;
   user.email = req.body.email || user.email;
-  user.phone = req.body.phone || user.phone;
+  // user.phone = req.body.phone || user.phone;
   user.password = req.body.password || user.password;
   user.role_id = req.body.role_id || user.role_id;
   //user.refreshToken = req.body.refreshToken || user.refreshToken;
