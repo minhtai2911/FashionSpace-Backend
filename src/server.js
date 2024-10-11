@@ -13,12 +13,19 @@ import userRoleRoute from "./routes/userRoleRoute.js";
 import userAddressRoute from "./routes/userAddressRoute.js";
 import productImageRoute from "./routes/productImageRoute.js";
 
-
 const app = express();
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 dotenv.config();
 const PORT = process.env.PORT || 5000;
