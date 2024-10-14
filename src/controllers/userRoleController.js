@@ -58,7 +58,7 @@ const updateUserRole = asyncHandler(async (req, res, next) => {
     await userRole.save();
     res.status(200).json(userRole);
   } catch (err) {
-    res.status(500).json({ message: err.message});
+    res.status(500).json({ message: err.message });
   }
 });
 

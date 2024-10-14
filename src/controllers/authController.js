@@ -1,4 +1,5 @@
 import User from "../models/user.js";
+import User_Role from "../models/userRole.js";
 import jwt from "jsonwebtoken";
 import asyncHandler from "../middleware/asyncHandler.js";
 
@@ -38,17 +39,18 @@ const login = asyncHandler(async (req, res, next) => {
 });
 
 const signup = asyncHandler(async (req, res, next) => {
-  const { email, full_name, phone, role_id, password } = req.body;
+  const { email, full_name, password } = req.body;
 
   // if (!email || !full_name || !phone || !role_id || !password) {
   //   throw new Error("Please fill in all required fields");
   // }
-
   const exists = await User.findOne({ email: email });
 
   if (exists) return res.status(400).json({ message: "Email already exists" });
 
-  const user = new User({ email, full_name, phone, role_id, password });
+  const role = await User_Role.findOne({ role_name: "User"});
+  const role_id = role.id;
+  const user = new User({ email, full_name, role_id, password });
 
   try {
     await user.save();

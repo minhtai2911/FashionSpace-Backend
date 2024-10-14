@@ -8,5 +8,6 @@ router.get('/', authMiddleware.verifyToken, userController.getAllUsers);
 router.get('/:id', authMiddleware.verifyToken, userController.getUserById);
 router.delete('/:id', authMiddleware.verifyToken, userController.deleteUserById);
 router.put('/:id', authMiddleware.verifyToken, userController.updateUserById);
+router.put('/', authMiddleware.verifyToken, userController.forgetPassword);
 
 export default router;

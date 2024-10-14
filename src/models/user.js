@@ -9,14 +9,10 @@ const userSchema = new mongoose.Schema({
     lowercase: true,
     unique: true,
     validate: (value) => {
-      return validator.isEmail(value)
-    }
+      return validator.isEmail(value);
+    },
   },
   full_name: {
-    type: String,
-    required: true,
-  },
-  phone: {
     type: String,
     required: true,
   },
@@ -30,19 +26,24 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 6,
   },
+  imgURL: {
+    type: String,
+  },
   refreshToken: {
     type: String,
-  }
+  },
 });
 
 userSchema.pre("save", async function (next) {
-  const salt = await bcrypt.genSalt();
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.password) {
+    const salt = await bcrypt.genSalt();
+    this.password = await bcrypt.hash(this.password, salt);
+  }
   next();
 });
 
 userSchema.statics.login = async function (email, password) {
-  const user = await this.findOne({ email});
+  const user = await this.findOne({ email });
   if (user) {
     const auth = await bcrypt.compare(password, user.password);
     if (auth) {
