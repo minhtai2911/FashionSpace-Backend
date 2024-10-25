@@ -30,8 +30,9 @@ const updateUserById = asyncHandler(async (req, res, next) => {
 
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  user.name = req.body.full_name || user.name;
+  user.full_name = req.body.full_name || user.full_name;
   user.email = req.body.email || user.email;
+  user.phone = req.body.phone || user.phone;
   user.password = req.body.password || user.password;
   user.role_id = req.body.role_id || user.role_id;
   //user.refreshToken = req.body.refreshToken || user.refreshToken;
@@ -44,29 +45,10 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   }
 });
 
-const forgetPassword = asyncHandler(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
-
-  if (!user) return res.status(404).json({ message: "User not found" });
-
-  user.name = req.body.full_name || user.name;
-  user.email = req.body.email || user.email;
-  user.password = req.body.password || user.password;
-  user.role_id = req.body.role_id || user.role_id;
-
-  try {
-    await user.save();
-    res.status(200).json({ message: "Password updated successfully", user: user });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-});
-
 
 export default {
   getAllUsers: getAllUsers,
   getUserById: getUserById,
   deleteUserById: deleteUserById,
   updateUserById: updateUserById,
-  forgetPassword: forgetPassword,
 };

@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    lowercase: true,
     unique: true,
     validate: (value) => {
       return validator.isEmail(value);
@@ -15,6 +14,13 @@ const userSchema = new mongoose.Schema({
   full_name: {
     type: String,
     required: true,
+  },
+  phone: {
+    type: String,
+    required: true,
+    validate: (value) => {
+      return validator.isMobilePhone(value, "vi-VN");
+    },
   },
   role_id: {
     type: mongoose.Schema.Types.ObjectId,
