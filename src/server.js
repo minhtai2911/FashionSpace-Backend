@@ -15,6 +15,7 @@ import userRoleRoute from "./routes/userRoleRoute.js";
 import orderAddressRoute from "./routes/orderAddressRoute.js";
 import productImageRoute from "./routes/productImageRoute.js";
 import orderRoute from "./routes/orderRoute.js";
+import shoppingCartRoute from "./routes/shoppingCartRoute.js";
 
 const app = express();
 
@@ -67,3 +68,4 @@ app.use("/api/v1/userRole", userRoleRoute);
 app.use("/api/v1/orderAddress", orderAddressRoute);
 app.use("/api/v1/productImage", productImageRoute);
 app.use("/api/v1/order", orderRoute);
+app.use("/api/v1/shoppingCart", shoppingCartRoute);

@@ -5,9 +5,9 @@ const router = Router();
 
 router.get('/', OrderAddressController.getAllOrderAddresses);
 router.post('/', OrderAddressController.createOrderAddress);
-router.put('/', OrderAddressController.updateOrderAddressById);
-router.delete('/', OrderAddressController.deleteOrderAddressById);
-router.get('/', OrderAddressController.getOrderAddressById);
+router.put('/:id', OrderAddressController.updateOrderAddressById);
+router.delete('/:id', OrderAddressController.deleteOrderAddressById);
+router.get('/id', OrderAddressController.getOrderAddressById);
 
 
 export default router;
