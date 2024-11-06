@@ -205,12 +205,27 @@ const checkEmail = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: "Email available" });
 });
 
-const resetPassword = asyncHandler(async (req, res, next) => {
+const forgotPassword = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     user.password = req.body.password;
     user.save();
     res.status(200).json({ message: "Reset password successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    const check = await bcrypt(req.body.password, user.password);
+
+    if (!check) return res.status(400).json({ message: "Invalid password" });
+
+    user.password = req.body.newPassword;
+    user.save();
+    res.status(200).json({ message: "Password reset successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -225,5 +240,6 @@ export default {
   sendOTP: sendOTP,
   checkOTPByEmail: checkOTPByEmail,
   checkEmail: checkEmail,
+  forgotPassword: forgotPassword,
   resetPassword: resetPassword,
 };
