@@ -85,10 +85,14 @@ const signup = asyncHandler(async (req, res, next) => {
 });
 
 const logout = asyncHandler(async (req, res, next) => {
-  const user = await User.findByIdAndUpdate(req.user.id, {
-    $set: { refreshToken: "" },
-  });
-  res.status(200).json({ message: "Logged out" });
+  try {
+    const user = await User.findByIdAndUpdate(req.user.id, {
+      $set: { refreshToken: "" },
+    });
+    res.status(200).json({ message: "Logged out" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 const refreshToken = asyncHandler(async (req, res, next) => {
@@ -159,7 +163,33 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
       return res.status(400).json({ message: "Invalid OTP" });
     }
 
-    res.status(200).json({ message: "OTP verified" });
+    const user = await User.findOne({ email: email });
+
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "30s",
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: { refreshToken: refreshToken },
+    });
+
+    user.refreshToken = refreshToken;
+
+    const { password, ...data } = user._doc;
+
+    res
+      .status(200)
+      .json({ message: "OTP verified", data: { ...data, accessToken } });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -174,6 +204,18 @@ const checkEmail = asyncHandler(async (req, res, next) => {
 
   res.status(200).json({ message: "Email available" });
 });
+
+const resetPassword = asyncHandler(async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id);
+    user.password = req.body.password;
+    user.save();
+    res.status(200).json({ message: "Reset password successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default {
   login: login,
   signup: signup,
@@ -183,4 +225,5 @@ export default {
   sendOTP: sendOTP,
   checkOTPByEmail: checkOTPByEmail,
   checkEmail: checkEmail,
+  resetPassword: resetPassword,
 };
