@@ -11,7 +11,7 @@ const userSchema = new mongoose.Schema({
       return validator.isEmail(value);
     },
   },
-  full_name: {
+  fullName: {
     type: String,
     required: true,
   },
@@ -22,17 +22,17 @@ const userSchema = new mongoose.Schema({
       return validator.isMobilePhone(value, "vi-VN");
     },
   },
-  role_id: {
+  roleId: {
     type: mongoose.Schema.Types.ObjectId,
     require: true,
-    ref: "roles",
+    ref: "Role",
   },
   password: {
     type: String,
     required: true,
     minlength: 6,
   },
-  imgURL: {
+  avatarPath: {
     type: String,
   },
   refreshToken: {
@@ -60,4 +60,4 @@ userSchema.statics.login = async function (email, password) {
   throw new Error("Invalid email or password");
 };
 
-export default mongoose.model("users", userSchema);
+export default mongoose.model("User", userSchema);

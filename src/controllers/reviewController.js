@@ -2,27 +2,27 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import Review from "../models/review.js";
 
 const getAllReviews = asyncHandler(async (req, res, next) => {
-  const reviews = await Review.find({});
+  const review = await Review.find({});
 
-  if (!reviews) return res.status(404).json({ message: "Reviews not found" });
+  if (!review) return res.status(404).json({ message: "Reviews not found" });
 
-  res.status(200).json(reviews);
+  res.status(200).json(review);
 });
 
 const createReview = asyncHandler(async (req, res, next) => {
-  const { user_id, product_id, rating, content } = req.body;
+  const { userId, productId, rating, content } = req.body;
 
-  if (!user_id || !product_id || !rating || !content) {
+  if (!userId || !productId || !rating || !content) {
     throw new Error("Please fill all required fields");
   }
 
-  const existingReview = await Review.findOne({ user_id, product_id });
+  const existingReview = await Review.findOne({ userId, productId });
 
   if (!existingReview) {
     throw new Error("Review already exists");
   }
 
-  const newReview = new Review({user_id, product_id, rating, content});
+  const newReview = new Review({userId, productId, rating, content});
 
   try {
     await newReview.save();
@@ -45,10 +45,10 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
 
     if (!review) return res.status(404).json({ message: "Review not found" });
 
-    const { user_id, product_id, rating, content } = req.body;
+    const { userId, productId, rating, content } = req.body;
     
-    review.user_id = user_id || review.user_id;
-    review.product_id = product_id || review.product_id;
+    review.userId = userId || review.userId;
+    review.productId = productId || review.productId;
     review.rating = rating || review.rating;
     review.content = content || review.content;
 

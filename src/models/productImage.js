@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  product_id: {
+  productId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "products",
+    ref: "Product",
   },
-  image_path: {
+  imagePath: {
     type: String,
     required: true,
   }
 });
 
-export default mongoose.model("product_images", userSchema);
+export default mongoose.model("ProductImage", userSchema);

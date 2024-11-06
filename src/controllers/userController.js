@@ -2,11 +2,11 @@ import User from "../models/user.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
-  const users = await User.find({});
+  const user = await User.find({});
 
-  if (!users) return res.status(404).json({ message: "Users not found" });
+  if (!user) return res.status(404).json({ message: "Users not found" });
 
-  res.status(200).json(users);
+  res.status(200).json(user);
 });
 
 const getUserById = asyncHandler(async (req, res, next) => {
@@ -30,12 +30,10 @@ const updateUserById = asyncHandler(async (req, res, next) => {
 
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  user.full_name = req.body.full_name || user.full_name;
+  user.fullName = req.body.fullName || user.fullName;
   user.email = req.body.email || user.email;
   user.phone = req.body.phone || user.phone;
   user.password = req.body.password || user.password;
-  user.role_id = req.body.role_id || user.role_id;
-  //user.refreshToken = req.body.refreshToken || user.refreshToken;
 
   try {
     await user.save();

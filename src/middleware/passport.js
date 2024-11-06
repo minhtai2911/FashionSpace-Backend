@@ -3,7 +3,7 @@ import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import dotenv from "dotenv";
 import User from "../models/user.js";
 import jwt from "jsonwebtoken";
-import User_Role from "../models/userRole.js";
+import UserRole from "../models/userRole.js";
 
 dotenv.config();
 
@@ -19,14 +19,14 @@ passport.use(
       try {
         let user = await User.findOne({ email: profile.emails[0].value });
         if (!user) {
-          const role = await User_Role.findOne({ role_name: "User" });
+          const role = await UserRole.findOne({ roleName: "User" });
           if (!role) {
             throw new Error("User role not found");
           }
           user = new User({
             email: profile.emails[0].value,
-            full_name: profile.displayName,
-            role_id: role.id,
+            fullName: profile.displayName,
+            roleId: role.id,
             password: profile.id,
             imgURL: profile.photos[0].value
           });

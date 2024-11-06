@@ -8,10 +8,10 @@ const userSchema = new mongoose.Schema({
   description: {
     type: String,
   },
-  category_id: {
+  categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "product_categories",
+    ref: "ProductCategory",
   },
   price: {
     type: Number,
@@ -23,4 +23,4 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("products", userSchema);
+export default mongoose.model("Product", userSchema);

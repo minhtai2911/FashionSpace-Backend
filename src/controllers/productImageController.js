@@ -1,15 +1,15 @@
 import asyncHandler from "../middleware/asyncHandler.js";
-import Product_Image from "../models/productImage.js";
+import ProductImage from "../models/productImage.js";
 
 const getAllProductImagesByProductId = asyncHandler(async (req, res, next) => {
   const productId = req.body.productId;
-  const productImages = await Product_Image.find({ productId });
+  const productImages = await ProductImage.find({ productId });
   res.status(200).json(productImages);
 });
 
 const getProductImageById = asyncHandler(async (req, res, next) => {
   const productImageId = req.params.id;
-  const productImage = await Product_Image.findById(productImageId);
+  const productImage = await ProductImage.findById(productImageId);
 
   if (!productImage)
     return res.status(404).json({ message: "Product image not found" });
@@ -23,7 +23,7 @@ const createProductImage = asyncHandler(async (req, res, next) => {
 
   if (!productId || !imagePath)
     throw new Error("Please fill all required fields");
-  const newProductImage = new Product_Image({ productId, imagePath });
+  const newProductImage = new ProductImage({ productId, imagePath });
   try {
     await newProductImage.save();
     res.status(201).json(newProductImage);
@@ -33,7 +33,7 @@ const createProductImage = asyncHandler(async (req, res, next) => {
 });
 
 const updateProductImageById = asyncHandler(async (req, res, next) => {
-  const updateProductImage = await Product_Image.findById(req.params.id);
+  const updateProductImage = await ProductImage.findById(req.params.id);
 
   if (!updateProductImage)
     return res.status(404).json({ message: "Product image not found" });
@@ -52,7 +52,7 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
 });
 
 const deleteProductImageById = asyncHandler(async (req, res, next) => {
-    const deleteProductImage = await Product_Image.findByIdAndDelete(req.params.id);
+    const deleteProductImage = await ProductImage.findByIdAndDelete(req.params.id);
     
     if (!deleteProductImage) return res.status(404).json({ message: "Product image not found" });
     

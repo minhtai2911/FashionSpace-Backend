@@ -1,15 +1,15 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  user_id: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "users",
+    ref: "User",
   },
-  product_id: {
+  productId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "products",
+    ref: "Product",
   },
   rating: {
     type: Number,
@@ -17,8 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    required: true,
   }
 });
 
-export default mongoose.model("reviews", userSchema);
+export default mongoose.model("Review", userSchema);

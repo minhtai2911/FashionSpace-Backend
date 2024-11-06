@@ -1,28 +1,28 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/order.js";
 
-const getAllOrders = asyncHandler(async (req, res, next) => {
-    const orders = await Order.find({});
+const getAllOrder = asyncHandler(async (req, res, next) => {
+    const order = await Order.find({});
 
-    if (!orders) return res.status(404).json({ message: "Orders not found" });
+    if (!order) return res.status(404).json({ message: "Order not found" });
     
-    res.status(200).json(orders);
+    res.status(200).json(order);
 });
 
 const getOrderById = asyncHandler(async (req, res, next) => {
-    const orders = await Order.find({ user: req.params.userId });
+    const order = await Order.find({ user: req.params.userId });
     
-    if (!orders) return res.status(404).json({ message: "Orders not found" });
+    if (!order) return res.status(404).json({ message: "Order not found" });
 
-    res.status(200).json(orders);
+    res.status(200).json(order);
 });
 
 const createOrder = asyncHandler(async (req, res, next) => {
-    const {user_id, status, total} = req.body;
+    const {userId, status, total, paymentDetailId, orderAddressId, deliveryDate} = req.body;
 
-    if (!user_id || !status || !total) throw new Error("Please fill all required fields");
+    if (!userId || !status || !total || !paymentDetailId || !orderAddressId || !deliveryDate) throw new Error("Please fill all required fields");
     
-    const newOrder = new Order({user_id, status, total});
+    const newOrder = new Order({userId, status, total, paymentDetailId, orderAddressId, deliveryDate});
     
     try {
         await newOrder.save();
@@ -37,11 +37,13 @@ const updateOrderById = asyncHandler(async (req, res, next) => {
 
     if (!order) return res.status(404).json({ message: "Order not found" });
 
-    const {user_id, status, total} = req.body;
+    const {userId, status, total, paymentDetailId, orderAddressId, deliveryDate} = req.body;
 
-    order.user_id = user_id || order.user_id;
+    order.userId = userId || order.userId;
     order.status = status || order.status;
     order.total = total || order.total;
+    order.paymentDetailId = paymentDetailId || order.paymentDetailId;
+    order.deliveryDate = deliveryDate || order.deliveryDate;
 
     try {
         await order.save();
@@ -60,7 +62,7 @@ const deleteOrderById = asyncHandler(async (req, res, next) => {
 });
 
 export default {
-    getAllOrders: getAllOrders,
+    getAllOrder: getAllOrder,
     getOrderById: getOrderById,
     createOrder: createOrder,
     updateOrderById: updateOrderById,

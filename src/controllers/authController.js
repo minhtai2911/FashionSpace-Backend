@@ -1,5 +1,5 @@
 import User from "../models/user.js";
-import User_Role from "../models/userRole.js";
+import UserRole from "../models/userRole.js";
 import jwt from "jsonwebtoken";
 import asyncHandler from "../middleware/asyncHandler.js";
 import bcrypt from "bcrypt";
@@ -22,8 +22,7 @@ const generateOTP = asyncHandler(async (req, res, next) => {
     await otpObj.save();
     res.status(200).json({ otp: otp });
   } catch (err) {
-    console.log(err.message);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: err.message });
   }
 });
 
@@ -63,18 +62,18 @@ const login = asyncHandler(async (req, res, next) => {
 });
 
 const signup = asyncHandler(async (req, res, next) => {
-  const { email, full_name, phone, password } = req.body;
+  const { email, fullName, phone, password } = req.body;
 
-  if (!email || !full_name || !phone || !password) {
+  if (!email || !fullName || !phone || !password) {
     throw new Error("Please fill in all required fields");
   }
   const exists = await User.findOne({ email: email });
 
   if (exists) return res.status(400).json({ message: "Email already exists" });
 
-  const role = await User_Role.findOne({ role_name: "User" });
-  const role_id = role.id;
-  const user = new User({ email, full_name, phone, role_id, password });
+  const role = await UserRole.findOne({ roleName: "User" });
+  const roleId = role.id;
+  const user = new User({ email, fullName, phone, roleId, password });
 
   try {
     await user.save();
@@ -134,9 +133,8 @@ const sendOTP = asyncHandler(async (req, res, next) => {
       `,
     });
   } catch (err) {
-    console.log(err.message);
     return res.status(500).json({
-      message: "Server error",
+      message: err.message,
     });
   }
 
@@ -163,8 +161,7 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ message: "OTP verified" });
   } catch (err) {
-    console.log(err.message);
-    return res.status(500).json({ message: "Server error" });
+    return res.status(500).json({ message: err.message });
   }
 });
 

@@ -12,7 +12,7 @@ import userRoute from "./routes/userRoute.js";
 import productRoute from "./routes/productRoute.js";
 import reviewRoute from "./routes/reviewRoute.js";
 import userRoleRoute from "./routes/userRoleRoute.js";
-import userAddressRoute from "./routes/userAddressRoute.js";
+import orderAddressRoute from "./routes/orderAddressRoute.js";
 import productImageRoute from "./routes/productImageRoute.js";
 import orderRoute from "./routes/orderRoute.js";
 
@@ -64,6 +64,6 @@ app.use("/api/v1/user", userRoute);
 app.use("/api/v1/product", productRoute);
 app.use("/api/v1/review", reviewRoute);
 app.use("/api/v1/userRole", userRoleRoute);
-app.use("/api/v1/userAddress", userAddressRoute);
+app.use("/api/v1/orderAddress", orderAddressRoute);
 app.use("/api/v1/productImage", productImageRoute);
 app.use("/api/v1/order", orderRoute);
