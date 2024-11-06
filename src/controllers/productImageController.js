@@ -2,29 +2,38 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import ProductImage from "../models/productImage.js";
 
 const getAllProductImagesByProductId = asyncHandler(async (req, res, next) => {
-  const productId = req.body.productId;
-  const productImages = await ProductImage.find({ productId });
-  res.status(200).json(productImages);
+  try {
+    const productId = req.body.productId;
+    const productImages = await ProductImage.find({ productId });
+    res.status(200).json(productImages);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 const getProductImageById = asyncHandler(async (req, res, next) => {
-  const productImageId = req.params.id;
-  const productImage = await ProductImage.findById(productImageId);
+  try {
+    const productImageId = req.params.id;
+    const productImage = await ProductImage.findById(productImageId);
 
-  if (!productImage)
-    return res.status(404).json({ message: "Product image not found" });
+    if (!productImage)
+      return res.status(404).json({ message: "Product image not found" });
 
-  res.status(200).json(productImage);
+    res.status(200).json(productImage);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 const createProductImage = asyncHandler(async (req, res, next) => {
-  const productId = req.body.productId;
-  const imagePath = req.body.imagePath;
-
-  if (!productId || !imagePath)
-    throw new Error("Please fill all required fields");
-  const newProductImage = new ProductImage({ productId, imagePath });
   try {
+    const productId = req.body.productId;
+    const imagePath = req.body.imagePath;
+
+    if (!productId || !imagePath)
+      throw new Error("Please fill all required fields");
+    const newProductImage = new ProductImage({ productId, imagePath });
+
     await newProductImage.save();
     res.status(201).json(newProductImage);
   } catch (err) {
@@ -33,17 +42,17 @@ const createProductImage = asyncHandler(async (req, res, next) => {
 });
 
 const updateProductImageById = asyncHandler(async (req, res, next) => {
-  const updateProductImage = await ProductImage.findById(req.params.id);
-
-  if (!updateProductImage)
-    return res.status(404).json({ message: "Product image not found" });
-
-  const { productId, imagePath } = req.body;
-
-  updateProductImage.productId = productId || updateProductImage.productId;
-  updateProductImage.imagePath = imagePath || updateProductImage.imagePath;
-
   try {
+    const updateProductImage = await ProductImage.findById(req.params.id);
+
+    if (!updateProductImage)
+      return res.status(404).json({ message: "Product image not found" });
+
+    const { productId, imagePath } = req.body;
+
+    updateProductImage.productId = productId || updateProductImage.productId;
+    updateProductImage.imagePath = imagePath || updateProductImage.imagePath;
+
     await updateProductImage.save();
     res.status(200).json(updateProductImage);
   } catch (err) {
@@ -52,17 +61,24 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
 });
 
 const deleteProductImageById = asyncHandler(async (req, res, next) => {
-    const deleteProductImage = await ProductImage.findByIdAndDelete(req.params.id);
-    
-    if (!deleteProductImage) return res.status(404).json({ message: "Product image not found" });
-    
+  try {
+    const deleteProductImage = await ProductImage.findByIdAndDelete(
+      req.params.id
+    );
+
+    if (!deleteProductImage)
+      return res.status(404).json({ message: "Product image not found" });
+
     res.status(200).json({ message: "Product image deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 export default {
-    getAllProductImagesByProductId: getAllProductImagesByProductId,
-    getProductImageById: getProductImageById,
-    createProductImage: createProductImage,
-    updateProductImageById: updateProductImageById,
-    deleteProductImageById: deleteProductImageById,
-}
+  getAllProductImagesByProductId: getAllProductImagesByProductId,
+  getProductImageById: getProductImageById,
+  createProductImage: createProductImage,
+  updateProductImageById: updateProductImageById,
+  deleteProductImageById: deleteProductImageById,
+};

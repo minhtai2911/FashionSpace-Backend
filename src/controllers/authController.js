@@ -7,18 +7,20 @@ import nodemailer from "nodemailer";
 import Otp from "../models/otp.js";
 
 const generateOTP = asyncHandler(async (req, res, next) => {
-  const otp = Math.floor(100000 + Math.random() * (999999 - 100000)).toString();
-
-  const salt = await bcrypt.genSalt();
-  const hashedOTP = await bcrypt.hash(otp, salt);
-  const email = req.body.email;
-
-  const otpObj = new Otp({
-    email,
-    otp: hashedOTP,
-  });
-
   try {
+    const otp = Math.floor(
+      100000 + Math.random() * (999999 - 100000)
+    ).toString();
+
+    const salt = await bcrypt.genSalt();
+    const hashedOTP = await bcrypt.hash(otp, salt);
+    const email = req.body.email;
+
+    const otpObj = new Otp({
+      email,
+      otp: hashedOTP,
+    });
+
     await otpObj.save();
     res.status(200).json({ otp: otp });
   } catch (err) {
@@ -27,38 +29,42 @@ const generateOTP = asyncHandler(async (req, res, next) => {
 });
 
 const login = asyncHandler(async (req, res, next) => {
-  const email = req.body.email;
-  const originalPassword = req.body.password;
+  try {
+    const email = req.body.email;
+    const originalPassword = req.body.password;
 
-  if (!email || !originalPassword) {
-    throw new Error("Please fill in the email and password");
-  }
-
-  const user = await User.login(email, originalPassword);
-
-  const accessToken = jwt.sign(
-    { id: user._id },
-    process.env.ACCESS_TOKEN_SECRET,
-    {
-      expiresIn: "30s",
+    if (!email || !originalPassword) {
+      throw new Error("Please fill in the email and password");
     }
-  );
 
-  const refreshToken = jwt.sign(
-    { id: user._id },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "365d" }
-  );
+    const user = await User.login(email, originalPassword);
 
-  await User.findByIdAndUpdate(user._id, {
-    $set: { refreshToken: refreshToken },
-  });
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "30s",
+      }
+    );
 
-  user.refreshToken = refreshToken;
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "365d" }
+    );
 
-  const { password, ...data } = user._doc;
+    await User.findByIdAndUpdate(user._id, {
+      $set: { refreshToken: refreshToken },
+    });
 
-  return res.status(200).json({ ...data, accessToken });
+    user.refreshToken = refreshToken;
+
+    const { password, ...data } = user._doc;
+
+    return res.status(200).json({ ...data, accessToken });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 const signup = asyncHandler(async (req, res, next) => {
@@ -96,21 +102,25 @@ const logout = asyncHandler(async (req, res, next) => {
 });
 
 const refreshToken = asyncHandler(async (req, res, next) => {
-  const refreshToken = req.body.refreshToken;
+  try {
+    const refreshToken = req.body.refreshToken;
 
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
-    if (err) {
-      return res.status(403).json({ message: "Invalid refresh token!" });
-    }
-    const accessToken = jwt.sign(
-      { id: data._id },
-      process.env.ACCESS_TOKEN_SECRET,
-      {
-        expiresIn: "30s",
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
+      if (err) {
+        return res.status(403).json({ message: "Invalid refresh token!" });
       }
-    );
-    return res.json({ accessToken: accessToken });
-  });
+      const accessToken = jwt.sign(
+        { id: data._id },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+          expiresIn: "30s",
+        }
+      );
+      return res.json({ accessToken: accessToken });
+    });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 const sendOTP = asyncHandler(async (req, res, next) => {
@@ -136,15 +146,14 @@ const sendOTP = asyncHandler(async (req, res, next) => {
       <div>Your OTP: <br>${OTP}</br></div>
       `,
     });
+    res.status(200).json({
+      message: "Successfully",
+    });
   } catch (err) {
     return res.status(500).json({
       message: err.message,
     });
   }
-
-  res.status(200).json({
-    message: "Successfully",
-  });
 });
 
 const checkOTPByEmail = asyncHandler(async (req, res, next) => {
@@ -196,13 +205,17 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
 });
 
 const checkEmail = asyncHandler(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
+  try {
+    const user = await User.findOne({ email: req.body.email });
 
-  if (!user) {
-    return res.status(404).json({ message: "Email not found" });
+    if (!user) {
+      return res.status(404).json({ message: "Email not found" });
+    }
+
+    res.status(200).json({ message: "Email available" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-
-  res.status(200).json({ message: "Email available" });
 });
 
 const forgotPassword = asyncHandler(async (req, res, next) => {
