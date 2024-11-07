@@ -39,6 +39,13 @@ const login = asyncHandler(async (req, res, next) => {
 
     const user = await User.login(email, originalPassword);
 
+    if (!user.isActive) {
+      sendMailVerifyAccount(user._id, user.email);
+      return res
+        .status(400)
+        .json({ message: "An Email sent to your account please verify" });
+    }
+
     const accessToken = jwt.sign(
       { id: user._id },
       process.env.ACCESS_TOKEN_SECRET,
@@ -78,13 +85,77 @@ const signup = asyncHandler(async (req, res, next) => {
   if (exists) return res.status(400).json({ message: "Email already exists" });
 
   const role = await UserRole.findOne({ roleName: "User" });
-  const roleId = role.id;
+  const roleId = role._id;
   const user = new User({ email, fullName, phone, roleId, password });
 
   try {
     await user.save();
+    sendMailVerifyAccount(user._id, user.email);
     const { password, ...data } = user._doc;
     return res.status(201).json({ data });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+const sendMailVerifyAccount = async (id, email) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const info = await transporter.sendMail({
+      from: `Fashion Space <${process.env.EMAIL_USER}>`,
+      to: `${email}`,
+      subject: "VERIFY REGISTRATION FASHION SPACE ACCOUNT",
+      html: `
+      <a href="${process.env.URL_CLIENT}/verify/${id}">Click here to verify your email</a>
+      `,
+    });
+  } catch (err) {
+    throw new Error(err.message);
+  }
+};
+
+const verifyAccount = asyncHandler(async (req, res, next) => {
+  try {
+    const user = await User.findByIdAndUpdate(req.params.id, {
+      $set: { isVerified: true },
+    });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const accessToken = jwt.sign(
+      { id: user._id },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: "30s",
+      }
+    );
+
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "365d" }
+    );
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: { refreshToken: refreshToken },
+    });
+
+    user.refreshToken = refreshToken;
+
+    const { password, ...data } = user._doc;
+
+    res
+      .status(200)
+      .json({ message: "Account verified successfully", data: data });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -109,7 +180,6 @@ const refreshToken = asyncHandler(async (req, res, next) => {
       if (err) {
         return res.status(403).json({ message: "Invalid refresh token!" });
       }
-      console.log(data);
       const accessToken = jwt.sign(
         { id: data.id },
         process.env.ACCESS_TOKEN_SECRET,
@@ -256,4 +326,5 @@ export default {
   checkEmail: checkEmail,
   forgotPassword: forgotPassword,
   resetPassword: resetPassword,
+  verifyAccount: verifyAccount,
 };

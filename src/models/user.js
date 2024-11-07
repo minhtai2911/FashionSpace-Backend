@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema({
   avatarPath: {
     type: String,
   },
+  isActive: {
+    type: Boolean,
+    default: false,
+  },
   refreshToken: {
     type: String,
   },
