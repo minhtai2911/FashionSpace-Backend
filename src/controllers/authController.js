@@ -40,9 +40,7 @@ const login = asyncHandler(async (req, res, next) => {
     const user = await User.login(email, originalPassword);
 
     if (!user.isActive) {
-      return res
-        .status(400)
-        .json({ message: "An Email sent to your account please verify" });
+      return res.status(400).json({ data: user });
     }
 
     const accessToken = jwt.sign(
