@@ -109,8 +109,9 @@ const refreshToken = asyncHandler(async (req, res, next) => {
       if (err) {
         return res.status(403).json({ message: "Invalid refresh token!" });
       }
+      console.log(data);
       const accessToken = jwt.sign(
-        { id: data._id },
+        { id: data.id },
         process.env.ACCESS_TOKEN_SECRET,
         {
           expiresIn: "30s",
@@ -221,7 +222,6 @@ const checkEmail = asyncHandler(async (req, res, next) => {
 const forgotPassword = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    console.log(req);
     user.password = req.body.newPassword;
     user.save();
     res.status(200).json({ message: "Reset password successfully" });
