@@ -18,6 +18,7 @@ router.post("/checkEmail", authController.checkEmail);
 router.post("/forgotPassword", authMiddleware.verifyToken, authController.forgotPassword);
 router.post("/resetPassword", authMiddleware.verifyToken, authController.resetPassword);
 router.get("/verifyAccount/:id", authController.verifyAccount);
+router.post("/sendMailVerifyAccount", authController.sendMailVerifyAccount);
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["email", "profile"] })

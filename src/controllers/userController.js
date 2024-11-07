@@ -39,15 +39,16 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
 
 const updateUserById = asyncHandler(async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findByIdAndUpdate(req.params.id, {
+      $set: {
+        fullName: req.body.fullName,
+        email: req.body.email,
+        phone: req.body.phone,
+      },
+    });
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    user.fullName = req.body.fullName || user.fullName;
-    user.email = req.body.email || user.email;
-    user.phone = req.body.phone || user.phone;
-    
-    await user.save();
     res.status(200).json(user);
   } catch (err) {
     res.status(500).json({ message: err.message });

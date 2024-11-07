@@ -40,7 +40,6 @@ const login = asyncHandler(async (req, res, next) => {
     const user = await User.login(email, originalPassword);
 
     if (!user.isActive) {
-      sendMailVerifyAccount(user._id, user.email);
       return res
         .status(400)
         .json({ message: "An Email sent to your account please verify" });
@@ -61,7 +60,10 @@ const login = asyncHandler(async (req, res, next) => {
     );
 
     user.refreshToken = refreshToken;
-    await user.save();
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: { refreshToken: refreshToken },
+    });
 
     const { password, ...data } = user._doc;
 
@@ -84,18 +86,16 @@ const signup = asyncHandler(async (req, res, next) => {
   const role = await UserRole.findOne({ roleName: "User" });
   const roleId = role._id;
   const user = new User({ email, fullName, phone, roleId, password });
-
   try {
     await user.save();
-    sendMailVerifyAccount(user._id, user.email);
     const { password, ...data } = user._doc;
-    return res.status(201).json({ data });
+    res.status(201).json({ data });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
 });
 
-const sendMailVerifyAccount = async (id, email) => {
+const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -109,16 +109,17 @@ const sendMailVerifyAccount = async (id, email) => {
 
     const info = await transporter.sendMail({
       from: `Fashion Space <${process.env.EMAIL_USER}>`,
-      to: `${email}`,
+      to: `${req.body.email}`,
       subject: "VERIFY REGISTRATION FASHION SPACE ACCOUNT",
       html: `
-      <a href="${process.env.URL_CLIENT}/verify/${id}">Click here to verify your email</a>
+      <a href="${process.env.URL_CLIENT}/verify/${req.body.id}">Click here to verify your email</a>
       `,
     });
+    res.status(200).json({ message: "Verification email sent" });
   } catch (err) {
-    throw new Error(err.message);
+    res.status(500).json({ message: err.message });
   }
-};
+});
 
 const verifyAccount = asyncHandler(async (req, res, next) => {
   try {
@@ -143,7 +144,10 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
     );
 
     user.refreshToken = refreshToken;
-    await user.save();
+
+    await User.findByIdAndUpdate(user._id, {
+      $set: { isActive: true, refreshToken: refreshToken },
+    });
 
     const { password, ...data } = user._doc;
 
@@ -287,7 +291,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     user.password = req.body.newPassword;
-    user.save();
+    await user.save();
     res.status(200).json({ message: "Reset password successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -302,7 +306,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     if (!check) return res.status(400).json({ message: "Invalid password" });
 
     user.password = req.body.newPassword;
-    user.save();
+    await user.save();
     res.status(200).json({ message: "Password reset successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -321,4 +325,5 @@ export default {
   forgotPassword: forgotPassword,
   resetPassword: resetPassword,
   verifyAccount: verifyAccount,
+  sendMailVerifyAccount: sendMailVerifyAccount,
 };
