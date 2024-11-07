@@ -60,11 +60,8 @@ const login = asyncHandler(async (req, res, next) => {
       { expiresIn: "365d" }
     );
 
-    await User.findByIdAndUpdate(user._id, {
-      $set: { refreshToken: refreshToken },
-    });
-
     user.refreshToken = refreshToken;
+    await user.save();
 
     const { password, ...data } = user._doc;
 
@@ -125,11 +122,11 @@ const sendMailVerifyAccount = async (id, email) => {
 
 const verifyAccount = asyncHandler(async (req, res, next) => {
   try {
-    const user = await User.findByIdAndUpdate(req.params.id, {
-      $set: { isVerified: true },
-    });
+    const user = await User.findById(req.params.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.isActive = true;
 
     const accessToken = jwt.sign(
       { id: user._id },
@@ -145,11 +142,8 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
       { expiresIn: "365d" }
     );
 
-    await User.findByIdAndUpdate(user._id, {
-      $set: { refreshToken: refreshToken },
-    });
-
     user.refreshToken = refreshToken;
+    await user.save();
 
     const { password, ...data } = user._doc;
 
