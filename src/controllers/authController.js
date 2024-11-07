@@ -221,7 +221,7 @@ const checkEmail = asyncHandler(async (req, res, next) => {
 const forgotPassword = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    user.password = req.body.password;
+    user.password = req.body.newPassword;
     user.save();
     res.status(200).json({ message: "Reset password successfully" });
   } catch (err) {
