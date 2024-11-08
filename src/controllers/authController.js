@@ -299,7 +299,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
 const resetPassword = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
-    const check = await bcrypt(req.body.password, user.password);
+    const check = await bcrypt.compare(req.body.password, user.password);
 
     if (!check) return res.status(400).json({ message: "Invalid password" });
 
