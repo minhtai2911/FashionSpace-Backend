@@ -44,7 +44,7 @@ const login = asyncHandler(async (req, res, next) => {
     }
 
     const accessToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, roleId: user.roleId },
       process.env.ACCESS_TOKEN_SECRET,
       {
         expiresIn: "30s",
@@ -52,7 +52,7 @@ const login = asyncHandler(async (req, res, next) => {
     );
 
     const refreshToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, roleId: user.roleId },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "365d" }
     );
@@ -128,7 +128,7 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
     user.isActive = true;
 
     const accessToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, roleId: user.roleId},
       process.env.ACCESS_TOKEN_SECRET,
       {
         expiresIn: "30s",
@@ -136,7 +136,7 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
     );
 
     const refreshToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, roleId: user.roleId},
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "365d" }
     );
@@ -151,7 +151,7 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
 
     res
       .status(200)
-      .json({ message: "Account verified successfully", data: data });
+      .json({ message: "Account verified successfully", data: {...data, accessToken} });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -177,7 +177,7 @@ const refreshToken = asyncHandler(async (req, res, next) => {
         return res.status(403).json({ message: "Invalid refresh token!" });
       }
       const accessToken = jwt.sign(
-        { id: data.id },
+        { id: data.id, roleId: data.roleId},
         process.env.ACCESS_TOKEN_SECRET,
         {
           expiresIn: "30s",
@@ -242,7 +242,7 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ email: email });
 
     const accessToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, roleId: user.roleId },
       process.env.ACCESS_TOKEN_SECRET,
       {
         expiresIn: "30s",
@@ -250,7 +250,7 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
     );
 
     const refreshToken = jwt.sign(
-      { id: user._id },
+      { id: user._id, roleId: user.roleId },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );

@@ -33,14 +33,14 @@ passport.use(
           await user.save();
         }
         const accessToken = jwt.sign(
-          { id: user._id },
+          { id: user._id, roleId: user.roleId },
           process.env.ACCESS_TOKEN_SECRET,
           {
             expiresIn: "30s",
           }
         );
         const refreshToken = jwt.sign(
-          { id: user._id },
+          { id: user._id, roleId: user.roleId},
           process.env.REFRESH_TOKEN_SECRET,
           { expiresIn: "365d" }
         );
