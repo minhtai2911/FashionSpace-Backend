@@ -6,6 +6,7 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import session from "express-session";
+import path from "path";
 
 import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
@@ -22,21 +23,22 @@ import categoryRoute from "./routes/categoryRoute.js";
 
 const app = express();
 
-app.use(session({
-  secret: process.env.KEY_SESSION,
-  resave: false,
-  saveUninitialized: true,
-  cookie: { secure: false, maxAge: 60 * 60 * 1000 },
-}));
+app.use(
+  session({
+    secret: process.env.KEY_SESSION,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, maxAge: 60 * 60 * 1000 },
+  })
+);
 
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
+app.use(express.static("src/public"));
 
 app.use(passport.initialize());
 app.use(passport.session());
-
-
 
 app.use(
   cors({

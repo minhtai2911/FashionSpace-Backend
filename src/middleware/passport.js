@@ -13,7 +13,7 @@ passport.use(
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: "http://localhost:8000/api/v1/auth/google/callback",
-      passReqToCallback   : true
+      passReqToCallback: true,
     },
     async (request, accessToken, refreshToken, profile, done) => {
       try {
@@ -28,7 +28,7 @@ passport.use(
             fullName: profile.displayName,
             roleId: role.id,
             password: profile.id,
-            imgURL: profile.photos[0].value
+            imgURL: profile.photos[0].value,
           });
           await user.save();
         }
@@ -40,14 +40,18 @@ passport.use(
           }
         );
         const refreshToken = jwt.sign(
-          { id: user._id, roleId: user.roleId},
+          { id: user._id, roleId: user.roleId },
           process.env.REFRESH_TOKEN_SECRET,
           { expiresIn: "365d" }
         );
-        await User.findByIdAndUpdate(user._id, {
-          $set: { refreshToken: refreshToken },
-        });
-        done(null, {...user, accessToken});
+        await User.findByIdAndUpdate(
+          user._id,
+          {
+            $set: { refreshToken: refreshToken },
+          },
+          { new: true }
+        );
+        done(null, { ...user, accessToken });
       } catch {
         done(null, false);
       }
