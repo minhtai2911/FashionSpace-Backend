@@ -16,6 +16,9 @@ import orderAddressRoute from "./routes/orderAddressRoute.js";
 import productImageRoute from "./routes/productImageRoute.js";
 import orderRoute from "./routes/orderRoute.js";
 import shoppingCartRoute from "./routes/shoppingCartRoute.js";
+import productSizeRoute from "./routes/productSizeRoute.js";
+import productColorRoute from "./routes/productColorRoute.js";
+import categoryRoute from "./routes/categoryRoute.js";
 
 const app = express();
 
@@ -69,3 +72,6 @@ app.use("/api/v1/orderAddress", orderAddressRoute);
 app.use("/api/v1/productImage", productImageRoute);
 app.use("/api/v1/order", orderRoute);
 app.use("/api/v1/shoppingCart", shoppingCartRoute);
+app.use("/api/v1/productSize", productSizeRoute);
+app.use("/api/v1/productColor", productColorRoute);
+app.use("/api/v1/category", categoryRoute);
