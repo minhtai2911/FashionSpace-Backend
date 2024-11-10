@@ -13,10 +13,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  street: {
+    type: String,
+    required: true,
+  },
   phone: {
     type: String,
     required: true,
-  }
+  },
 });
 
 export default mongoose.model("OrderAddress", userSchema);

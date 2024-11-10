@@ -1,32 +1,25 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "User",
-  },
   productId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
     ref: "Product",
   },
-  reviewId: {
+  sizeId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Review",
-    default: null,
+    required: true,
+    ref: "Size",
   },
-  rating: {
+  colorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    required: true,
+    ref: "Color",
+  },
+  quantity: {
     type: Number,
     required: true,
-  },
-  content: {
-    type: String,
-  },
-  createdDate: {
-    type: Date,
-    default: Date.now,
   }
 });
 
-export default mongoose.model("Review", userSchema);
+export default mongoose.model("ProductVariant", userSchema);
