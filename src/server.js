@@ -6,7 +6,6 @@ import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import session from "express-session";
-import path from "path";
 
 import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";

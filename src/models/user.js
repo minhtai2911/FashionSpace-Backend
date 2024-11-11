@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
+import path from "path";
+import dotenv from "dotenv";
+dotenv.config();
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -33,6 +36,7 @@ const userSchema = new mongoose.Schema({
   },
   avatarPath: {
     type: String,
+    default: path.join(process.env.URL_SERVER + "/avatars//avatar.jpg"),
   },
   isActive: {
     type: Boolean,
@@ -40,6 +44,7 @@ const userSchema = new mongoose.Schema({
   },
   refreshToken: {
     type: String,
+    default: "",
   },
 });
 

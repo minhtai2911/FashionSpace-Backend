@@ -33,6 +33,13 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
     const user = await User.findByIdAndDelete(req.params.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const deleteStart = user.avatarPath.indexOf("\\avatars\\");
+    const deleteFile = "\\public" + user.avatarPath.slice(deleteStart);
+    
+    if ("\\public\\avatars\\avatar.jpg" != deleteFile)
+      fs.unlinkSync(path.join(__dirname, "..", deleteFile));
 
     res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
@@ -50,7 +57,9 @@ const updateUserById = asyncHandler(async (req, res, next) => {
         const __dirname = path.dirname(__filename);
         const deleteStart = user.avatarPath.indexOf("\\avatars\\");
         const deleteFile = "\\public" + user.avatarPath.slice(deleteStart);
-        fs.unlinkSync(path.join(__dirname, "..", deleteFile));
+        
+        if ("\\public\\avatars\\avatar.jpg" != deleteFile)
+          fs.unlinkSync(path.join(__dirname, "..", deleteFile));
       }
       let filePath = req.file.path;
       const start = filePath.indexOf("\\avatars\\");
@@ -86,6 +95,9 @@ const updateUserById = asyncHandler(async (req, res, next) => {
 
     res.status(200).json(newUser);
   } catch (err) {
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
     res.status(500).json({ message: err.message });
   }
 });

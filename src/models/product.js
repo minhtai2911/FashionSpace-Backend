@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    default: null,
   },
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +20,7 @@ const userSchema = new mongoose.Schema({
   },
   rating: {
     type: Number,
-    required: true,
+    default: null,
   },
 });
 

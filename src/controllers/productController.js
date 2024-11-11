@@ -18,7 +18,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
   try {
     const { name, description, categoryId, price, rating } = req.body;
 
-    if (!name || !description || !categoryId || !price || !rating) {
+    if (!name || !categoryId || !price) {
       throw new Error("Please fill all required fields");
     }
 

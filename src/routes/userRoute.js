@@ -15,7 +15,7 @@ router.delete(
 router.put(
   "/:id",
   authMiddleware.verifyToken,
-  upload.single("avatarPath"),
+  upload.uploadAvatar.single("avatarPath"),
   userController.updateUserById
 );
 

@@ -8,10 +8,13 @@ const userSchema = new mongoose.Schema({
   },
   productVariantId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "ProductVariant"
+    ref: "ProductVariant",
+    required: true,
   },
   quantity: {
     type: Number,
+    required: true,
+    min: 1,
   },
 });
 
