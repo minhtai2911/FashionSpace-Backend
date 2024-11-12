@@ -25,7 +25,7 @@ const getShoppingCartById = asyncHandler(async (req, res, next) => {
 
 const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
   try {
-    const shoppingCart = await ShoppingCart.find({ userId: req.body.userId });
+    const shoppingCart = await ShoppingCart.find({ userId: req.params.id });
     if (!shoppingCart)
       return res.status(404).json({ message: "Shopping cart not found" });
     res.status(200).json(shoppingCart);
