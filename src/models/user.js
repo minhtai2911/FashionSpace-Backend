@@ -20,7 +20,6 @@ const userSchema = new mongoose.Schema({
   },
   phone: {
     type: String,
-    required: true,
     validate: (value) => {
       return validator.isMobilePhone(value, "vi-VN");
     },
