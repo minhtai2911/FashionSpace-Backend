@@ -157,12 +157,10 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
 
     const { password, ...data } = user._doc;
 
-    res
-      .status(200)
-      .json({
-        message: "Account verified successfully",
-        data: { ...data, accessToken },
-      });
+    res.status(200).json({
+      message: "Account verified successfully",
+      data: { ...data, accessToken },
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -330,6 +328,23 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   }
 });
 
+const loginGoogleSuccess = asyncHandler(async (req, res, next) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    const check = await bcrypt.compare(user._id.toString(), req.body.token);
+
+    if (!check) return res.status(403).json({ message: "Token is not valid" });
+
+    const { password, ...data } = user._doc;
+    res.status(200).json({ data });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default {
   login: login,
   signup: signup,
@@ -343,4 +358,5 @@ export default {
   resetPassword: resetPassword,
   verifyAccount: verifyAccount,
   sendMailVerifyAccount: sendMailVerifyAccount,
+  loginGoogleSuccess: loginGoogleSuccess,
 };

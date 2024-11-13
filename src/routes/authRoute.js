@@ -3,6 +3,7 @@ import authController from "../controllers/authController.js";
 import passport from "../middleware/passport.js";
 import dotenv from "dotenv";
 import authMiddleware from "../middleware/authMiddleware.js";
+import bcrypt from "bcrypt";
 
 const router = Router();
 dotenv.config();
@@ -29,10 +30,14 @@ router.get(
   passport.authenticate("google", {
     failureRedirect: `${process.env.URL_CLIENT}/login`,
   }),
-  (req, res) => {
-    const accessToken = req.user.accessToken;
-    return res.status(200).json({ ...req.user._doc, accessToken });
+  async (req, res) => {
+    const salt = await bcrypt.genSalt();
+    const token = await bcrypt.hash(req.user._doc._id.toString(), salt);
+    const email = req.user._doc.email;
+    res.redirect(`${process.env.URL_CLIENT}/success/${email}/${token}`);
   }
 );
+
+router.get("/loginGoogleSuccess", authController.loginGoogleSuccess);
 
 export default router;
