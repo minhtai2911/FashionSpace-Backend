@@ -38,6 +38,6 @@ router.get(
   }
 );
 
-router.get("/loginGoogleSuccess", authController.loginGoogleSuccess);
+router.post("/loginGoogleSuccess", authController.loginGoogleSuccess);
 
 export default router;
