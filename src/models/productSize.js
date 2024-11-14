@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "ProductCategory",
+    ref: "Category",
   },
   size: {
     type: String,
