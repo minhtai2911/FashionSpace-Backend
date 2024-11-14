@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 
 const getAllProductImagesByProductId = asyncHandler(async (req, res, next) => {
   try {
-    const productId = req.body.productId;
+    const productId = req.params.id;
     const productImages = await ProductImage.find({ productId });
     res.status(200).json(productImages);
   } catch (err) {
