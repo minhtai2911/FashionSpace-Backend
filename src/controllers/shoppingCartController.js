@@ -86,7 +86,7 @@ const deleteShoppingCartById = asyncHandler(async (req, res, next) => {
     const shoppingCart = await ShoppingCart.findByIdAndDelete(req.params.id);
 
     if (!shoppingCart)
-      res.status(404).json({ message: "Couldn't find shopping cart" });
+      res.status(404).json({ message: "Shopping cart not found" });
 
     res.status(200).json({ message: "Shopping cart deleted successfully" });
   } catch {
