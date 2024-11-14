@@ -1,13 +1,14 @@
 import {Router} from "express";
 import ShoppingCartController from "../controllers/shoppingCartController.js";
+import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get('/', ShoppingCartController.getAllShoppingCarts);
-router.post('/', ShoppingCartController.createShoppingCart);
-router.put('/:id', ShoppingCartController.updateShoppingCartQuantityById);
-router.delete('/:id', ShoppingCartController.deleteShoppingCartById);
-router.get('/:id', ShoppingCartController.getShoppingCartById);
-router.get('/userId/:id', ShoppingCartController.getShoppingCartByUserId);
+router.get('/', authMiddleware.verifyToken, ShoppingCartController.getAllShoppingCarts);
+router.post('/', authMiddleware.verifyToken, ShoppingCartController.createShoppingCart);
+router.put('/:id', authMiddleware.verifyToken, ShoppingCartController.updateShoppingCartQuantityById);
+router.delete('/:id', authMiddleware.verifyToken, ShoppingCartController.deleteShoppingCartById);
+router.get('/:id', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartById);
+router.get('/userId/:id', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartByUserId);
 
 export default router;

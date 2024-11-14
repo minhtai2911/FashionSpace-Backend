@@ -5,16 +5,8 @@ import upload from "../middleware/upload.js";
 
 const router = Router();
 
-router.get(
-  "/",
-  authMiddleware.verifyToken,
-  productImageController.getAllProductImagesByProductId
-);
-router.get(
-  "/:id",
-  authMiddleware.verifyToken,
-  productImageController.getProductImageById
-);
+router.get("/", productImageController.getAllProductImagesByProductId);
+router.get("/:id", productImageController.getProductImageById);
 router.post(
   "/",
   authMiddleware.verifyToken,
