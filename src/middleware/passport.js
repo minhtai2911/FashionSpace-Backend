@@ -19,7 +19,7 @@ passport.use(
       try {
         let user = await User.findOne({ email: profile.emails[0].value });
         if (!user) {
-          const role = await UserRole.findOne({ roleName: "User" });
+          const role = await UserRole.findOne({ roleName: "Customer" });
           if (!role) {
             throw new Error("User role not found");
           }

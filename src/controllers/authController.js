@@ -85,7 +85,7 @@ const signup = asyncHandler(async (req, res, next) => {
 
   if (exists) return res.status(400).json({ message: "Email already exists" });
 
-  const role = await UserRole.findOne({ roleName: "User" });
+  const role = await UserRole.findOne({ roleName: "Customer" });
   const roleId = role._id;
   const user = new User({ email, fullName, phone, roleId, password });
   try {
