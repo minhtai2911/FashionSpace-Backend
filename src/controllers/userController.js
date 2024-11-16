@@ -3,6 +3,7 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
+import UserRole from "../models/userRole.js";
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
   try {
@@ -37,7 +38,7 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
     const __dirname = path.dirname(__filename);
     const deleteStart = user.avatarPath.indexOf("\\avatars\\");
     const deleteFile = "\\public" + user.avatarPath.slice(deleteStart);
-    
+
     if ("\\public\\avatars\\avatar.jpg" != deleteFile)
       fs.unlinkSync(path.join(__dirname, "..", deleteFile));
 
@@ -57,7 +58,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
         const __dirname = path.dirname(__filename);
         const deleteStart = user.avatarPath.indexOf("\\avatars\\");
         const deleteFile = "\\public" + user.avatarPath.slice(deleteStart);
-        
+
         if ("\\public\\avatars\\avatar.jpg" != deleteFile)
           fs.unlinkSync(path.join(__dirname, "..", deleteFile));
       }
@@ -102,9 +103,30 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   }
 });
 
+const createUser = asyncHandler(async (req, res, next) => {
+  try {
+    const { email, fullName, phone, password, roleName } = req.body;
+    if (!email || !fullName || !phone || !password || !roleName) {
+      throw new Error("Please fill all required fields");
+    }
+    const exists = await User.findOne({ email: email });
+    if (exists)
+      return res.status(400).json({ message: "Email already exists" });
+    const role = await UserRole.findOne({ roleName: roleName });
+    if (!role) return res.status(400).json({ message: "Invalid role name" });
+    const roleId = role._id;
+    const newUser = new User({ email, fullName, phone, roleId, password });
+    await newUser.save();
+    res.status(201).json(newUser);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default {
   getAllUsers: getAllUsers,
   getUserById: getUserById,
   deleteUserById: deleteUserById,
   updateUserById: updateUserById,
+  createUser: createUser,
 };
