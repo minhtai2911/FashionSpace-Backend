@@ -18,6 +18,6 @@ router.put(
   upload.uploadAvatar.single("avatarPath"),
   userController.updateUserById
 );
-router.post("/", userController.createUser);
+router.post("/", authMiddleware.verifyToken, userController.createUser);
 
 export default router;
