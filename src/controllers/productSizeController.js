@@ -27,6 +27,17 @@ const getProductSizeById = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getProductSizesByCategoryId = asyncHandler(async (req, res, next) => {
+  try {
+    const productSizes = await ProductSize.find({ categoryId: req.params.id });
+    if (!productSizes)
+      res.status(404).json({ message: "Product size not found" });
+    res.status(200).json(productSizes);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 const createProductSize = asyncHandler(async (req, res, next) => {
   try {
     const { categoryId, size } = req.body;
@@ -81,4 +92,5 @@ export default {
   createProductSize: createProductSize,
   updateProductSizeById: updateProductSizeById,
   deleteProductSizeById: deleteProductSizeById,
+  getProductSizesByCategoryId: getProductSizesByCategoryId,
 };
