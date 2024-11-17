@@ -25,7 +25,8 @@ const getShoppingCartById = asyncHandler(async (req, res, next) => {
 
 const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
   try {
-    const shoppingCart = await ShoppingCart.find({ userId: req.params.id });
+    const userId = req.user.id;
+    const shoppingCart = await ShoppingCart.find({ userId: userId });
     if (!shoppingCart)
       return res.status(404).json({ message: "Shopping cart not found" });
     res.status(200).json(shoppingCart);
@@ -36,22 +37,23 @@ const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
 
 const createShoppingCart = asyncHandler(async (req, res, next) => {
   try {
-    const { userId, productVariantId, quantity } = req.body;
+    const { productVariantId, quantity } = req.body;
+    const userId = req.user.id;
 
-    // if (!userId ||!productVariantId ||!quantity) {
-    //   throw new Error("Please fill in all required fields");
-    // }
+    if (!userId ||!productVariantId ||!quantity) {
+      throw new Error("Please fill in all required fields");
+    }
 
-    // const existingShoppingCart = await ShoppingCart.findOne({
-    //   userId,
-    //   productVariantId,
-    // });
+    const existingShoppingCart = await ShoppingCart.findOne({
+      userId,
+      productVariantId,
+    });
 
-    // if (existingShoppingCart) {
-    //   existingShoppingCart.quantity += quantity;
-    //   await existingShoppingCart.save();
-    //   return res.status(200).json(existingShoppingCart);
-    // }
+    if (existingShoppingCart) {
+      existingShoppingCart.quantity += quantity;
+      await existingShoppingCart.save();
+      return res.status(200).json(existingShoppingCart);
+    }
 
     const newShoppingCart = new ShoppingCart({
       userId,

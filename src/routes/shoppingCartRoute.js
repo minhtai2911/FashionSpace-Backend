@@ -9,6 +9,6 @@ router.post('/', authMiddleware.verifyToken, ShoppingCartController.createShoppi
 router.put('/:id', authMiddleware.verifyToken, ShoppingCartController.updateShoppingCartQuantityById);
 router.delete('/:id', authMiddleware.verifyToken, ShoppingCartController.deleteShoppingCartById);
 router.get('/:id', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartById);
-router.get('/userId/:id', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartByUserId);
+router.get('/get/userId', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartByUserId);
 
 export default router;

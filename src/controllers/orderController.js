@@ -28,16 +28,14 @@ const getOrderById = asyncHandler(async (req, res, next) => {
 const createOrder = asyncHandler(async (req, res, next) => {
   try {
     const {
-      userId,
       status,
       total,
       paymentDetailId,
       orderAddressId,
       deliveryDate,
     } = req.body;
-
+    const userId = req.user.id;
     if (
-      !userId ||
       !status ||
       !total ||
       !paymentDetailId ||
