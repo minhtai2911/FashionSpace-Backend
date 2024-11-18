@@ -101,12 +101,34 @@ const deleteProductImageByProductId = asyncHandler(async (req, res, next) => {
     const __dirname = path.dirname(__filename);
 
     for (let i = 0; i < deleteProductImage.length; i++) {
-      const deleteStart = deleteProductImage[i].imagePath.indexOf("\\products\\");
+      const deleteStart =
+        deleteProductImage[i].imagePath.indexOf("\\products\\");
       const deleteFile =
         "\\public" + deleteProductImage[i].imagePath.slice(deleteStart);
       fs.unlinkSync(path.join(__dirname, "..", deleteFile));
     }
     await ProductImage.deleteMany({ productId: req.body.productId });
+    res.status(200).json({ message: "Product image deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+const deleteProductImageById = asyncHandler(async (req, res, next) => {
+  try {
+    const deleteProductImage = await ProductImage.findByIdAndDelete(
+      req.params.id
+    );
+    if (!deleteProductImage)
+      return res.status(404).json({ message: "Product image not found" });
+
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+
+    const deleteStart = deleteProductImage.imagePath.indexOf("\\products\\");
+    const deleteFile =
+      "\\public" + deleteProductImage.imagePath.slice(deleteStart);
+    fs.unlinkSync(path.join(__dirname, "..", deleteFile));
     res.status(200).json({ message: "Product image deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -119,4 +141,5 @@ export default {
   createProductImage: createProductImage,
   updateProductImageById: updateProductImageById,
   deleteProductImageByProductId: deleteProductImageByProductId,
+  deleteProductImageById: deleteProductImageById,
 };

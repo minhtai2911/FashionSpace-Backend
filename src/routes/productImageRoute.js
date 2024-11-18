@@ -25,4 +25,10 @@ router.delete(
   productImageController.deleteProductImageByProductId
 );
 
+router.delete(
+  "/:id",
+  authMiddleware.verifyToken,
+  productImageController.deleteProductImageById
+);
+
 export default router;
