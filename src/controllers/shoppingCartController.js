@@ -1,3 +1,4 @@
+import { response } from "express";
 import asyncHandler from "../middleware/asyncHandler.js";
 import ShoppingCart from "../models/shoppingCart.js";
 
@@ -35,12 +36,32 @@ const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getShoppingCartByUserIdProductVariantId = asyncHandler(
+  async (req, res, next) => {
+    try {
+      const userId = req.user.id;
+      const productVariantId = req.params.productVariantId;
+      const shoppingCart = await ShoppingCart.findOne({
+        userId,
+        productVariantId,
+      });
+
+      if (!shoppingCart)
+        return res.status(404).json({ message: "Shopping cart not found" });
+
+      res.status(200).json(shoppingCart);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
+
 const createShoppingCart = asyncHandler(async (req, res, next) => {
   try {
     const { productVariantId, quantity } = req.body;
     const userId = req.user.id;
 
-    if (!userId ||!productVariantId ||!quantity) {
+    if (!userId || !productVariantId || !quantity) {
       throw new Error("Please fill in all required fields");
     }
 
@@ -103,4 +124,5 @@ export default {
   createShoppingCart: createShoppingCart,
   updateShoppingCartQuantityById: updateShoppingCartQuantityById,
   deleteShoppingCartById: deleteShoppingCartById,
+  getShoppingCartByUserIdProductVariantId: getShoppingCartByUserIdProductVariantId,
 };

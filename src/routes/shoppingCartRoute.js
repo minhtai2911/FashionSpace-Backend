@@ -10,5 +10,6 @@ router.put('/:id', authMiddleware.verifyToken, ShoppingCartController.updateShop
 router.delete('/:id', authMiddleware.verifyToken, ShoppingCartController.deleteShoppingCartById);
 router.get('/:id', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartById);
 router.get('/get/userId', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartByUserId);
+router.get('/get/userId/:productVariantId', authMiddleware.verifyToken, ShoppingCartController.getShoppingCartByUserIdProductVariantId);
 
 export default router;
