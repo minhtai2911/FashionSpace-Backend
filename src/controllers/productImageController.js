@@ -91,7 +91,7 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
 const deleteProductImageByProductId = asyncHandler(async (req, res, next) => {
   try {
     const deleteProductImage = await ProductImage.find({
-      productId: req.body.productId,
+      productId: req.params.productId,
     });
 
     if (!deleteProductImage)
@@ -119,6 +119,7 @@ const deleteProductImageById = asyncHandler(async (req, res, next) => {
     const deleteProductImage = await ProductImage.findByIdAndDelete(
       req.params.id
     );
+    
     if (!deleteProductImage)
       return res.status(404).json({ message: "Product image not found" });
 
