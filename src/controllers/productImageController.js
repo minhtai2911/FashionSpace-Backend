@@ -107,7 +107,7 @@ const deleteProductImageByProductId = asyncHandler(async (req, res, next) => {
         "\\public" + deleteProductImage[i].imagePath.slice(deleteStart);
       fs.unlinkSync(path.join(__dirname, "..", deleteFile));
     }
-    await ProductImage.deleteMany({ productId: req.body.productId });
+    await ProductImage.deleteMany({ productId: req.params.productId });
     res.status(200).json({ message: "Product image deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
