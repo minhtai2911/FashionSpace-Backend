@@ -11,5 +11,6 @@ router.put("/:id", authMiddleware.verifyToken, productVariantController.updatePr
 router.delete("/:id", authMiddleware.verifyToken, productVariantController.deleteProductVariantById);
 router.get("/productId/:id", productVariantController.getProductVariantsByProductId);
 router.delete("/productId/:id", authMiddleware.verifyToken, productVariantController.deleteProductVariantsByProductId);
+router.get("/:productId/:colorId/:sizeId", productVariantController.getProductVariantByProductIdColorIdSizeId);
 
 export default router;

@@ -27,6 +27,24 @@ const getProductVariantById = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getProductVariantByProductIdColorIdSizeId = asyncHandler(
+  async (req, res, next) => {
+    try {
+      const productVariant = await ProductVariant.findOne({
+        productId: req.params.productId,
+        colorId: req.params.colorId,
+        sizeId: req.params.sizeId,
+      });
+      if (!productVariant)
+        return res.status(404).json({ message: "Product variant not found" });
+
+      res.status(200).json(productVariant);
+    } catch (err) {
+      res.status(500).json({ message: err.message });
+    }
+  }
+);
+
 const getProductVariantsByProductId = asyncHandler(async (req, res, next) => {
   try {
     const productVariant = await ProductVariant.find({
@@ -49,6 +67,14 @@ const createProductVariant = asyncHandler(async (req, res, next) => {
 
     if (!productId || !sizeId || !colorId || !quantity)
       throw new Error("Please fill all required fields");
+
+    const existingProductVariant = await ProductVariant.findOne({
+      productId,
+      sizeId,
+      colorId,
+    });
+    
+    if (existingProductVariant) return res.status(409).json({ message: "Product variant already exists" });
 
     const newProductVariant = new ProductVariant({
       productId,
@@ -89,7 +115,9 @@ const updateProductVariantById = asyncHandler(async (req, res, next) => {
 
 const deleteProductVariantById = asyncHandler(async (req, res, next) => {
   try {
-    const deleteProductVariant = await ProductVariant.findByIdAndDelete(req.params.id);
+    const deleteProductVariant = await ProductVariant.findByIdAndDelete(
+      req.params.id
+    );
 
     if (!deleteProductVariant)
       return res.status(404).json({ message: "ProductVariant not found" });
@@ -127,4 +155,5 @@ export default {
   updateProductVariantById: updateProductVariantById,
   deleteProductVariantById: deleteProductVariantById,
   deleteProductVariantsByProductId: deleteProductVariantsByProductId,
+  getProductVariantByProductIdColorIdSizeId: getProductVariantByProductIdColorIdSizeId,
 };
