@@ -9,7 +9,7 @@ router.get("/productId/:id", productImageController.getAllProductImagesByProduct
 router.get("/:id", productImageController.getProductImageById);
 router.post(
   "/",
-  // authMiddleware.verifyToken,
+  authMiddleware.verifyToken,
   upload.uploadProduct.array("imagePath"),
   productImageController.createProductImage
 );
@@ -21,13 +21,13 @@ router.put(
 );
 router.delete(
   "/productId/:productId",
-  // authMiddleware.verifyToken,
+  authMiddleware.verifyToken,
   productImageController.deleteProductImageByProductId
 );
 
 router.delete(
   "/:id",
-  // authMiddleware.verifyToken,
+  authMiddleware.verifyToken,
   productImageController.deleteProductImageById
 );
 
