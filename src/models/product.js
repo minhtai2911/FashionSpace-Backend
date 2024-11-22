@@ -22,6 +22,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: null,
   },
+  soldQuantity: {
+    type: Number,
+    default: 0,
+  }
 });
 
 export default mongoose.model("Product", userSchema);

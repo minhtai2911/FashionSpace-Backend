@@ -16,7 +16,7 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
 
 const createProduct = asyncHandler(async (req, res, next) => {
   try {
-    const { name, description, categoryId, price, rating } = req.body;
+    const { name, description, categoryId, price } = req.body;
 
     if (!name || !categoryId || !price) {
       throw new Error("Please fill all required fields");
@@ -27,7 +27,6 @@ const createProduct = asyncHandler(async (req, res, next) => {
       description,
       categoryId,
       price,
-      rating,
     });
 
     await newProduct.save();
@@ -56,13 +55,14 @@ const updateProductById = asyncHandler(async (req, res, next) => {
     if (!updateProduct)
       return res.status(404).json({ message: "Product not found" });
 
-    const { name, description, categoryId, price, rating } = req.body;
+    const { name, description, categoryId, price, rating, soldQuantity } = req.body;
 
     updateProduct.name = name || updateProduct.name;
     updateProduct.description = description || updateProduct.description;
     updateProduct.categoryId = categoryId || updateProduct.categoryId;
     updateProduct.price = price || updateProduct.price;
     updateProduct.rating = rating || updateProduct.rating;
+    updateProduct.soldQuantity = soldQuantity || updateProduct.soldQuantity;
 
     await updateProduct.save();
     res.status(200).json(updateProduct);

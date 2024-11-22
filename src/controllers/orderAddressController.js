@@ -29,9 +29,9 @@ const getOrderAddressById = asyncHandler(async (req, res, next) => {
 
 const createOrderAddress = asyncHandler(async (req, res, next) => {
   try {
-    const { city, district, commune, phone } = req.body;
+    const { city, district, commune, phone, street } = req.body;
 
-    if (!city || !district || !commune || !phone) {
+    if (!city || !district || !commune || !phone || !street) {
       throw new Error("Please fill all required fields");
     }
 
@@ -40,6 +40,7 @@ const createOrderAddress = asyncHandler(async (req, res, next) => {
       district,
       commune,
       phone,
+      street,
     });
 
     await newOrderAddress.save();
@@ -56,12 +57,13 @@ const updateOrderAddressById = asyncHandler(async (req, res, next) => {
     if (!orderAddress)
       return res.status(404).json({ message: "Order Address not found" });
 
-    const { city, district, commune, phone } = req.body;
+    const { city, district, commune, phone, street } = req.body;
 
     orderAddress.city = city || orderAddress.city;
     orderAddress.district = district || orderAddress.district;
     orderAddress.commune = commune || orderAddress.commune;
     orderAddress.phone = phone || orderAddress.phone;
+    orderAddress.street = street || orderAddress.street;
 
     await orderAddress.save();
     res.status(200).json(orderAddress);
