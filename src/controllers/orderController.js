@@ -73,13 +73,16 @@ const updateOrderById = asyncHandler(async (req, res, next) => {
       paymentDetailId,
       orderAddressId,
       deliveryDate,
+      currentAddress
     } = req.body;
 
     order.userId = userId || order.userId;
     order.status = status || order.status;
     order.total = total || order.total;
     order.paymentDetailId = paymentDetailId || order.paymentDetailId;
+    order.orderAddressId = orderAddressId || order.orderAddressId;
     order.deliveryDate = deliveryDate || order.deliveryDate;
+    order.currentAddress = currentAddress || order.currentAddress;
 
     await order.save();
     res.status(200).json(order);

@@ -27,12 +27,16 @@ const userSchema = new mongoose.Schema({
   },
   deliveryDate: {
     type: Date,
-    required: true,
+    default: null,
   },
   createdDate: {
     type: Date,
     default: Date.now,
     required: true
+  },
+  currentAddress: {
+    type: String,
+    default: null,
   }
 });
 
