@@ -27,21 +27,9 @@ const getOrderById = asyncHandler(async (req, res, next) => {
 
 const createOrder = asyncHandler(async (req, res, next) => {
   try {
-    const {
-      status,
-      total,
-      paymentDetailId,
-      orderAddressId,
-      deliveryDate,
-    } = req.body;
+    const { status, total, paymentDetailId, orderAddressId } = req.body;
     const userId = req.user.id;
-    if (
-      !status ||
-      !total ||
-      !paymentDetailId ||
-      !orderAddressId ||
-      !deliveryDate
-    )
+    if (!status || !total || !paymentDetailId || !orderAddressId)
       throw new Error("Please fill all required fields");
 
     const newOrder = new Order({
@@ -73,7 +61,7 @@ const updateOrderById = asyncHandler(async (req, res, next) => {
       paymentDetailId,
       orderAddressId,
       deliveryDate,
-      currentAddress
+      currentAddress,
     } = req.body;
 
     order.userId = userId || order.userId;

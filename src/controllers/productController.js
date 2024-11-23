@@ -55,7 +55,8 @@ const updateProductById = asyncHandler(async (req, res, next) => {
     if (!updateProduct)
       return res.status(404).json({ message: "Product not found" });
 
-    const { name, description, categoryId, price, rating, soldQuantity } = req.body;
+    const { name, description, categoryId, price, rating, soldQuantity } =
+      req.body;
 
     updateProduct.name = name || updateProduct.name;
     updateProduct.description = description || updateProduct.description;
@@ -83,10 +84,34 @@ const deleteProductById = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getBestSellerProduct = asyncHandler(async (req, res, next) => {
+  try {
+    const product = await Product.find({ soldQuantity: { $gt: 0 } })
+      .sort({
+        soldQuantity: -1,
+      })
+      .limit(10);
+    res.status(200).json(product);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+const getNewArrivalProduct = asyncHandler(async (req, res, next) => {
+  try {
+    const product = await Product.find({}).sort({ createdAt: -1 }).limit(10);
+    res.status(200).json(product);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default {
   getAllProducts: getAllProducts,
   createProduct: createProduct,
   getProductById: getProductById,
   updateProductById: updateProductById,
   deleteProductById: deleteProductById,
+  getBestSellerProduct: getBestSellerProduct,
+  getNewArrivalProduct: getNewArrivalProduct,
 };

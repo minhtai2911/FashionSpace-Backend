@@ -27,12 +27,11 @@ const userSchema = new mongoose.Schema({
   },
   deliveryDate: {
     type: Date,
-    default: null,
+    default: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
   },
   createdDate: {
     type: Date,
     default: Date.now,
-    required: true
   },
   currentAddress: {
     type: String,
