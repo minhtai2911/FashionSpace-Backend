@@ -4,11 +4,11 @@ const userSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "User"
+    ref: "User",
   },
   status: {
     type: String,
-    required: true,
+    default: "Pending",
     // enum: ["pending", "processing", "shipped", "delivered", "cancelled"]
   },
   total: {
@@ -18,12 +18,12 @@ const userSchema = new mongoose.Schema({
   paymentDetailId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "PaymentDetail"
+    ref: "PaymentDetail",
   },
   orderAddressId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: "OrderAddress"
+    ref: "OrderAddress",
   },
   deliveryDate: {
     type: Date,
@@ -36,7 +36,7 @@ const userSchema = new mongoose.Schema({
   currentAddress: {
     type: String,
     default: null,
-  }
+  },
 });
 
 export default mongoose.model("Order", userSchema);
