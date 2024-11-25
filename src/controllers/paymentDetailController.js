@@ -88,7 +88,7 @@ const checkoutWithMoMo = asyncHandler(async (req, res, next) => {
     const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
     const orderInfo = "Checkout with MoMo";
     const partnerCode = "MOMO";
-    const redirectUrl = `${process.env.URL_CLIENT}/checkout`;
+    const redirectUrl = `${process.env.URL_CLIENT}/orderCompleted`;
     const ipnUrl = `${process.env.LINK_NGROK}/api/v1/paymentDetail/callback`;
     const requestType = "payWithMethod";
     const amount = req.body.amount;
