@@ -4,6 +4,7 @@ const userSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "Unpaid",
+    enum: ["Paid", "Unpaid", "Refunded"],
   },
   paymentMethod: {
     type: String,
@@ -12,7 +13,7 @@ const userSchema = new mongoose.Schema({
   updatedDate: {
     type: Date,
     default: Date.now,
-  }
+  },
 });
 
 export default mongoose.model("PaymentDetail", userSchema);

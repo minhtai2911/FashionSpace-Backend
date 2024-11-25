@@ -20,7 +20,9 @@ import productSizeRoute from "./routes/productSizeRoute.js";
 import productColorRoute from "./routes/productColorRoute.js";
 import categoryRoute from "./routes/categoryRoute.js";
 import productVariantRoute from "./routes/productVariantRoute.js";
-import chatbotRoute from "./routes/chatbotRoute.js"
+import chatbotRoute from "./routes/chatbotRoute.js";
+import paymentDetailRoute from "./routes/paymentDetailRoute.js";
+import orderDetailRoute from "./routes/orderDetailRoute.js";
 
 const app = express();
 
@@ -80,3 +82,5 @@ app.use("/api/v1/productColor", productColorRoute);
 app.use("/api/v1/category", categoryRoute);
 app.use("/api/v1/productVariant", productVariantRoute);
 app.use("/api/v1/chatbot", chatbotRoute);
+app.use("/api/v1/paymentDetail", paymentDetailRoute);
+app.use("/api/v1/orderDetail", orderDetailRoute);

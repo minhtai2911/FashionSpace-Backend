@@ -9,7 +9,14 @@ const userSchema = new mongoose.Schema({
   status: {
     type: String,
     default: "Pending",
-    // enum: ["pending", "processing", "shipped", "delivered", "cancelled"]
+    enum: [
+      "Pending",
+      "Processing",
+      "Shipped",
+      "In Delivery",
+      "Cancelled",
+      "Accepted",
+    ],
   },
   total: {
     type: Number,
