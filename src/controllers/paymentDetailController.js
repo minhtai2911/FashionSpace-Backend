@@ -212,17 +212,9 @@ const checkStatusTransaction = asyncHandler(async (req, res, next) => {
     const response = await axios(options);
 
     if (response.data.resultCode === 0) {
-      const order = await Order.findById({ _id: req.body.orderId });
-
-      if (!order) throw new Error("Order not found");
-      const paymentDetail = await PaymentDetail.findById({
-        _id: order.paymentDetailId,
-      });
-      paymentDetail.status = "Paid";
-      paymentDetail.save();
-      res.status(200).json("Update status successfully");
+      return res.status(200).json({message: "Paid"});
     } else {
-      res.status(400).json("Payment failed");
+      res.status(400).json("Unpaid");
     }
   } catch (err) {
     return res.status(500).json({ message: err.message });
