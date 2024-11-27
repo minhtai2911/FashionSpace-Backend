@@ -15,7 +15,7 @@ const getAllOrder = asyncHandler(async (req, res, next) => {
 
 const getOrderById = asyncHandler(async (req, res, next) => {
   try {
-    const order = await Order.find({ user: req.params.userId });
+    const order = await Order.findById(req.params.id);
 
     if (!order) return res.status(404).json({ message: "Order not found" });
 
@@ -38,7 +38,6 @@ const createOrder = asyncHandler(async (req, res, next) => {
       total,
       paymentDetailId,
       orderAddressId,
-      deliveryDate,
     });
 
     await newOrder.save();
