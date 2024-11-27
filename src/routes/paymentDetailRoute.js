@@ -9,8 +9,8 @@ router.get("/:id", paymentDetailController.getPaymentDetailById);
 router.delete("/:id", authMiddleware.verifyToken, paymentDetailController.deletePaymentDetailById);
 router.put("/:id", authMiddleware.verifyToken, paymentDetailController.updatePaymentDetailById);
 router.post("/", authMiddleware.verifyToken, paymentDetailController.createPaymentDetail);
-router.post("/checkoutWithMoMo", paymentDetailController.checkoutWithMoMo);
+router.post("/checkoutWithMoMo", authMiddleware.verifyToken, paymentDetailController.checkoutWithMoMo);
 router.post("/callback", paymentDetailController.callbackPaymentDetail);
-router.post("/checkStatusTransaction", paymentDetailController.checkStatusTransaction);
+router.post("/checkStatusTransaction", authMiddleware.verifyToken, paymentDetailController.checkStatusTransaction);
 
 export default router;
