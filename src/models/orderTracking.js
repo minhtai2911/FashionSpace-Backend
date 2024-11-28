@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema({
       "Accepted",
     ],
   },
-  updatedDate: {
+  date: {
     type: Date,
     default: Date.now,
   },
