@@ -7,7 +7,6 @@ const router = Router();
 router.get("/", authMiddleware.verifyToken, orderController.getAllOrder);
 router.get("/:id", authMiddleware.verifyToken, orderController.getOrderById);
 router.delete("/:id", authMiddleware.verifyToken, orderController.deleteOrderById);
-router.put("/:id", authMiddleware.verifyToken, orderController.updateOrderById);
 router.post("/", authMiddleware.verifyToken, orderController.createOrder);
 router.get("/get/userId", authMiddleware.verifyToken, orderController.getOrderByUserId);
 

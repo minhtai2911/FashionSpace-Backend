@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fashionspace-hagm",
+  "private_key_id": "4daf1afccda7f3e1fe28c4e835ae1c18fa0dfac1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDgpiYb1Nc67sCK\nMQYyOZVUJ2M/76lGSrIfqKrrjG+cQTWYOn9D7zGydYIdjuM8syk3wLHVXBHJWWdU\nZ+KOqbDwmJkitffOZL5l8ROjZ4uANpuVHNdDLNZTHwOyWfQbGCxdKXT8WDTbprK3\nx/jaykSisY1yy7eIi7YqPD+gScmC91KTOEGneRViBX72R+GStV/CI7lb1eKFW+1g\nuiWrhhLyz2njeDzoEcGO6ifjHS+XWh675dmG6a1AZPSfggiSOIwlVYL9NedEjauQ\nGjw2Td2r+BvJgtQV1yqU5g+MMiGJYjA77QKbFYcbRkCRWuurOoOE7P9psq3h0aXf\nzgolNS4bAgMBAAECggEAH2hLOqfioWwgwhFBjwMK9BV/pEAy989YoOF5Z+4d6ogZ\nYJuJEGvgFFWmZ9CCx4k60X8gvbYeDHrx3dSaUZy6zqBfBIHRT+s4zVLLjpRa5gV8\ncffyxoL9weg7oZM+9AzIowu5PdBtL2paYSRVj+0odGCDaJG/qpjx0mzS7mtyf1sm\nbxB2Es6GSfWyOL49yD02TUWnbanGavG0aSSbTGKQCC/GKE5QH5YXyb9plNQuOhQK\ngS+zEKTONa7kEiFrjqoq1xAR9mQKTtc4bkuIrkvr/2KA+cBbgq8Vqdu6xOCS/6/O\njl35QXo9eyUWBVbIicpwkB9n5RGtPqa9iXHLZWLHfQKBgQD7zqEaZxTdLzmemZlI\neoh7spWlyD/0MLd94AtM1awXQRucWNRij6TmufGxDKjZrV5nWSeaNeAMheKHIjAH\n1ERmHPJXlFEfMNuOqUBzatZgd/YcnQfJEdC94B/+slMhLBtQWVTBXWT1pqmWGPSP\nPtQaSvPAxu8lLcTmgxWpslLGVQKBgQDkY8DguTqn+QRWiS1uSns/U75knxrv3HgV\nvFy/Phlzfmj0wMneAiP6FlSdcarqLye4MIsVDDmebH+OhyfLWKo/SLi/voBt+U4/\ncvh9tfphL0zEnlAQZJxljhuWJlG59ln2+QB0G2hRCwn2YqPcPyp0uNX/dtcVTVQy\n3/V/+VcyrwKBgG/W0o8bgZTLyNe8eOxMIBpwsy6yxlT63kS2Ic66iHi7njvO6GXu\nTtt7cvGkIcqsyeU1H/XKP/zP6lECyjpv+QExkiF76pvj42B1o/6fUR//p/wFctPH\naeMrjIpfQbTWFjuVsaNAi/rfTysvYk/NI/+ZkrHoqYbl0TJgvlpkrYcRAoGAGFeN\nciYr20VOMg7y2aN0mV5Kl5zhmRkNb3uhAv0SZ13cv+FgYpolzXzdzd4UklsuR5Jc\n8IRaC8mSmtVK54BuvMn6bu1V8OK2dUrCs1tW8U7CRt58uBKRHL3VsN4qrcBU/F6z\nrqxRJPohOLJwtoPA+anNnSnEaM/SHo4CM36WzZ8CgYEAjXbqlQPV6mMzXBjvRhXy\n/QmZXhsE52kk90iYBfGcPCvm34R03WfM22ulVLovHPgpNtw8toqLBon8Qr07r8py\nOgi9FZesX3PaAYSXpaRL5HHUh7L3Utpegs5mLTO/w1Mj0xutucxiZPohywNpYMdc\n6V1Tjw70Ly2jeasWV3E9pLk=\n-----END PRIVATE KEY-----\n",
+  "client_email": "fashion-space@fashionspace-hagm.iam.gserviceaccount.com",
+  "client_id": "109398665258007456373",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fashion-space%40fashionspace-hagm.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

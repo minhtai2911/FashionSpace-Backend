@@ -6,18 +6,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     ref: "User",
   },
-  status: {
-    type: String,
-    default: "Pending",
-    enum: [
-      "Pending",
-      "Processing",
-      "Shipped",
-      "In Delivery",
-      "Cancelled",
-      "Accepted",
-    ],
-  },
   total: {
     type: Number,
     required: true,
@@ -39,10 +27,6 @@ const userSchema = new mongoose.Schema({
   createdDate: {
     type: Date,
     default: Date.now,
-  },
-  currentAddress: {
-    type: String,
-    default: null,
   },
 });
 
