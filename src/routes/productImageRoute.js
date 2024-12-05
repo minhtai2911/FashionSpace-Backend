@@ -19,16 +19,16 @@ router.put(
   upload.uploadProduct.single("imagePath"),
   productImageController.updateProductImageById
 );
-router.delete(
-  "/productId/:productId",
-  authMiddleware.verifyToken,
-  productImageController.deleteProductImageByProductId
-);
+// router.delete(
+//   "/productId/:productId",
+//   authMiddleware.verifyToken,
+//   productImageController.deleteProductImageByProductId
+// );
 
-router.delete(
-  "/:id",
-  authMiddleware.verifyToken,
-  productImageController.deleteProductImageById
-);
+// router.delete(
+//   "/:id",
+//   authMiddleware.verifyToken,
+//   productImageController.deleteProductImageById
+// );
 
 export default router;

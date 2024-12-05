@@ -55,15 +55,12 @@ const updateProductById = asyncHandler(async (req, res, next) => {
     if (!updateProduct)
       return res.status(404).json({ message: "Product not found" });
 
-    const { name, description, categoryId, price, rating, soldQuantity } =
-      req.body;
+    const { name, description, categoryId, price } = req.body;
 
     updateProduct.name = name || updateProduct.name;
     updateProduct.description = description || updateProduct.description;
     updateProduct.categoryId = categoryId || updateProduct.categoryId;
     updateProduct.price = price || updateProduct.price;
-    updateProduct.rating = rating || updateProduct.rating;
-    updateProduct.soldQuantity = soldQuantity || updateProduct.soldQuantity;
 
     await updateProduct.save();
     res.status(200).json(updateProduct);
@@ -72,13 +69,17 @@ const updateProductById = asyncHandler(async (req, res, next) => {
   }
 });
 
-const deleteProductById = asyncHandler(async (req, res, next) => {
+const updateStatusProductById = asyncHandler(async (req, res, next) => {
   try {
-    const product = await Product.findByIdAndDelete(req.params.id);
+    const product = await Product.findById(req.params.id);
 
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    res.status(200).json({ message: "Product deleted successfully" });
+    product.isActive = !product.isActive;
+
+    await product.save();
+
+    res.status(200).json({ message: "Update product status successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -111,7 +112,7 @@ export default {
   createProduct: createProduct,
   getProductById: getProductById,
   updateProductById: updateProductById,
-  deleteProductById: deleteProductById,
+  updateStatusProductById: updateStatusProductById,
   getBestSellerProduct: getBestSellerProduct,
   getNewArrivalProduct: getNewArrivalProduct,
 };

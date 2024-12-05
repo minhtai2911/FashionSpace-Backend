@@ -1,5 +1,6 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import ProductSize from "../models/productSize.js";
+import ProductVariant from "../models/productVariant.js";
 
 const getAllProductSizes = asyncHandler(async (req, res, next) => {
   try {
@@ -75,6 +76,16 @@ const updateProductSizeById = asyncHandler(async (req, res, next) => {
 
 const deleteProductSizeById = asyncHandler(async (req, res, next) => {
   try {
+    const productVariant = await ProductVariant.findOne({
+      sizeId: req.params.id,
+    });
+
+    if (!productVariant)
+      return res.status(400).json({
+        message:
+          "Cannot delete product size while it is associated with product variants",
+      });
+
     const productSize = await ProductSize.findByIdAndDelete(req.params.id);
 
     if (!productSize)

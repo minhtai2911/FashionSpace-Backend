@@ -1,5 +1,7 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Category from "../models/category.js";
+import ProductSize from "../models/productSize.js";
+import Product from "../models/product.js";
 
 const getAllCategories = asyncHandler(async (req, res, next) => {
   try {
@@ -61,6 +63,26 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
 
 const deleteCategoryById = asyncHandler(async (req, res, next) => {
   try {
+    const productSize = await ProductSize.find({ categoryId: req.params.id });
+
+    if (!productSize)
+      return res
+        .status(400)
+        .json({
+          message:
+            "Cannot delete category while it is associated with product sizes",
+        });
+
+    const product = await Product.find({ categoryId: req.params.id });
+
+    if (!product)
+      return res
+        .status(400)
+        .json({
+          message:
+            "Cannot delete category while it is associated with products",
+        });
+
     const category = await Category.findByIdAndDelete(req.params.id);
 
     if (!category)
