@@ -23,6 +23,7 @@ import productVariantRoute from "./routes/productVariantRoute.js";
 import chatbotRoute from "./routes/chatbotRoute.js";
 import paymentDetailRoute from "./routes/paymentDetailRoute.js";
 import orderDetailRoute from "./routes/orderDetailRoute.js";
+import reviewResponseRoute from "./routes/reviewResponseRoute.js";
 
 const app = express();
 
@@ -84,3 +85,4 @@ app.use("/api/v1/productVariant", productVariantRoute);
 app.use("/api/v1/chatbot", chatbotRoute);
 app.use("/api/v1/paymentDetail", paymentDetailRoute);
 app.use("/api/v1/orderDetail", orderDetailRoute);
+app.use("/api/v1/reviewResponse", reviewResponseRoute);

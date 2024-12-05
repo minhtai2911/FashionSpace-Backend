@@ -41,6 +41,7 @@ const updateReviewResponseById = asyncHandler(async (req, res, next) => {
       return res.status(404).json({ message: "Review response not found" });
 
     reviewResponse.content = content || reviewResponse.content;
+    reviewResponse.createdDate = Date.now();
     await reviewResponse.save();
     res.status(200).json(reviewResponse);
   } catch (err) {

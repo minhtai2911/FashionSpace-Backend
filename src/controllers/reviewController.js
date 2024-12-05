@@ -26,9 +26,10 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
 
 const createReview = asyncHandler(async (req, res, next) => {
   try {
-    const { userId, productId, rating, content } = req.body;
+    const { productId, rating, content } = req.body;
 
-    if (!userId || !productId || !rating) {
+    const userId = req.user.id;
+    if (!productId || !rating) {
       throw new Error("Please fill all required fields");
     }
 
@@ -67,21 +68,19 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
 
     if (!review) return res.status(404).json({ message: "Review not found" });
 
-    const { userId, productId, rating, content } = req.body;
+    const { rating, content } = req.body;
 
-    if (!userId || !productId || !rating)
-      throw new Error("Please fill all required fields");
+    if (!rating) throw new Error("Please fill all required fields");
 
-    const product = await Product.findById(productId);
+    const product = await Product.findById(review.productId);
     product.rating =
       (product.rating * product.totalReview - review.rating + rating) /
       product.totalReview;
     await product.save();
 
-    review.userId = userId || review.userId;
-    review.productId = productId || review.productId;
     review.rating = rating || review.rating;
     review.content = content || review.content;
+    review.createdAt = Date.now();
 
     await review.save();
 
