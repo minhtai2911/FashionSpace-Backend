@@ -4,11 +4,21 @@ import Product from "../models/product.js";
 
 const getReviewsByProductId = asyncHandler(async (req, res, next) => {
   try {
-    const review = await Review.find({productId: req.params.productId});
+    const review = await Review.find({ productId: req.params.productId });
 
     if (!review) return res.status(404).json({ message: "Reviews not found" });
 
     res.status(200).json(review);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+const getAllReviews = asyncHandler(async (req, res, next) => {
+  try {
+    const reviews = await Review.find({});
+    if (!reviews) return res.status(404).json({ message: "Reviews not found" });
+    res.status(200).json(reviews);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -106,4 +116,5 @@ export default {
   getReviewById: getReviewById,
   updateReviewById: updateReviewById,
   deleteReviewById: deleteReviewById,
+  getAllReviews: getAllReviews,
 };
