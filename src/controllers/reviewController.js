@@ -2,9 +2,9 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import Review from "../models/review.js";
 import Product from "../models/product.js";
 
-const getAllReviews = asyncHandler(async (req, res, next) => {
+const getReviewsByProductId = asyncHandler(async (req, res, next) => {
   try {
-    const review = await Review.find({});
+    const review = await Review.find({productId: req.params.productId});
 
     if (!review) return res.status(404).json({ message: "Reviews not found" });
 
@@ -101,7 +101,7 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
 });
 
 export default {
-  getAllReviews: getAllReviews,
+  getReviewsByProductId,
   createReview: createReview,
   getReviewById: getReviewById,
   updateReviewById: updateReviewById,

@@ -4,7 +4,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get('/', reviewController.getAllReviews);
+router.get('/productId/:productId', reviewController.getReviewsByProductId);
 router.post('/', authMiddleware.verifyToken, reviewController.createReview);
 router.get('/:id', reviewController.getReviewById);
 router.put('/:id', authMiddleware.verifyToken, reviewController.updateReviewById);
