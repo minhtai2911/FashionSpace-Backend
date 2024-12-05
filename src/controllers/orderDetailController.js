@@ -36,12 +36,6 @@ const createOrderDetail = asyncHandler(async (req, res, next) => {
     if (!orderId || !productVariantId || !quantity)
       throw new Error("Please fill in all required fields");
 
-    const newOrderDetail = new OrderDetail({
-      orderId,
-      productVariantId,
-      quantity,
-    });
-
     const productVariant = await ProductVariant.find({
       _id: productVariantId,
     });
@@ -49,12 +43,24 @@ const createOrderDetail = asyncHandler(async (req, res, next) => {
     if (!productVariant)
       res.status(404).json({ message: "Product variant not found" });
 
+    if (productVariant.quantity < quantity) throw new Error("Not enough stock");
+
+    productVariant.quantity = productVariant.quantity - quantity;
+    await productVariant.save();
+
     const product = await Product.findById(productVariant.productId);
 
-    if (!product) res.status(404).json({ message: "Product not found"});
+    if (!product) res.status(404).json({ message: "Product not found" });
 
     product.soldQuantity = product.soldQuantity + quantity;
     await product.save();
+
+    const newOrderDetail = new OrderDetail({
+      orderId,
+      productVariantId,
+      quantity,
+    });
+
     await newOrderDetail.save();
     res.status(201).json(newOrderDetail);
   } catch (err) {
