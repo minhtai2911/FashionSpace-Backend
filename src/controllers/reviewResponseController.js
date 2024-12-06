@@ -3,7 +3,8 @@ import ReviewResponse from "../models/reviewResponse.js";
 
 const getReviewResponseByReviewId = asyncHandler(async (req, res, next) => {
   try {
-    const { reviewId } = req.params.reviewId;
+    const reviewId = req.params.reviewId;
+
     const reviewResponse = await ReviewResponse.find({ reviewId: reviewId });
 
     if (!reviewResponse)
