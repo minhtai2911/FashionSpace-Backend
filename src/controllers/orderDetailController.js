@@ -36,9 +36,7 @@ const createOrderDetail = asyncHandler(async (req, res, next) => {
     if (!orderId || !productVariantId || !quantity)
       throw new Error("Please fill in all required fields");
 
-    const productVariant = await ProductVariant.find({
-      _id: productVariantId,
-    });
+    const productVariant = await ProductVariant.findById(productVariantId);
 
     if (!productVariant)
       res.status(404).json({ message: "Product variant not found" });
