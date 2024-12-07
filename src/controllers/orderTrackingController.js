@@ -3,7 +3,7 @@ import OrderTracking from "../models/orderTracking.js";
 
 const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
   try {
-    const { orderId } = req.params.orderId;
+    const orderId = req.params.orderId;
     const orderTracking = await OrderTracking.find({ orderId: orderId });
 
     if (!orderTracking)
