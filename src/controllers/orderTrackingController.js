@@ -17,7 +17,7 @@ const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
 
 const createOrderTracking = asyncHandler(async (req, res, next) => {
   try {
-    const { orderId, status, currentAddress } = req.body;
+    const { orderId, status, currentAddress, expectedDeliveryDate } = req.body;
 
     if (!orderId || !status || !currentAddress)
       throw new Error("Please fill all required fields");
@@ -25,6 +25,7 @@ const createOrderTracking = asyncHandler(async (req, res, next) => {
       orderId,
       status,
       currentAddress,
+      expectedDeliveryDate,
     });
     await orderTracking.save();
     res.status(201).json(orderTracking);
@@ -34,6 +35,6 @@ const createOrderTracking = asyncHandler(async (req, res, next) => {
 });
 
 export default {
-    getOrderTrackingByOrderId: getOrderTrackingByOrderId,
-    createOrderTracking: createOrderTracking,
-}
+  getOrderTrackingByOrderId: getOrderTrackingByOrderId,
+  createOrderTracking: createOrderTracking,
+};

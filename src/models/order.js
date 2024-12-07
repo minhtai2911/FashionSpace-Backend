@@ -20,10 +20,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     ref: "OrderAddress",
   },
-  deliveryDate: {
-    type: Date,
-    default: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-  },
   createdDate: {
     type: Date,
     default: Date.now,
