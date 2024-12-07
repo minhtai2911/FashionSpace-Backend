@@ -1,5 +1,6 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/order.js";
+import OrderTracking from "../models/orderTracking.js";
 
 const getAllOrder = asyncHandler(async (req, res, next) => {
   try {
@@ -50,6 +51,12 @@ const createOrder = asyncHandler(async (req, res, next) => {
       orderAddressId,
       shippingFee,
     });
+
+    const newOrderTracking = new OrderTracking({
+      orderId: newOrder._id,
+    })
+
+    await newOrderTracking.save();
 
     await newOrder.save();
     res.status(201).json(newOrder);
