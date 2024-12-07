@@ -41,7 +41,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
   try {
     const { total, paymentDetailId, orderAddressId, shippingFee } = req.body;
     const userId = req.user.id;
-    if ( !total || !paymentDetailId || !orderAddressId || !shippingFee)
+    if ( !total || !paymentDetailId || !orderAddressId || shippingFee === undefined || shippingFee === null)
       throw new Error("Please fill all required fields");
 
     const newOrder = new Order({
