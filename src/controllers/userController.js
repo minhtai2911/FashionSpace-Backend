@@ -50,9 +50,10 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
 
 const updateUserById = asyncHandler(async (req, res, next) => {
   try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+
     if (req.file) {
-      const user = await User.findById(req.params.id);
-      if (!user) return res.status(404).json({ message: "User not found" });
       if (user.avatarPath) {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
@@ -71,10 +72,10 @@ const updateUserById = asyncHandler(async (req, res, next) => {
         req.params.id,
         {
           $set: {
-            fullName: req.body.fullName,
-            phone: req.body.phone,
+            fullName: req.body.fullName || user.fullName,
+            phone: req.body.phone || user.phone,
             avatarPath: avatarPath,
-            roleId: req.body.roleId,
+            roleId: req.body.roleId || user.roleId,
           },
         },
         { new: true }
@@ -86,15 +87,13 @@ const updateUserById = asyncHandler(async (req, res, next) => {
       req.params.id,
       {
         $set: {
-          fullName: req.body.fullName,
-          phone: req.body.phone,
-          roleId: req.body.roleId,
+          fullName: req.body.fullName || user.fullName,
+          phone: req.body.phone || user.phone,
+          roleId: req.body.roleId || user.roleId,
         },
       },
       { new: true }
     );
-
-    if (!newUser) return res.status(404).json({ message: "User not found" });
 
     res.status(200).json(newUser);
   } catch (err) {
