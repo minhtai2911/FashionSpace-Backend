@@ -24,6 +24,7 @@ import chatbotRoute from "./routes/chatbotRoute.js";
 import paymentDetailRoute from "./routes/paymentDetailRoute.js";
 import orderDetailRoute from "./routes/orderDetailRoute.js";
 import reviewResponseRoute from "./routes/reviewResponseRoute.js";
+import orderTrackingRoute from "./routes/orderTrackingRoute.js";
 
 const app = express();
 
@@ -86,3 +87,4 @@ app.use("/api/v1/chatbot", chatbotRoute);
 app.use("/api/v1/paymentDetail", paymentDetailRoute);
 app.use("/api/v1/orderDetail", orderDetailRoute);
 app.use("/api/v1/reviewResponse", reviewResponseRoute);
+app.use("/api/v1/orderTracking", orderTrackingRoute);
