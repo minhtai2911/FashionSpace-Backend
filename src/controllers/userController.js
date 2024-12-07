@@ -74,6 +74,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
             fullName: req.body.fullName,
             phone: req.body.phone,
             avatarPath: avatarPath,
+            roleId: req.body.roleId,
           },
         },
         { new: true }
@@ -87,6 +88,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
         $set: {
           fullName: req.body.fullName,
           phone: req.body.phone,
+          roleId: req.body.roleId,
         },
       },
       { new: true }
