@@ -1,4 +1,3 @@
-import { response } from "express";
 import asyncHandler from "../middleware/asyncHandler.js";
 import ShoppingCart from "../models/shoppingCart.js";
 
