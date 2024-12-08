@@ -6,8 +6,8 @@ const router = Router();
 
 router.get("/", productColorController.getAllProductColors);
 router.get("/:id", productColorController.getProductColorById);
-router.post("/", authMiddleware.verifyToken, productColorController.createProductColor);
-router.put("/:id", authMiddleware.verifyToken, productColorController.updateProductColorById);
-router.delete("/:id", authMiddleware.verifyToken, productColorController.deleteProductColorById);
+router.post("/", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), productColorController.createProductColor);
+router.put("/:id", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), productColorController.updateProductColorById);
+router.delete("/:id", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), productColorController.deleteProductColorById);
 
 export default router;

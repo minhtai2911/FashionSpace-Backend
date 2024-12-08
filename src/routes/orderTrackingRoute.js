@@ -12,6 +12,7 @@ router.get(
 router.post(
   "/",
   authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Employee"]),
   orderTrackingController.createOrderTracking
 );
 

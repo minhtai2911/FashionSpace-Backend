@@ -6,8 +6,8 @@ const router = Router();
 
 router.get("/", categoryController.getAllCategories);
 router.get("/:id", categoryController.getCategoryById);
-router.post("/", authMiddleware.verifyToken, categoryController.createCategory);
-router.put("/:id", authMiddleware.verifyToken, categoryController.updateCategoryById);
-router.delete("/:id", authMiddleware.verifyToken, categoryController.deleteCategoryById);
+router.post("/", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), categoryController.createCategory);
+router.put("/:id", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), categoryController.updateCategoryById);
+router.delete("/:id", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), categoryController.deleteCategoryById);
 
 export default router;

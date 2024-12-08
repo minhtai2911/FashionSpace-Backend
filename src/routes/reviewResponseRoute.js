@@ -5,8 +5,8 @@ import authMiddleware from "../middleware/authMiddleware.js";
 const router = Router();
 
 router.get('/reviewId/:reviewId', reviewResponseController.getReviewResponseByReviewId);
-router.post('/', authMiddleware.verifyToken, reviewResponseController.createReviewResponse);
-router.put('/:id', authMiddleware.verifyToken, reviewResponseController.updateReviewResponseById);
-router.delete('/:id', authMiddleware.verifyToken, reviewResponseController.deleteReviewResponseById);
+router.post('/', authMiddleware.verifyToken, authMiddleware.checkPermission(["Employee"]), reviewResponseController.createReviewResponse);
+router.put('/:id', authMiddleware.verifyToken, authMiddleware.checkPermission(["Employee"]), reviewResponseController.updateReviewResponseById);
+router.delete('/:id', authMiddleware.verifyToken, authMiddleware.checkPermission(["Employee"]), reviewResponseController.deleteReviewResponseById);
 
 export default router;

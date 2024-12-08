@@ -10,12 +10,14 @@ router.get("/:id", productImageController.getProductImageById);
 router.post(
   "/",
   authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Admin"]),
   upload.uploadProduct.array("imagePath"),
   productImageController.createProductImage
 );
 router.put(
   "/:id",
   authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Admin"]),
   upload.uploadProduct.single("imagePath"),
   productImageController.updateProductImageById
 );

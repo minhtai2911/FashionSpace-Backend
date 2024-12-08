@@ -19,6 +19,10 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
 
 const getUserById = asyncHandler(async (req, res, next) => {
   try {
+    const role = await UserRole.findById(req.user.roleId);
+    if (req.user.id !== req.params.id && role.roleName !== "Admin")
+      return res.status(403).json({ message: "You do not have permission!" });
+
     const user = await User.findById(req.params.id);
 
     if (!user) return res.status(404).json({ message: "User not found" });
@@ -50,6 +54,10 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
 
 const updateUserById = asyncHandler(async (req, res, next) => {
   try {
+    const role = await UserRole.findById(req.user.roleId);
+    if (req.user.id !== req.params.id && role.roleName !== "Admin")
+      return res.status(403).json({ message: "You do not have permission!" });
+
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
