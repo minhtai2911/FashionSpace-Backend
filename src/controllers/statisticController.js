@@ -48,6 +48,28 @@ const createStatistic = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getStatistics = asyncHandler(async (req, res, next) => {
+  try {
+    const query = {};
+    if (req.query.year) query.year = req.query.year;
+    if (req.query.month) query.month = req.query.month;
+    if (req.query.day) query.day = req.query.day;
+
+    const statistics = await Statistic.find(query).sort({
+      year: -1,
+      month: -1,
+      day: -1,
+    });
+
+    if (!statistics)
+      return res.status(404).json({ message: "Statistic not found" });
+
+    res.status(200).json(statistics);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 cron.schedule("0 59 23 * * *", async () => {
   try {
     const today = new Date();
@@ -102,4 +124,5 @@ cron.schedule("0 59 23 * * *", async () => {
 
 export default {
   createStatistic: createStatistic,
+  getStatistics: getStatistics,
 };
