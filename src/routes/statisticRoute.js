@@ -6,15 +6,15 @@ const router = Router();
 
 router.post(
   "/",
-//   authMiddleware.verifyToken,
-//   authMiddleware.checkPermission(["Admin"]),
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Admin"]),
   statisticController.createStatistic
 );
 
 router.get(
   "/",
-//   authMiddleware.verifyToken,
-//   authMiddleware.checkPermission(["Admin"]),
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Admin"]),
   statisticController.getStatistics
 );
 
