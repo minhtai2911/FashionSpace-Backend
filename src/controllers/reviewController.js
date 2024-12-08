@@ -109,6 +109,21 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
   }
 });
 
+const getReviewByProductIdAndUserId = asyncHandler(async (req, res, next) => {
+  try {
+    const review = await Review.find({
+      productId: req.params.productId,
+      userId: req.user.id,
+    });
+
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    res.status(200).json(review);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
 export default {
   getReviewsByProductId,
   createReview: createReview,
@@ -116,4 +131,5 @@ export default {
   updateReviewById: updateReviewById,
   deleteReviewById: deleteReviewById,
   getAllReviews: getAllReviews,
+  getReviewByProductIdAndUserId: getReviewByProductIdAndUserId,
 };

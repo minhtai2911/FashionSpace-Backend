@@ -10,5 +10,6 @@ router.post('/', authMiddleware.verifyToken, reviewController.createReview);
 router.get('/:id', reviewController.getReviewById);
 router.put('/:id', authMiddleware.verifyToken, reviewController.updateReviewById);
 router.delete('/:id', authMiddleware.verifyToken, reviewController.deleteReviewById);
+router.get('/:productId/productIdAndUserId', authMiddleware.verifyToken, reviewController.getReviewByProductIdAndUserId);
 
 export default router;
