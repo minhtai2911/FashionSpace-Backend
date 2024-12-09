@@ -20,7 +20,11 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
 const getUserById = asyncHandler(async (req, res, next) => {
   try {
     const role = await UserRole.findById(req.user.roleId);
-    if (req.user.id !== req.params.id && role.roleName !== "Admin")
+    if (
+      req.user.id !== req.params.id &&
+      role.roleName !== "Admin" &&
+      role.roleName !== "Employee"
+    )
       return res.status(403).json({ message: "You do not have permission!" });
 
     const user = await User.findById(req.params.id);
