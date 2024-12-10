@@ -357,7 +357,7 @@ const resetPassword = asyncHandler(async (req, res, next) => {
     if (!check)
       return res
         .status(400)
-        .json({ message: "Mật khẩu không đúng. Vui lòng thử lại!" });
+        .json({ message: "Mật khẩu cũ không đúng. Vui lòng thử lại!" });
 
     user.password = req.body.newPassword;
     await user.save();
