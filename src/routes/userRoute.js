@@ -6,7 +6,7 @@ import upload from "../middleware/upload.js";
 const router = Router();
 
 router.get("/", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), userController.getAllUsers);
-router.get("/:id", authMiddleware.verifyToken, userController.getUserById);
+router.get("/:id", userController.getUserById);
 router.delete(
   "/:id",
   authMiddleware.verifyToken,

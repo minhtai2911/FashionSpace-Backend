@@ -119,7 +119,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
     );
 
     res.status(200).json({
-      message: "Cập nhật thông tin người dùng thành công",
+      message: "Cập nhật thông tin người dùng thành công!",
       data: newUser,
     });
   } catch (err) {
