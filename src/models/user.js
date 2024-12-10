@@ -62,9 +62,13 @@ userSchema.statics.login = async function (email, password) {
     if (auth) {
       return user;
     }
-    throw new Error("Invalid email or password");
+    throw new Error(
+      "Thông tin đăng nhập không chính xác. Vui lòng kiểm tra lại tên đăng nhập và mật khẩu."
+    );
   }
-  throw new Error("Invalid email or password");
+  throw new Error(
+    "Thông tin đăng nhập không chính xác. Vui lòng kiểm tra lại tên đăng nhập và mật khẩu."
+  );
 };
 
 export default mongoose.model("User", userSchema);
