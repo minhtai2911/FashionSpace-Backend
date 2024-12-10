@@ -124,9 +124,9 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
     const info = await transporter.sendMail({
       from: `Fashion Space <${process.env.EMAIL_USER}>`,
       to: `${req.body.email}`,
-      subject: "VERIFY REGISTRATION FASHION SPACE ACCOUNT",
+      subject: "YÊU CẦU XÁC NHẬN THÔNG TIN ĐĂNG KÝ TÀI KHOẢN TỪ FASHION SPACE",
       html: `
-      <a href="${process.env.URL_CLIENT}/verify/${req.body.id}">Click here to verify your email</a>
+      <a href="${process.env.URL_CLIENT}/verify/${req.body.id}">Nhấn vào đây để xác nhận email của bạn.</a>
       `,
     });
     res
@@ -246,11 +246,11 @@ const sendOTP = asyncHandler(async (req, res, next) => {
     const info = await transporter.sendMail({
       from: `Fashion Space <${process.env.EMAIL_USER}>`,
       to: `${email}`,
-      subject: "RESET PASSWORD FROM FASHION SPACE",
+      subject: "YÊU CẦU ĐỔI MẬT KHẨU TỪ FASHION SPACE",
       html: `
-      <div>Hi ${email},</div>
-      <div>We received a request to reset your password</div>
-      <div>Your OTP: <br>${OTP}</br></div>
+      <div>Chào ${email},</div>
+      <div>Chúng tôi đã nhận được yêu cầu để đặt lại mật khẩu của bạn.</div>
+      <div>Mã OTP của bạn: <br>${OTP}</br></div>
       `,
     });
     res.status(200).json({
