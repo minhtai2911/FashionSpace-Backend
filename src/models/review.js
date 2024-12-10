@@ -11,11 +11,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     ref: "Product",
   },
-  reviewId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Review",
-    default: null,
-  },
   rating: {
     type: Number,
     required: true,

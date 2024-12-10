@@ -21,7 +21,7 @@ passport.use(
         if (!user) {
           const role = await UserRole.findOne({ roleName: "Customer" });
           if (!role) {
-            throw new Error("User role not found");
+            throw new Error("Vai trò không tồn tại.");
           }
           user = new User({
             email: profile.emails[0].value,

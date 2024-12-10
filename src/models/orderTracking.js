@@ -8,14 +8,14 @@ const userSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    default: "Pending",
+    default: "Đang chờ",
     enum: [
-      "Pending",
-      "Processing",
-      "Shipped",
-      "In Delivery",
-      "Cancelled",
-      "Accepted",
+      "Đang chờ",
+      "Đang xử lý",
+      "Đã giao",
+      "Đang giao",
+      "Đã hủy",
+      "Đã nhận đơn",
     ],
   },
   date: {
