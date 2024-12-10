@@ -10,13 +10,44 @@ const createStatistic = asyncHandler(async (req, res, next) => {
     const todayStart = new Date(year, month - 1, day);
     const todayEnd = new Date(year, month - 1, day + 1);
 
-    const totalOrder = await Order.countDocuments({
-      createdDate: { $gte: todayStart, $lt: todayEnd },
-    });
+    const totalOrder = await Order.aggregate([
+      {
+        $lookup: {
+          from: "ordertrackings",
+          localField: "_id",
+          foreignField: "orderId",
+          as: "orderTrackings",
+        },
+      },
+      {
+        $unwind: "$orderTrackings",
+      },
+      {
+        $match: {
+          "orderTrackings.status": "Đã giao",
+          createdDate: { $gte: todayStart, $lt: todayEnd },
+        },
+      },
+      {
+        $count: "totalOrders", 
+      },
+    ]);
 
     const totalRevenue = await Order.aggregate([
       {
+        $lookup: {
+          from: "ordertrackings",
+          localField: "_id",
+          foreignField: "orderId",
+          as: "orderTrackings",
+        },
+      },
+      {
+        $unwind: "$orderTrackings",
+      },
+      {
         $match: {
+          "orderTrackings.status": "Đã giao",
           createdDate: {
             $gte: todayStart,
             $lt: todayEnd,
@@ -32,12 +63,13 @@ const createStatistic = asyncHandler(async (req, res, next) => {
     ]);
 
     if (!totalRevenue[0]) totalRevenue[0] = { totalRevenue: 0 };
+    if (!totalOrder[0]) totalOrder[0] = { totalOrders: 0 };
 
     const statistic = new Statistic({
       day: day,
       month: month,
       year: year,
-      totalOrder: totalOrder,
+      totalOrder: totalOrder[0].totalOrders,
       totalRevenue: totalRevenue[0].totalRevenue,
     });
 
@@ -85,13 +117,44 @@ cron.schedule("0 59 23 * * *", async () => {
       today.getDate() + 1
     );
 
-    const totalOrder = await Order.countDocuments({
-      createdDate: { $gte: todayStart, $lt: todayEnd },
-    });
+    const totalOrder = await Order.aggregate([
+      {
+        $lookup: {
+          from: "ordertrackings",
+          localField: "_id",
+          foreignField: "orderId",
+          as: "orderTrackings",
+        },
+      },
+      {
+        $unwind: "$orderTrackings",
+      },
+      {
+        $match: {
+          "orderTrackings.status": "Đã giao",
+          createdDate: { $gte: todayStart, $lt: todayEnd },
+        },
+      },
+      {
+        $count: "totalOrders", 
+      },
+    ]);
 
     const totalRevenue = await Order.aggregate([
       {
+        $lookup: {
+          from: "ordertrackings",
+          localField: "_id",
+          foreignField: "orderId",
+          as: "orderTrackings",
+        },
+      },
+      {
+        $unwind: "$orderTrackings",
+      },
+      {
         $match: {
+          "orderTrackings.status": "Đã giao",
           createdDate: {
             $gte: todayStart,
             $lt: todayEnd,
@@ -107,15 +170,16 @@ cron.schedule("0 59 23 * * *", async () => {
     ]);
 
     if (!totalRevenue[0]) totalRevenue[0] = { totalRevenue: 0 };
+    if (!totalOrder[0]) totalOrder[0] = { totalOrders: 0 };
 
     const statistic = new Statistic({
-      day: today.getDate(),
-      month: today.getMonth() + 1,
-      year: today.getFullYear(),
-      totalOrder: totalOrder,
+      day: day,
+      month: month,
+      year: year,
+      totalOrder: totalOrder[0].totalOrders,
       totalRevenue: totalRevenue[0].totalRevenue,
     });
-
+    
     await statistic.save();
   } catch (error) {
     throw new Error(error.message);

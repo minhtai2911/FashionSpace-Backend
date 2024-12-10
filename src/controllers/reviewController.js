@@ -1,15 +1,30 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Review from "../models/review.js";
 import Product from "../models/product.js";
+import mongoose from "mongoose";
 
 const getReviewsByProductId = asyncHandler(async (req, res, next) => {
   try {
-    const review = await Review.find({ productId: req.params.productId });
+    const reviews = await Review.aggregate([
+      {
+        $lookup: {
+          from: "reviewresponses",
+          localField: "_id",
+          foreignField: "reviewId",
+          as: "reviewResponses",
+        },
+      },
+      {
+        $match: {
+          productId: new mongoose.Types.ObjectId(req.params.productId),
+        },
+      },
+    ]);
 
-    if (!review)
+    if (!reviews)
       return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
-    res.status(200).json({ data: review });
+    res.status(200).json({ data: reviews });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -20,9 +35,20 @@ const getReviewsByProductId = asyncHandler(async (req, res, next) => {
 
 const getAllReviews = asyncHandler(async (req, res, next) => {
   try {
-    const reviews = await Review.find({});
+    const reviews = await Review.aggregate([
+      {
+        $lookup: {
+          from: "reviewresponses",
+          localField: "_id",
+          foreignField: "reviewId",
+          as: "reviewResponses",
+        },
+      },
+    ]);
+
     if (!reviews)
       return res.status(404).json({ error: "Đánh giá không tồn tại." });
+
     res.status(200).json({ data: reviews });
   } catch (err) {
     res.status(500).json({
@@ -55,12 +81,10 @@ const createReview = asyncHandler(async (req, res, next) => {
       product.totalReview;
     await product.save();
 
-    res
-      .status(201)
-      .json({
-        message: "Đánh giá của bạn đã được gửi thành công!",
-        data: newReview,
-      });
+    res.status(201).json({
+      message: "Đánh giá của bạn đã được gửi thành công!",
+      data: newReview,
+    });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -71,13 +95,27 @@ const createReview = asyncHandler(async (req, res, next) => {
 
 const getReviewById = asyncHandler(async (req, res, next) => {
   try {
-    const review = await Review.findById(req.params.id);
+    const review = await Review.aggregate([
+      {
+        $lookup: {
+          from: "reviewresponses",
+          localField: "_id",
+          foreignField: "reviewId",
+          as: "reviewResponses",
+        },
+      },
+      {
+        $match: {
+          _id: new mongoose.Types.ObjectId(req.params.id),
+        },
+      },
+    ]);
 
     if (!review)
       return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
     res.status(200).json(review);
-  } catch {
+  } catch (err) {
     res.status(500).json({
       error: err.message,
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
@@ -108,12 +146,10 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
 
     await review.save();
 
-    res
-      .status(200)
-      .json({
-        message: "Đánh giá của bạn đã được cập nhật thành công!",
-        data: review,
-      });
+    res.status(200).json({
+      message: "Đánh giá của bạn đã được cập nhật thành công!",
+      data: review,
+    });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -149,15 +185,86 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
 
 const getReviewByProductIdAndUserId = asyncHandler(async (req, res, next) => {
   try {
-    const review = await Review.find({
-      productId: req.params.productId,
-      userId: req.user.id,
-    });
+    const review = await Review.aggregate([
+      {
+        $lookup: {
+          from: "reviewresponses",
+          localField: "_id",
+          foreignField: "reviewId",
+          as: "reviewResponses",
+        },
+      },
+      {
+        $match: {
+          productId: new mongoose.Types.ObjectId(req.params.productId),
+          userId: new mongoose.Types.ObjectId(req.user.id),
+        },
+      },
+    ]);
 
     if (!review)
       return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
     res.status(200).json({ data: review });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
+  }
+});
+
+const getReviewsNotReplied = asyncHandler(async (req, res, next) => {
+  try {
+    const reviews = await Review.aggregate([
+      {
+        $lookup: {
+          from: "reviewresponses",
+          localField: "_id",
+          foreignField: "reviewId",
+          as: "reviewResponses",
+        },
+      },
+      {
+        $match: {
+          reviewResponses: { $size: 0 },
+        },
+      },
+    ]);
+
+    if (!reviews)
+      return res.status(404).json({ error: "Đánh giá không tồn tại" });
+
+    res.status(200).json({ data: reviews });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
+  }
+});
+const getReviewsReplied = asyncHandler(async (req, res, next) => {
+  try {
+    const reviews = await Review.aggregate([
+      {
+        $lookup: {
+          from: "reviewresponses",
+          localField: "_id",
+          foreignField: "reviewId",
+          as: "reviewResponses",
+        },
+      },
+      {
+        $match: {
+          reviewResponses: { $ne: [] },
+        },
+      },
+    ]);
+
+    if (!reviews)
+      return res.status(404).json({ error: "Đánh giá không tồn tại" });
+
+    res.status(200).json({ data: reviews });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -174,4 +281,6 @@ export default {
   deleteReviewById: deleteReviewById,
   getAllReviews: getAllReviews,
   getReviewByProductIdAndUserId: getReviewByProductIdAndUserId,
+  getReviewsNotReplied: getReviewsNotReplied,
+  getReviewsReplied: getReviewsReplied,
 };
