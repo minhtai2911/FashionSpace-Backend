@@ -105,7 +105,7 @@ const deleteOrderAddressById = asyncHandler(async (req, res, next) => {
     if (!orderAddress)
       return res.status(404).json({ error: "Địa chỉ giao hàng không tồn tại." });
 
-    res.status(200).json({ success: "Xóa địa chỉ giao hàng thành công!" });
+    res.status(200).json({ message: "Xóa địa chỉ giao hàng thành công!" });
   } catch (err) {
     res
       .status(500)

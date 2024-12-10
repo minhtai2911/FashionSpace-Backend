@@ -101,7 +101,7 @@ const deleteOrderById = asyncHandler(async (req, res, next) => {
     if (!order)
       return res.status(404).json({ error: "Đơn hàng không tồn tại." });
 
-    res.status(200).json({ success: "Xóa đơn hàng thành công!" });
+    res.status(200).json({ message: "Xóa đơn hàng thành công!" });
   } catch (err) {
     res
       .status(500)

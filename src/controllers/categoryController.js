@@ -54,7 +54,7 @@ const createCategory = asyncHandler(async (req, res, next) => {
     res
       .status(201)
       .json({
-        message: "Tạo danh mục sản phẩm thành công!",
+        message: "Thêm danh mục sản phẩm thành công!",
         data: newCategory,
       });
   } catch (err) {
@@ -85,7 +85,7 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
     res
       .status(200)
       .json({
-        message: "Cập nhật danh mục sản phẩm thành công",
+        message: "Cập nhật danh mục sản phẩm thành công!",
         data: category,
       });
   } catch (err) {

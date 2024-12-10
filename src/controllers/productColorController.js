@@ -44,7 +44,7 @@ const createProductColor = asyncHandler(async (req, res, next) => {
 
     await newProductColor.save();
     res.status(201).json({
-      message: "Tạo màu sắc sản phẩm thành công!",
+      message: "Thêm màu sắc sản phẩm thành công!",
       data: newProductColor,
     });
   } catch (err) {
