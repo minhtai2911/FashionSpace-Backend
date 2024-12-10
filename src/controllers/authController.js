@@ -323,7 +323,7 @@ const checkEmail = asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      return res.status(404).json({ error: "Email không tồn tại." });
+      return res.status(404).json({ message: "Email không tồn tại." });
     }
 
     res.status(200).json({ message: "Email đã tồn tại." });
