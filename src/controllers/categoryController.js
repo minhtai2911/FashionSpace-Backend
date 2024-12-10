@@ -8,11 +8,18 @@ const getAllCategories = asyncHandler(async (req, res, next) => {
     const category = await Category.find({});
 
     if (!category)
-      return res.status(404).json({ message: "Categories not found" });
+      return res
+        .status(404)
+        .json({ error: "Danh mục sản phẩm không tồn tại." });
 
-    res.status(200).json(category);
+    res.status(200).json({ data: category });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -21,11 +28,18 @@ const getCategoryById = asyncHandler(async (req, res, next) => {
     const category = await Category.findById(req.params.id);
 
     if (!category)
-      return res.status(404).json({ message: "Category not found" });
+      return res
+        .status(404)
+        .json({ error: "Danh mục sản phẩm không tồn tại." });
 
-    res.status(200).json(category);
+    res.status(200).json({ data: category });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -33,12 +47,23 @@ const createCategory = asyncHandler(async (req, res, next) => {
   try {
     const { name, gender } = req.body;
 
-    if (!name) throw new Error("Please fill all required fields");
+    if (!name) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
     const newCategory = new Category({ name, gender });
+
     await newCategory.save();
-    res.status(201).json(newCategory);
+    res
+      .status(201)
+      .json({
+        message: "Tạo danh mục sản phẩm thành công!",
+        data: newCategory,
+      });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res
+      .status(400)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -47,7 +72,9 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
     const category = await Category.findById(req.params.id);
 
     if (!category)
-      return res.status(404).json({ message: "Category not found" });
+      return res
+        .status(404)
+        .json({ error: "Danh mục sản phẩm không tồn tại." });
 
     const { name, gender } = req.body;
 
@@ -55,9 +82,19 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
     category.gender = gender || category.gender;
 
     await category.save();
-    res.status(200).json(category);
+    res
+      .status(200)
+      .json({
+        message: "Cập nhật danh mục sản phẩm thành công",
+        data: category,
+      });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -66,31 +103,34 @@ const deleteCategoryById = asyncHandler(async (req, res, next) => {
     const productSize = await ProductSize.find({ categoryId: req.params.id });
 
     if (!productSize)
-      return res
-        .status(400)
-        .json({
-          message:
-            "Cannot delete category while it is associated with product sizes",
-        });
+      return res.status(400).json({
+        message:
+          "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với các kích thước sản phẩm.",
+      });
 
     const product = await Product.find({ categoryId: req.params.id });
 
     if (!product)
-      return res
-        .status(400)
-        .json({
-          message:
-            "Cannot delete category while it is associated with products",
-        });
+      return res.status(400).json({
+        message:
+          "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với sản phẩm.",
+      });
 
     const category = await Category.findByIdAndDelete(req.params.id);
 
     if (!category)
-      return res.status(404).json({ message: "Category not found" });
+      return res
+        .status(404)
+        .json({ error: "Danh mục sản phẩm không tồn tại." });
 
-    res.status(200).json({ message: "Category deleted successfully" });
+    res.status(200).json({ message: "Xóa danh mục sản phẩm thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 

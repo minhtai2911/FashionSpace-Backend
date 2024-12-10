@@ -8,11 +8,16 @@ const getOrderDetailsByOrderId = asyncHandler(async (req, res, next) => {
     const orderDetail = await OrderDetail.find({ orderId: req.params.orderId });
 
     if (!orderDetail)
-      return res.status(404).json({ message: "Order details not found" });
+      return res
+        .status(404)
+        .json({ error: "Chi tiết đơn hàng không tồn tại." });
 
-    res.status(200).json(orderDetail);
+    res.status(200).json({ data: orderDetail });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -21,11 +26,16 @@ const getOrderDetailById = asyncHandler(async (req, res, next) => {
     const orderDetail = await OrderDetail.findById(req.params.id);
 
     if (!orderDetail)
-      return res.status(404).json({ message: "Order detail not found" });
+      return res
+        .status(404)
+        .json({ error: "Chi tiết đơn hàng không tồn tại." });
 
-    res.status(200).json(orderDetail);
+    res.status(200).json({ data: orderDetail });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -34,21 +44,24 @@ const createOrderDetail = asyncHandler(async (req, res, next) => {
     const { orderId, productVariantId, quantity } = req.body;
 
     if (!orderId || !productVariantId || !quantity)
-      throw new Error("Please fill in all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
 
     const productVariant = await ProductVariant.findById(productVariantId);
 
     if (!productVariant)
-      res.status(404).json({ message: "Product variant not found" });
+      res.status(404).json({ error: "Biến thể sản phẩm không tồn tại." });
 
-    if (productVariant.quantity < quantity) throw new Error("Not enough stock");
+    if (productVariant.quantity < quantity)
+      res
+        .status(409)
+        .json({ message: "Không đủ số lượng sản phẩm trong kho." });
 
     productVariant.quantity = productVariant.quantity - quantity;
     await productVariant.save();
 
     const product = await Product.findById(productVariant.productId);
 
-    if (!product) res.status(404).json({ message: "Product not found" });
+    if (!product) res.status(404).json({ error: "Sản phẩm không tồn tại." });
 
     product.soldQuantity = product.soldQuantity + quantity;
     await product.save();
@@ -60,9 +73,12 @@ const createOrderDetail = asyncHandler(async (req, res, next) => {
     });
 
     await newOrderDetail.save();
-    res.status(201).json(newOrderDetail);
+    res.status(201).json({data: newOrderDetail});
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 

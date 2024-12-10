@@ -7,11 +7,14 @@ const getAllProductColors = asyncHandler(async (req, res, next) => {
     const productColor = await ProductColor.find({});
 
     if (!productColor)
-      return res.status(404).json({ message: "Product colors not found" });
+      return res.status(404).json({ error: "Màu sắc sản phẩm không tồn tại." });
 
-    res.status(200).json(productColor);
+    res.status(200).json({ data: productColor });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -20,11 +23,14 @@ const getProductColorById = asyncHandler(async (req, res, next) => {
     const productColor = await ProductColor.findById(req.params.id);
 
     if (!productColor)
-      return res.status(404).json({ message: "Product color not found" });
+      return res.status(404).json({ error: "Màu sắc sản phẩm không tồn tại." });
 
-    res.status(200).json(productColor);
+    res.status(200).json({ data: productColor });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -32,14 +38,20 @@ const createProductColor = asyncHandler(async (req, res, next) => {
   try {
     const { color } = req.body;
 
-    if (!color) throw new Error("Please fill all required fields");
+    if (!color) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
 
     const newProductColor = new ProductColor({ color: color });
 
     await newProductColor.save();
-    res.status(201).json(newProductColor);
+    res.status(201).json({
+      message: "Tạo màu sắc sản phẩm thành công!",
+      data: newProductColor,
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(400).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -48,14 +60,20 @@ const updateProductColorById = asyncHandler(async (req, res, next) => {
     const productColor = await ProductColor.findById(req.params.id);
 
     if (!productColor)
-      return res.status(404).json({ message: "Product color not found" });
+      return res.status(404).json({ error: "Màu sắc sản phẩm không tồn tại." });
 
     productColor.color = req.body.color || productColor.color;
 
     await productColor.save();
-    res.status(200).json(productColor);
+    res.status(200).json({
+      message: "Cập nhật màu sắc sản phẩm thành công!",
+      data: productColor,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -66,21 +84,22 @@ const deleteProductColorById = asyncHandler(async (req, res, next) => {
     });
 
     if (!productVariant)
-      return res
-        .status(400)
-        .json({
-          message:
-            "Cannot delete product color while it is associated with product variants",
-        });
+      return res.status(400).json({
+        message:
+          "Không thể xóa màu sản phẩm khi nó đang được liên kết với các sản phẩm.",
+      });
 
     const productColor = await ProductColor.findByIdAndDelete(req.params.id);
 
     if (!productColor)
-      return res.status(404).json({ message: "Product color not found" });
+      return res.status(404).json({ error: "Màu sắc sản phẩm không tồn tại." });
 
-    res.status(200).json({ message: "Product color deleted successfully" });
+    res.status(200).json({ message: "Xóa màu sắc sản phẩm thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 

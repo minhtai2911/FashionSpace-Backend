@@ -8,11 +8,14 @@ const getReviewResponseByReviewId = asyncHandler(async (req, res, next) => {
     const reviewResponse = await ReviewResponse.find({ reviewId: reviewId });
 
     if (!reviewResponse)
-      return res.status(404).json({ message: "Review response not found" });
+      return res.status(404).json({ error: "Phản hồi không tồn tại." });
 
-    res.status(200).json(reviewResponse);
+    res.status(200).json({ data: reviewResponse });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -21,32 +24,40 @@ const createReviewResponse = asyncHandler(async (req, res, next) => {
     const { reviewId, content } = req.body;
     const userId = req.user.id;
     if (!reviewId || !content)
-      throw new Error("Please fill all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
 
     const newReviewResponse = new ReviewResponse({ userId, reviewId, content });
     await newReviewResponse.save();
-    res.status(201).json(newReviewResponse);
+    res
+      .status(201)
+      .json({ message: "Phản hồi thành công!", data: newReviewResponse });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
 const updateReviewResponseById = asyncHandler(async (req, res, next) => {
   try {
     const { content } = req.body;
-    if (!content) throw new Error("Please fill all required fields");
+    if (!content) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
 
     const reviewResponse = await ReviewResponse.findById(req.params.id);
 
     if (!reviewResponse)
-      return res.status(404).json({ message: "Review response not found" });
+      return res.status(404).json({ error: "Phản hồi không tồn tại." });
 
     reviewResponse.content = content || reviewResponse.content;
     reviewResponse.createdDate = Date.now();
     await reviewResponse.save();
     res.status(200).json(reviewResponse);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -56,10 +67,14 @@ const deleteReviewResponseById = asyncHandler(async (req, res, next) => {
       req.params.id
     );
     if (!reviewResponse)
-      return res.status(404).json({ message: "Review response not found" });
-    res.status(200).json({ message: "Review response deleted successfully" });
+      return res.status(404).json({ error: "Phản hồi không tồn tại" });
+
+    res.status(200).json({ message: "Phản hồi đã được xóa thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 

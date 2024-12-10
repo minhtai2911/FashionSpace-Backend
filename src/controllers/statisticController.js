@@ -42,7 +42,7 @@ const createStatistic = asyncHandler(async (req, res, next) => {
     });
 
     await statistic.save();
-    res.status(201).json(statistic);
+    res.status(201).json({ data: statistic });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -62,9 +62,9 @@ const getStatistics = asyncHandler(async (req, res, next) => {
     });
 
     if (!statistics)
-      return res.status(404).json({ message: "Statistic not found" });
+      return res.status(404).json({ error: "Báo cáo không tồn tại." });
 
-    res.status(200).json(statistics);
+    res.status(200).json({ data: statistics });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

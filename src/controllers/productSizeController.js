@@ -6,12 +6,12 @@ const getAllProductSizes = asyncHandler(async (req, res, next) => {
   try {
     const productSize = await ProductSize.find({});
 
-    if (!productSize)
-      return res.status(404).json({ message: "Product sizes not found" });
-
-    res.status(200).json(productSize);
+    res.status(200).json({ data: productSize });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -20,22 +20,27 @@ const getProductSizeById = asyncHandler(async (req, res, next) => {
     const productSize = await ProductSize.findById(req.params.id);
 
     if (!productSize)
-      return res.status(404).json({ message: "Product size not found" });
+      return res.status(404).json({ error: "Kích cỡ sản phẩm không tồn tại." });
 
-    res.status(200).json(productSize);
+    res.status(200).json({ data: productSize });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
 const getProductSizesByCategoryId = asyncHandler(async (req, res, next) => {
   try {
     const productSizes = await ProductSize.find({ categoryId: req.params.id });
-    if (!productSizes)
-      res.status(404).json({ message: "Product size not found" });
-    res.status(200).json(productSizes);
+
+    res.status(200).json({ data: productSizes });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -44,14 +49,20 @@ const createProductSize = asyncHandler(async (req, res, next) => {
     const { categoryId, size } = req.body;
 
     if (!size || !categoryId)
-      throw new Error("Please fill all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
 
     const productSize = new ProductSize({ categoryId: categoryId, size: size });
 
     await productSize.save();
-    res.status(201).json(productSize);
+    res.status(201).json({
+      message: "Thêm kích cỡ sản phẩm thành công!",
+      data: productSize,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -60,7 +71,7 @@ const updateProductSizeById = asyncHandler(async (req, res, next) => {
     const productSize = await ProductSize.findById(req.params.id);
 
     if (!productSize)
-      return res.status(404).json({ message: "Product size not found" });
+      return res.status(404).json({ error: "Kích cỡ sản phẩm không tồn tại." });
 
     const { categoryId, size } = req.body;
 
@@ -68,9 +79,17 @@ const updateProductSizeById = asyncHandler(async (req, res, next) => {
     productSize.size = size || productSize.size;
 
     await productSize.save();
-    res.status(200).json(productSize);
+    res
+      .status(200)
+      .json({
+        message: "Cập nhật kích cỡ sản phẩm thành công!",
+        data: productSize,
+      });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -83,17 +102,20 @@ const deleteProductSizeById = asyncHandler(async (req, res, next) => {
     if (!productVariant)
       return res.status(400).json({
         message:
-          "Cannot delete product size while it is associated with product variants",
+          "Không thể xóa kích cỡ sản phẩm khi nó đang được liên kết với các sản phẩm.",
       });
 
     const productSize = await ProductSize.findByIdAndDelete(req.params.id);
 
     if (!productSize)
-      return res.status(404).json({ message: "Product size not found" });
+      return res.status(404).json({ error: "Kích cỡ sản phẩm không tồn tại." });
 
-    res.status(200).json({ message: "Product size deleted successfully" });
+    res.status(200).json({ message: "Xóa kích cỡ sản phẩm thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 

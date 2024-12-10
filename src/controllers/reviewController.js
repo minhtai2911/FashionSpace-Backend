@@ -6,21 +6,29 @@ const getReviewsByProductId = asyncHandler(async (req, res, next) => {
   try {
     const review = await Review.find({ productId: req.params.productId });
 
-    if (!review) return res.status(404).json({ message: "Reviews not found" });
+    if (!review)
+      return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
-    res.status(200).json(review);
+    res.status(200).json({ data: review });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
 const getAllReviews = asyncHandler(async (req, res, next) => {
   try {
     const reviews = await Review.find({});
-    if (!reviews) return res.status(404).json({ message: "Reviews not found" });
-    res.status(200).json(reviews);
+    if (!reviews)
+      return res.status(404).json({ error: "Đánh giá không tồn tại." });
+    res.status(200).json({ data: reviews });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -30,7 +38,7 @@ const createReview = asyncHandler(async (req, res, next) => {
 
     const userId = req.user.id;
     if (!productId || !rating) {
-      throw new Error("Please fill all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
     }
 
     const newReview = new Review({ userId, productId, rating, content });
@@ -38,15 +46,26 @@ const createReview = asyncHandler(async (req, res, next) => {
     await newReview.save();
 
     const product = await Product.findById(productId);
+    if (!product)
+      return res.status(404).json({ message: "Sản phẩm không tồn tại" });
+
     product.totalReview = product.totalReview + 1;
     product.rating =
       (rating + product.rating * (product.totalReview - 1)) /
       product.totalReview;
     await product.save();
 
-    res.status(201).json(newReview);
+    res
+      .status(201)
+      .json({
+        message: "Đánh giá của bạn đã được gửi thành công!",
+        data: newReview,
+      });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -54,11 +73,15 @@ const getReviewById = asyncHandler(async (req, res, next) => {
   try {
     const review = await Review.findById(req.params.id);
 
-    if (!review) return res.status(404).json({ message: "Review not found" });
+    if (!review)
+      return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
     res.status(200).json(review);
   } catch {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -66,11 +89,12 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
   try {
     const review = Review.findById(req.params.id);
 
-    if (!review) return res.status(404).json({ message: "Review not found" });
+    if (!review)
+      return res.status(404).json({ error: "Đánh giá không tồn tại" });
 
     const { rating, content } = req.body;
 
-    if (!rating) throw new Error("Please fill all required fields");
+    if (!rating) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
 
     const product = await Product.findById(review.productId);
     product.rating =
@@ -84,9 +108,17 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
 
     await review.save();
 
-    res.status(200).json(review);
+    res
+      .status(200)
+      .json({
+        message: "Đánh giá của bạn đã được cập nhật thành công!",
+        data: review,
+      });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -94,7 +126,8 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
   try {
     const review = await Review.findByIdAndDelete(req.params.id);
 
-    if (!review) return res.status(404).json({ message: "Review not found" });
+    if (!review)
+      return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
     const product = await Product.findById(review.productId);
     product.totalReview = product.totalReview - 1;
@@ -103,9 +136,14 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
       product.totalReview;
     await product.save();
 
-    res.status(200).json({ message: "Review deleted successfully" });
+    res
+      .status(200)
+      .json({ message: "Đánh giá của bạn đã được xóa thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -116,11 +154,15 @@ const getReviewByProductIdAndUserId = asyncHandler(async (req, res, next) => {
       userId: req.user.id,
     });
 
-    if (!review) return res.status(404).json({ message: "Review not found" });
+    if (!review)
+      return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
-    res.status(200).json(review);
+    res.status(200).json({ data: review });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 

@@ -8,9 +8,11 @@ const getAllProductImagesByProductId = asyncHandler(async (req, res, next) => {
   try {
     const productId = req.params.id;
     const productImages = await ProductImage.find({ productId });
-    res.status(200).json(productImages);
+   
+    res.status(200).json({data: productImages});
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
 });
 
@@ -20,11 +22,12 @@ const getProductImageById = asyncHandler(async (req, res, next) => {
     const productImage = await ProductImage.findById(productImageId);
 
     if (!productImage)
-      return res.status(404).json({ message: "Product image not found" });
+      return res.status(404).json({ error: "Ảnh sản phẩm không tồn tại." });
 
-    res.status(200).json(productImage);
+    res.status(200).json({data: productImage});
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
 });
 
@@ -38,19 +41,20 @@ const createProductImage = asyncHandler(async (req, res, next) => {
       imagePath = imagePath.slice(start);
       imagePath = path.join(process.env.URL_SERVER, imagePath);
       if (!productId || !imagePath)
-        throw new Error("Please fill all required fields");
+        throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
       const newProductImage = new ProductImage({ productId, imagePath });
       newProductImages.push(newProductImage);
       await newProductImage.save();
     }
-    res.status(201).json(newProductImages);
+    res.status(201).json({data: newProductImages});
   } catch (err) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     for (let i = 0; i < req.files.length; i++) {
       fs.unlinkSync(path.join(__dirname, "../..", req.files[i].path));
     }
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
 });
 
@@ -59,7 +63,7 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
     const updateProductImage = await ProductImage.findById(req.params.id);
 
     if (!updateProductImage)
-      return res.status(404).json({ message: "Product image not found" });
+      return res.status(404).json({ error: "Ảnh sản phẩm không tồn tại." });
 
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
@@ -79,12 +83,13 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
     updateProductImage.imagePath = imagePath;
 
     await updateProductImage.save();
-    res.status(200).json(updateProductImage);
+    res.status(200).json({data: updateProductImage});
   } catch (err) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
 });
 
@@ -110,7 +115,8 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
 //     await ProductImage.deleteMany({ productId: req.params.productId });
 //     res.status(200).json({ message: "Product image deleted successfully" });
 //   } catch (err) {
-//     res.status(500).json({ message: err.message });
+//     res.status(500).json({ error: err.message,
+        // message: "Đã xảy ra lỗi, vui lòng thử lại!", });
 //   }
 // });
 
@@ -132,7 +138,8 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
 //     fs.unlinkSync(path.join(__dirname, "..", deleteFile));
 //     res.status(200).json({ message: "Product image deleted successfully" });
 //   } catch (err) {
-//     res.status(500).json({ message: err.message });
+//     res.status(500).json({ error: err.message,
+        // message: "Đã xảy ra lỗi, vui lòng thử lại!", });
 //   }
 // });
 

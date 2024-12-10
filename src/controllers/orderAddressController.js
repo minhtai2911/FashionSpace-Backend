@@ -6,11 +6,18 @@ const getAllOrderAddresses = asyncHandler(async (req, res, next) => {
     const orderAddresses = await OrderAddress.find({});
 
     if (!orderAddresses)
-      return res.status(404).json({ message: "Order Addresses not found" });
+      return res
+        .status(404)
+        .json({ error: "Địa chỉ giao hàng không tồn tại." });
 
-    res.status(200).json(orderAddresses);
+    res.status(200).json({ data: orderAddresses });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -19,11 +26,18 @@ const getOrderAddressById = asyncHandler(async (req, res, next) => {
     const orderAddress = await OrderAddress.findById(req.params.id);
 
     if (!orderAddress)
-      return res.status(404).json({ message: "Order Address not found" });
+      return res
+        .status(404)
+        .json({ error: "Địa chỉ giao hàng không tồn tại." });
 
-    res.status(200).json(orderAddress);
+    res.status(200).json({ data: orderAddress });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -32,7 +46,7 @@ const createOrderAddress = asyncHandler(async (req, res, next) => {
     const { city, district, commune, phone, street } = req.body;
 
     if (!city || !district || !commune || !phone || !street) {
-      throw new Error("Please fill all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
     }
 
     const newOrderAddress = new OrderAddress({
@@ -44,9 +58,14 @@ const createOrderAddress = asyncHandler(async (req, res, next) => {
     });
 
     await newOrderAddress.save();
-    res.status(201).json(newOrderAddress);
+    res.status(201).json({ data: newOrderAddress });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -55,7 +74,9 @@ const updateOrderAddressById = asyncHandler(async (req, res, next) => {
     const orderAddress = await OrderAddress.findById(req.params.id);
 
     if (!orderAddress)
-      return res.status(404).json({ message: "Order Address not found" });
+      return res
+        .status(404)
+        .json({ error: "Địa chỉ giao hàng không tồn tại." });
 
     const { city, district, commune, phone, street } = req.body;
 
@@ -66,9 +87,14 @@ const updateOrderAddressById = asyncHandler(async (req, res, next) => {
     orderAddress.street = street || orderAddress.street;
 
     await orderAddress.save();
-    res.status(200).json(orderAddress);
+    res.status(200).json({ data: orderAddress });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -77,11 +103,16 @@ const deleteOrderAddressById = asyncHandler(async (req, res, next) => {
     const orderAddress = await OrderAddress.findByIdAndDelete(req.params.id);
 
     if (!orderAddress)
-      return res.status(404).json({ message: "Order Address not found" });
+      return res.status(404).json({ error: "Địa chỉ giao hàng không tồn tại." });
 
-    res.status(200).json({ message: "Order Address deleted successfully" });
+    res.status(200).json({ success: "Xóa địa chỉ giao hàng thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 

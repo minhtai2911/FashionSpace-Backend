@@ -7,11 +7,18 @@ const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
     const orderTracking = await OrderTracking.find({ orderId: orderId });
 
     if (!orderTracking)
-      return res.status(404).json({ message: "Order tracking not found" });
+      return res
+        .status(404)
+        .json({ error: "Lịch sử giao hàng không tồn tại." });
 
-    res.status(200).json(orderTracking);
+    res.status(200).json({ data: orderTracking });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -20,7 +27,7 @@ const createOrderTracking = asyncHandler(async (req, res, next) => {
     const { orderId, status, currentAddress, expectedDeliveryDate } = req.body;
 
     if (!orderId || !status || !currentAddress)
-      throw new Error("Please fill all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
     const orderTracking = new OrderTracking({
       orderId,
       status,
@@ -28,9 +35,19 @@ const createOrderTracking = asyncHandler(async (req, res, next) => {
       expectedDeliveryDate,
     });
     await orderTracking.save();
-    res.status(201).json(orderTracking);
+    res
+      .status(201)
+      .json({
+        message: "Thông tin theo dõi đơn hàng đã được cập nhật!",
+        data: orderTracking,
+      });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res
+      .status(400)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 

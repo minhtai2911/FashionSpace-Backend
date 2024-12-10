@@ -6,11 +6,14 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
     const product = await Product.find({});
 
     if (!product)
-      return res.status(404).json({ message: "Products not found" });
+      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
 
-    return res.status(200).json(product);
+    return res.status(200).json({ data: product });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -19,7 +22,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
     const { name, description, categoryId, price } = req.body;
 
     if (!name || !categoryId || !price) {
-      throw new Error("Please fill all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
     }
 
     const newProduct = new Product({
@@ -30,9 +33,14 @@ const createProduct = asyncHandler(async (req, res, next) => {
     });
 
     await newProduct.save();
-    res.status(201).json(newProduct);
+    res
+      .status(201)
+      .json({ message: "Thêm sản phẩm thành công!", data: newProduct });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -40,11 +48,15 @@ const getProductById = asyncHandler(async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product)
+      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
 
-    res.status(200).json(product);
+    res.status(200).json({ data: product });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -53,7 +65,7 @@ const updateProductById = asyncHandler(async (req, res, next) => {
     const updateProduct = await Product.findById(req.params.id);
 
     if (!updateProduct)
-      return res.status(404).json({ message: "Product not found" });
+      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
 
     const { name, description, categoryId, price } = req.body;
 
@@ -63,9 +75,14 @@ const updateProductById = asyncHandler(async (req, res, next) => {
     updateProduct.price = price || updateProduct.price;
 
     await updateProduct.save();
-    res.status(200).json(updateProduct);
+    res
+      .status(200)
+      .json({ message: "Cập nhật sản phẩm thành công!", data: updateProduct });
   } catch {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -73,37 +90,48 @@ const updateStatusProductById = asyncHandler(async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
 
-    if (!product) return res.status(404).json({ message: "Product not found" });
+    if (!product)
+      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
 
     product.isActive = !product.isActive;
 
     await product.save();
-
-    res.status(200).json({ message: "Update product status successfully" });
+    if (product.isActive)
+      res.status(200).json({ message: "Khôi phục sản phẩm thành công!" });
+    else res.status(200).json({ message: "Lưu trữ sản phẩm thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
 const getBestSellerProduct = asyncHandler(async (req, res, next) => {
   try {
-    const product = await Product.find({ soldQuantity: { $gt: 0 } })
+    const products = await Product.find({ soldQuantity: { $gt: 0 } })
       .sort({
         soldQuantity: -1,
       })
       .limit(10);
-    res.status(200).json(product);
+    res.status(200).json({ data: products });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
 const getNewArrivalProduct = asyncHandler(async (req, res, next) => {
   try {
-    const product = await Product.find({}).sort({ createdAt: -1 }).limit(10);
-    res.status(200).json(product);
+    const products = await Product.find({}).sort({ createdAt: -1 }).limit(10);
+    res.status(200).json({ data: products });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 

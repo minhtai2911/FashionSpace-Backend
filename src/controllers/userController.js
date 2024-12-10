@@ -9,11 +9,15 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.find({});
 
-    if (!user) return res.status(404).json({ message: "Users not found" });
+    if (!user)
+      return res.status(404).json({ error: "Người dùng không tồn tại." });
 
-    res.status(200).json(user);
+    res.status(200).json({ data: user });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -25,15 +29,22 @@ const getUserById = asyncHandler(async (req, res, next) => {
       role.roleName !== "Admin" &&
       role.roleName !== "Employee"
     )
-      return res.status(403).json({ message: "You do not have permission!" });
+      return res.status(403).json({
+        error:
+          "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên.",
+      });
 
     const user = await User.findById(req.params.id);
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user)
+      return res.status(404).json({ error: "Người dùng không tồn tại." });
 
-    res.status(200).json(user);
+    res.status(200).json({ data: user });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -41,7 +52,8 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
   try {
     const user = await User.findByIdAndDelete(req.params.id);
 
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user)
+      return res.status(404).json({ error: "Người dùng không tồn tại" });
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     const deleteStart = user.avatarPath.indexOf("\\avatars\\");
@@ -50,9 +62,12 @@ const deleteUserById = asyncHandler(async (req, res, next) => {
     if ("\\public\\avatars\\avatar.jpg" != deleteFile)
       fs.unlinkSync(path.join(__dirname, "..", deleteFile));
 
-    res.status(200).json({ message: "User deleted successfully" });
+    res.status(200).json({ message: "Xóa người dùng thành công!" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -60,10 +75,14 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   try {
     const role = await UserRole.findById(req.user.roleId);
     if (req.user.id !== req.params.id && role.roleName !== "Admin")
-      return res.status(403).json({ message: "You do not have permission!" });
+      return res.status(403).json({
+        message:
+          "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên.",
+      });
 
     const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user)
+      return res.status(404).json({ error: "Người dùng không tồn tại." });
 
     if (req.file) {
       if (user.avatarPath) {
@@ -92,7 +111,10 @@ const updateUserById = asyncHandler(async (req, res, next) => {
         },
         { new: true }
       );
-      return res.status(200).json(newUser);
+      return res.status(200).json({
+        message: "Cập nhật thông tin người dùng thành công!",
+        data: newUser,
+      });
     }
 
     const newUser = await User.findByIdAndUpdate(
@@ -107,12 +129,18 @@ const updateUserById = asyncHandler(async (req, res, next) => {
       { new: true }
     );
 
-    res.status(200).json(newUser);
+    res.status(200).json({
+      message: "Cập nhật thông tin người dùng thành công",
+      data: newUser,
+    });
   } catch (err) {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -120,19 +148,23 @@ const createUser = asyncHandler(async (req, res, next) => {
   try {
     const { email, fullName, phone, password, roleName } = req.body;
     if (!email || !fullName || !phone || !password || !roleName) {
-      throw new Error("Please fill all required fields");
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
     }
     const exists = await User.findOne({ email: email });
-    if (exists)
-      return res.status(400).json({ message: "Email already exists" });
+    if (exists) return res.status(400).json({ message: "Email đã tồn tại." });
     const role = await UserRole.findOne({ roleName: roleName });
-    if (!role) return res.status(400).json({ message: "Invalid role name" });
+    if (!role) return res.status(400).json({ error: "Vai trò không tồn tại." });
     const roleId = role._id;
     const newUser = new User({ email, fullName, phone, roleId, password });
     await newUser.save();
-    res.status(201).json(newUser);
+    res
+      .status(201)
+      .json({ message: "Thêm người dùng thành công!", data: newUser });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 

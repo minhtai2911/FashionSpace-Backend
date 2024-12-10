@@ -9,11 +9,18 @@ const getAllPaymentDetails = asyncHandler(async (req, res, next) => {
     const paymentDetail = await PaymentDetail.find({});
 
     if (!paymentDetail)
-      return res.status(404).json({ message: "PaymentDetail not found" });
+      return res
+        .status(404)
+        .json({ error: "Chi tiết thanh toán không tồn tại." });
 
-    res.status(200).json(paymentDetail);
+    res.status(200).json({ data: paymentDetail });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -22,11 +29,18 @@ const getPaymentDetailById = asyncHandler(async (req, res, next) => {
     const paymentDetail = await PaymentDetail.findById(req.params.id);
 
     if (!paymentDetail)
-      return res.status(404).json({ message: "PaymentDetail not found" });
+      return res
+        .status(404)
+        .json({ error: "Chi tiết thanh toán không tồn tại." });
 
-    res.status(200).json(paymentDetail);
+    res.status(200).json({ data: paymentDetail });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -34,7 +48,8 @@ const createPaymentDetail = asyncHandler(async (req, res, next) => {
   try {
     const { paymentMethod, status } = req.body;
 
-    if (!paymentMethod) throw new Error("Please fill all required fields");
+    if (!paymentMethod)
+      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
 
     const newPaymentDetail = new PaymentDetail({
       paymentMethod,
@@ -42,9 +57,19 @@ const createPaymentDetail = asyncHandler(async (req, res, next) => {
     });
 
     await newPaymentDetail.save();
-    res.status(201).json(newPaymentDetail);
+    res
+      .status(201)
+      .json({
+        message: "Thanh toán của bạn đã được xử lý thành công!",
+        data: newPaymentDetail,
+      });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -53,7 +78,9 @@ const updatePaymentDetailById = asyncHandler(async (req, res, next) => {
     const updatePaymentDetail = await PaymentDetail.findById(req.params.id);
 
     if (!updatePaymentDetail)
-      return res.status(404).json({ message: "PaymentDetail not found" });
+      return res
+        .status(404)
+        .json({ error: "Chi tiết thanh toán không tồn tại." });
 
     const { status } = req.body;
 
@@ -61,9 +88,19 @@ const updatePaymentDetailById = asyncHandler(async (req, res, next) => {
     updatePaymentDetail.updatedDate = Date.now();
 
     await updatePaymentDetail.save();
-    res.status(200).json(updatePaymentDetail);
+    res
+      .status(200)
+      .json({
+        message: "Thanh toán của bạn đã được xử lý thành công!",
+        data: updatePaymentDetail,
+      });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -74,11 +111,16 @@ const deletePaymentDetailById = asyncHandler(async (req, res, next) => {
     );
 
     if (!deletePaymentDetail)
-      return res.status(404).json({ message: "PaymentDetail not found" });
+      return res.status(404).json({ error: "Chi tiết thanh toán không tồn tại." });
 
-    res.status(200).json({ message: "PaymentDetail deleted successfully" });
+    res.status(200).json({ message: "Xóa thành công!" });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -157,7 +199,12 @@ const checkoutWithMoMo = asyncHandler(async (req, res, next) => {
     const response = await axios(options);
     res.status(200).json(response.data);
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -174,7 +221,10 @@ const callbackPaymentDetail = asyncHandler(async (req, res, next) => {
       paymentDetail.save();
     }
   } catch (err) {
-    throw new Error({ message: err.message });
+    throw new Error({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -212,12 +262,17 @@ const checkStatusTransaction = asyncHandler(async (req, res, next) => {
     const response = await axios(options);
 
     if (response.data.resultCode === 0) {
-      return res.status(200).json({message: "Paid"});
+      return res.status(200).json({ message: "Paid" });
     } else {
       res.status(400).json("Unpaid");
     }
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    return res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
