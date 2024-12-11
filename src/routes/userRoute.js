@@ -11,7 +11,7 @@ router.delete(
   "/:id",
   authMiddleware.verifyToken,
   authMiddleware.checkPermission(["Admin"]),
-  userController.deleteUserById
+  userController.updateStatusUserById
 );
 router.put(
   "/:id",

@@ -41,8 +41,9 @@ const login = asyncHandler(async (req, res, next) => {
     }
 
     const user = await User.login(email, originalPassword);
+    const role = await UserRole.findById(user.roleId);
 
-    if (!user.isActive) {
+    if (!user.isActive && role.roleName === "Customer") {
       return res.status(400).json({ data: user });
     }
 

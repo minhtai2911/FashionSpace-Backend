@@ -77,7 +77,7 @@ const updateUserRole = asyncHandler(async (req, res, next) => {
     await userRole.save();
     res
       .status(200)
-      .json({ message: "Cập nhật vai trò thành công!", data: userRole });
+      .json({ message: "Chỉnh sửa vai trò thành công!", data: userRole });
   } catch (err) {
     res.status(500).json({
       error: err.message,

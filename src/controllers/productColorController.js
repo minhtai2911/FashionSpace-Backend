@@ -66,7 +66,7 @@ const updateProductColorById = asyncHandler(async (req, res, next) => {
 
     await productColor.save();
     res.status(200).json({
-      message: "Cập nhật màu sắc sản phẩm thành công!",
+      message: "Chỉnh sửa màu sắc sản phẩm thành công!",
       data: productColor,
     });
   } catch (err) {

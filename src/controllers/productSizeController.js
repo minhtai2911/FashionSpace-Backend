@@ -82,7 +82,7 @@ const updateProductSizeById = asyncHandler(async (req, res, next) => {
     res
       .status(200)
       .json({
-        message: "Cập nhật kích cỡ sản phẩm thành công!",
+        message: "Chỉnh sửa kích cỡ sản phẩm thành công!",
         data: productSize,
       });
   } catch (err) {

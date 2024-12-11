@@ -85,7 +85,7 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
     res
       .status(200)
       .json({
-        message: "Cập nhật danh mục sản phẩm thành công!",
+        message: "Chỉnh sửa danh mục sản phẩm thành công!",
         data: category,
       });
   } catch (err) {

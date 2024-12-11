@@ -77,7 +77,7 @@ const updateProductById = asyncHandler(async (req, res, next) => {
     await updateProduct.save();
     res
       .status(200)
-      .json({ message: "Cập nhật sản phẩm thành công!", data: updateProduct });
+      .json({ message: "Chỉnh sửa sản phẩm thành công!", data: updateProduct });
   } catch {
     res.status(500).json({
       error: err.message,

@@ -37,21 +37,24 @@ const getUserById = asyncHandler(async (req, res, next) => {
   }
 });
 
-const deleteUserById = asyncHandler(async (req, res, next) => {
+const updateStatusUserById = asyncHandler(async (req, res, next) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
-
+    const user = await User.findById(req.params.id);
     if (!user)
-      return res.status(404).json({ error: "Người dùng không tồn tại" });
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const deleteStart = user.avatarPath.indexOf("\\avatars\\");
-    const deleteFile = "\\public" + user.avatarPath.slice(deleteStart);
+      return res.status(404).json({ error: "Người dùng không tồn tại." });
 
-    if ("\\public\\avatars\\avatar.jpg" != deleteFile)
-      fs.unlinkSync(path.join(__dirname, "..", deleteFile));
-
-    res.status(200).json({ message: "Xóa người dùng thành công!" });
+    const updateUser = await User.findByIdAndUpdate(
+      req.params.id,
+      {
+        $set: {
+          isActive: !user.isActive,
+        },
+      },
+      { new: true }
+    );
+    res
+      .status(200)
+      .json({ message: "Lưu trữ người dùng thành công!", data: updateUser });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -101,7 +104,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
         { new: true }
       );
       return res.status(200).json({
-        message: "Cập nhật thông tin người dùng thành công!",
+        message: "Chỉnh sửa thông tin người dùng thành công!",
         data: newUser,
       });
     }
@@ -119,7 +122,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
     );
 
     res.status(200).json({
-      message: "Cập nhật thông tin người dùng thành công!",
+      message: "Chỉnh sửa thông tin người dùng thành công!",
       data: newUser,
     });
   } catch (err) {
@@ -160,7 +163,7 @@ const createUser = asyncHandler(async (req, res, next) => {
 export default {
   getAllUsers: getAllUsers,
   getUserById: getUserById,
-  deleteUserById: deleteUserById,
+  updateStatusUserById: updateStatusUserById,
   updateUserById: updateUserById,
   createUser: createUser,
 };
