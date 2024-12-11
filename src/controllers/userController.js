@@ -52,9 +52,13 @@ const updateStatusUserById = asyncHandler(async (req, res, next) => {
       },
       { new: true }
     );
+    if (!updateUser.isActive)
+      return res
+        .status(200)
+        .json({ message: "Lưu trữ người dùng thành công!", data: updateUser });
     res
       .status(200)
-      .json({ message: "Lưu trữ người dùng thành công!", data: updateUser });
+      .json({ message: "Khôi phục người dùng thành công!", data: updateUser });
   } catch (err) {
     res.status(500).json({
       error: err.message,
