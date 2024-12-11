@@ -47,6 +47,15 @@ const login = asyncHandler(async (req, res, next) => {
       return res.status(400).json({ data: user });
     }
 
+    if (!user.isActive) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên.",
+        });
+    }
+
     const accessToken = jwt.sign(
       { id: user._id, roleId: user.roleId },
       process.env.ACCESS_TOKEN_SECRET,
