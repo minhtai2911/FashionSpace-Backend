@@ -83,9 +83,9 @@ const createStatistic = asyncHandler(async (req, res, next) => {
 const getStatistics = asyncHandler(async (req, res, next) => {
   try {
     const query = {};
-    if (req.query.year) query.year = req.query.year;
-    if (req.query.month) query.month = req.query.month;
-    if (req.query.day) query.day = req.query.day;
+    if (req.query.year) query.year = parseInt(req.query.year);
+    if (req.query.month) query.month = parseInt(req.query.month);
+    if (req.query.day) query.day = parseInt(req.query.day);
 
     let statistics;
 

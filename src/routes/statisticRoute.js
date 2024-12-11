@@ -13,8 +13,8 @@ router.post(
 
 router.get(
   "/",
-  authMiddleware.verifyToken,
-  authMiddleware.checkPermission(["Admin"]),
+  // authMiddleware.verifyToken,
+  // authMiddleware.checkPermission(["Admin"]),
   statisticController.getStatistics
 );
 
