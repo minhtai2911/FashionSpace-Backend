@@ -29,7 +29,7 @@ const createStatistic = asyncHandler(async (req, res, next) => {
         },
       },
       {
-        $count: "totalOrders", 
+        $count: "totalOrders",
       },
     ]);
 
@@ -87,11 +87,31 @@ const getStatistics = asyncHandler(async (req, res, next) => {
     if (req.query.month) query.month = req.query.month;
     if (req.query.day) query.day = req.query.day;
 
-    const statistics = await Statistic.find(query).sort({
-      year: -1,
-      month: -1,
-      day: -1,
-    });
+    let statistics;
+
+    if (!req.query.day && !req.query.month) {
+      statistics = await Statistic.aggregate([
+        {
+          $match: query,
+        },
+        {
+          $group: {
+            _id: { year: "$year", month: "$month" },
+            totalOrder: { $sum: "$totalOrder" },
+            totalRevenue: { $sum: "$totalRevenue" },
+          },
+        },
+        {
+          $sort: { "_id.year": -1, "_id.month": -1 }, // Sắp xếp theo năm và tháng giảm dần
+        },
+      ]);
+    } else {
+      statistics = await Statistic.find(query).sort({
+        year: -1,
+        month: -1,
+        day: -1,
+      });
+    }
 
     if (!statistics)
       return res.status(404).json({ error: "Báo cáo không tồn tại." });
@@ -136,7 +156,7 @@ cron.schedule("0 59 23 * * *", async () => {
         },
       },
       {
-        $count: "totalOrders", 
+        $count: "totalOrders",
       },
     ]);
 
@@ -179,7 +199,7 @@ cron.schedule("0 59 23 * * *", async () => {
       totalOrder: totalOrder[0].totalOrders,
       totalRevenue: totalRevenue[0].totalRevenue,
     });
-    
+
     await statistic.save();
   } catch (error) {
     throw new Error(error.message);

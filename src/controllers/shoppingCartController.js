@@ -118,7 +118,7 @@ const deleteShoppingCartById = asyncHandler(async (req, res, next) => {
     if (!shoppingCart)
       res.status(404).json({ error: "Giỏ hàng không tồn tại" });
 
-    res.status(200).json({ message: "Xóa thành công!" });
+    res.status(200).json({ message: "Sản phẩm đã được xóa khỏi giỏ hàng!" });
   } catch {
     res.status(500).json({ error: err.message,
         message: "Đã xảy ra lỗi, vui lòng thử lại!", });

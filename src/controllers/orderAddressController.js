@@ -87,7 +87,7 @@ const updateOrderAddressById = asyncHandler(async (req, res, next) => {
     orderAddress.street = street || orderAddress.street;
 
     await orderAddress.save();
-    res.status(200).json({ data: orderAddress });
+    res.status(200).json({message: "Cập nhật thông tin giao hàng thành công!", data: orderAddress });
   } catch (err) {
     res
       .status(500)
