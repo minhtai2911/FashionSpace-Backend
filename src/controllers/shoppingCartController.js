@@ -8,10 +8,14 @@ const getAllShoppingCarts = asyncHandler(async (req, res, next) => {
     if (!shoppingCart)
       return res.status(404).json({ error: "Giỏ hàng không tồn tại." });
 
-    res.status(200).json({data: shoppingCart});
+    res.status(200).json({ data: shoppingCart });
   } catch (err) {
-    res.status(500).json({ error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -20,10 +24,14 @@ const getShoppingCartById = asyncHandler(async (req, res, next) => {
     const shoppingCart = await ShoppingCart.findById(req.params.id);
     if (!shoppingCart)
       return res.status(404).json({ error: "Giỏ hàng không tồn tại" });
-    res.status(200).json({data: shoppingCart});
+    res.status(200).json({ data: shoppingCart });
   } catch (err) {
-    res.status(500).json({ error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -33,10 +41,14 @@ const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
     const shoppingCart = await ShoppingCart.find({ userId: userId });
     if (!shoppingCart)
       return res.status(404).json({ error: "Giỏ hàng không tồn tại" });
-    res.status(200).json({data: shoppingCart});
+    res.status(200).json({ data: shoppingCart });
   } catch (err) {
-    res.status(500).json({ error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -53,10 +65,14 @@ const getShoppingCartByUserIdProductVariantId = asyncHandler(
       if (!shoppingCart)
         return res.status(404).json({ error: "Giỏ hàng không tồn tại." });
 
-      res.status(200).json({data: shoppingCart});
+      res.status(200).json({ data: shoppingCart });
     } catch (err) {
-      res.status(500).json({ error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+      res
+        .status(500)
+        .json({
+          error: err.message,
+          message: "Đã xảy ra lỗi, vui lòng thử lại!",
+        });
     }
   }
 );
@@ -78,7 +94,12 @@ const createShoppingCart = asyncHandler(async (req, res, next) => {
     if (existingShoppingCart) {
       existingShoppingCart.quantity += quantity;
       await existingShoppingCart.save();
-      return res.status(200).json({data: existingShoppingCart});
+      return res
+        .status(200)
+        .json({
+          message: "Sản phẩm đã được thêm vào giỏ hàng!",
+          data: existingShoppingCart,
+        });
     }
 
     const newShoppingCart = new ShoppingCart({
@@ -88,10 +109,19 @@ const createShoppingCart = asyncHandler(async (req, res, next) => {
     });
 
     await newShoppingCart.save();
-    res.status(201).json({data: newShoppingCart});
+    res
+      .status(201)
+      .json({
+        message: "Sản phẩm đã được thêm vào giỏ hàng!",
+        data: newShoppingCart,
+      });
   } catch {
-    res.status(500).json({ error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -104,10 +134,14 @@ const updateShoppingCartQuantityById = asyncHandler(async (req, res, next) => {
 
     shoppingCart.quantity = req.body.quantity || shoppingCart.quantity;
     await shoppingCart.save();
-    res.status(200).json({data: shoppingCart});
+    res.status(200).json({ data: shoppingCart });
   } catch (err) {
-    res.status(500).json({ error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -120,8 +154,12 @@ const deleteShoppingCartById = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ message: "Sản phẩm đã được xóa khỏi giỏ hàng!" });
   } catch {
-    res.status(500).json({ error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+    res
+      .status(500)
+      .json({
+        error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      });
   }
 });
 
@@ -132,5 +170,6 @@ export default {
   createShoppingCart: createShoppingCart,
   updateShoppingCartQuantityById: updateShoppingCartQuantityById,
   deleteShoppingCartById: deleteShoppingCartById,
-  getShoppingCartByUserIdProductVariantId: getShoppingCartByUserIdProductVariantId,
+  getShoppingCartByUserIdProductVariantId:
+    getShoppingCartByUserIdProductVariantId,
 };

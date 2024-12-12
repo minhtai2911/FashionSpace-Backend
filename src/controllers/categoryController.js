@@ -105,7 +105,7 @@ const deleteCategoryById = asyncHandler(async (req, res, next) => {
     if (!productSize)
       return res.status(400).json({
         message:
-          "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với các kích thước sản phẩm.",
+          "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với các kích cỡ sản phẩm.",
       });
 
     const product = await Product.find({ categoryId: req.params.id });

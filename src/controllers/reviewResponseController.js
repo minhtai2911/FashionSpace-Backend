@@ -30,7 +30,7 @@ const createReviewResponse = asyncHandler(async (req, res, next) => {
     await newReviewResponse.save();
     res
       .status(201)
-      .json({ message: "Phản hồi thành công!", data: newReviewResponse });
+      .json({ message: "Phản hồi đánh giá thành công!", data: newReviewResponse });
   } catch (err) {
     res.status(500).json({
       error: err.message,
