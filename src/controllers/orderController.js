@@ -5,7 +5,7 @@ import chatbotController from "./chatbotController.js";
 
 const getAllOrder = asyncHandler(async (req, res, next) => {
   try {
-    const order = await Order.find({});
+    const order = await Order.find({}).sort({ createdDate: -1 });
 
     if (!order)
       return res.status(404).json({ error: "Đơn hàng không tồn tại." });

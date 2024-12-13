@@ -5,7 +5,7 @@ const getReviewResponseByReviewId = asyncHandler(async (req, res, next) => {
   try {
     const reviewId = req.params.reviewId;
 
-    const reviewResponse = await ReviewResponse.find({ reviewId: reviewId });
+    const reviewResponse = await ReviewResponse.find({ reviewId: reviewId }).sort({ createdDate: -1 }); ;
 
     if (!reviewResponse)
       return res.status(404).json({ error: "Phản hồi không tồn tại." });

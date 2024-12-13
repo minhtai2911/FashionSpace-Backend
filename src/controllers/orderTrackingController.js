@@ -5,7 +5,7 @@ import chatbotController from "./chatbotController.js";
 const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
   try {
     const orderId = req.params.orderId;
-    const orderTracking = await OrderTracking.find({ orderId: orderId });
+    const orderTracking = await OrderTracking.find({ orderId: orderId }).sort({ date: 1 }); 
 
     if (!orderTracking)
       return res

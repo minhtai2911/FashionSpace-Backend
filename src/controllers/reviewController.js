@@ -19,6 +19,9 @@ const getReviewsByProductId = asyncHandler(async (req, res, next) => {
           productId: new mongoose.Types.ObjectId(req.params.productId),
         },
       },
+      {
+        $sort: { createdDate: -1 },
+      },
     ]);
 
     if (!reviews)
@@ -43,6 +46,10 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
           foreignField: "reviewId",
           as: "reviewResponses",
         },
+        
+      },
+      {
+        $sort: { createdDate: -1 }, 
       },
     ]);
 
@@ -200,6 +207,9 @@ const getReviewByProductIdAndUserId = asyncHandler(async (req, res, next) => {
           userId: new mongoose.Types.ObjectId(req.user.id),
         },
       },
+      {
+        $sort: { createdDate: -1 }, 
+      },
     ]);
 
     if (!review)
@@ -230,6 +240,9 @@ const getReviewsNotReplied = asyncHandler(async (req, res, next) => {
           reviewResponses: { $size: 0 },
         },
       },
+      {
+        $sort: { createdDate: 1 }, 
+      },
     ]);
 
     if (!reviews)
@@ -258,6 +271,9 @@ const getReviewsReplied = asyncHandler(async (req, res, next) => {
         $match: {
           reviewResponses: { $ne: [] },
         },
+      },
+      {
+        $sort: { createdDate: -1 }, 
       },
     ]);
 
