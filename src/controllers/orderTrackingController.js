@@ -1,5 +1,6 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import OrderTracking from "../models/orderTracking.js";
+import chatbotController from "./chatbotController.js";
 
 const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
   try {
@@ -34,6 +35,11 @@ const createOrderTracking = asyncHandler(async (req, res, next) => {
       currentAddress,
       expectedDeliveryDate,
     });
+
+    if (orderTracking.status === "Đã giao" || orderTracking.status === "Đã hủy" || orderTracking.status === "Đã trả hàng") {
+      chatbotController.deleteEntityOrderId(orderTracking.orderId);
+    } 
+    
     await orderTracking.save();
     res
       .status(201)

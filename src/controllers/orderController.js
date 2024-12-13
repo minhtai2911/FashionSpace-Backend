@@ -1,6 +1,7 @@
 import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/order.js";
 import OrderTracking from "../models/orderTracking.js";
+import chatbotController from "./chatbotController.js";
 
 const getAllOrder = asyncHandler(async (req, res, next) => {
   try {
@@ -79,29 +80,11 @@ const createOrder = asyncHandler(async (req, res, next) => {
     const newOrderTracking = new OrderTracking({
       orderId: newOrder._id,
     });
-
     await newOrderTracking.save();
 
+    chatbotController.updateEntityOrderId(newOrder._id);
     await newOrder.save();
     res.status(201).json({ message: "Đặt hàng thành công!", data: newOrder });
-  } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
-  }
-});
-
-const deleteOrderById = asyncHandler(async (req, res, next) => {
-  try {
-    const order = await Order.findByIdAndDelete(req.params.id);
-
-    if (!order)
-      return res.status(404).json({ error: "Đơn hàng không tồn tại." });
-
-    res.status(200).json({ message: "Xóa đơn hàng thành công!" });
   } catch (err) {
     res
       .status(500)
@@ -116,6 +99,5 @@ export default {
   getAllOrder: getAllOrder,
   getOrderById: getOrderById,
   createOrder: createOrder,
-  deleteOrderById: deleteOrderById,
   getOrderByUserId: getOrderByUserId,
 };

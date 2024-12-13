@@ -255,7 +255,7 @@ const sendOTP = asyncHandler(async (req, res, next) => {
     const info = await transporter.sendMail({
       from: `Fashion Space <${process.env.EMAIL_USER}>`,
       to: `${email}`,
-      subject: "YÊU CẦU ĐỔI MẬT KHẨU TỪ FASHION SPACE",
+      subject: "YÊU CẦU ĐẶT LẠI MẬT KHẨU TỪ FASHION SPACE",
       html: `
       <div>Chào ${email},</div>
       <div>Chúng tôi đã nhận được yêu cầu để đặt lại mật khẩu của bạn.</div>

@@ -2,6 +2,7 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import Category from "../models/category.js";
 import ProductSize from "../models/productSize.js";
 import Product from "../models/product.js";
+import chatbotController from "./chatbotController.js";
 
 const getAllCategories = asyncHandler(async (req, res, next) => {
   try {
@@ -51,6 +52,7 @@ const createCategory = asyncHandler(async (req, res, next) => {
     const newCategory = new Category({ name, gender });
 
     await newCategory.save();
+    chatbotController.updateEntityCategory(name, [name]);
     res
       .status(201)
       .json({
@@ -77,6 +79,9 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
         .json({ error: "Danh mục sản phẩm không tồn tại." });
 
     const { name, gender } = req.body;
+
+    chatbotController.deleteEntityCategory(category.name);
+    chatbotController.updateEntityCategory(name, [name]);
 
     category.name = name || category.name;
     category.gender = gender || category.gender;
@@ -122,7 +127,7 @@ const deleteCategoryById = asyncHandler(async (req, res, next) => {
       return res
         .status(404)
         .json({ error: "Danh mục sản phẩm không tồn tại." });
-
+    chatbotController.deleteEntityCategory(category.name);
     res.status(200).json({ message: "Xóa danh mục sản phẩm thành công!" });
   } catch (err) {
     res

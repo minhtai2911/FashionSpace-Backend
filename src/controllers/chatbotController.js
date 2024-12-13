@@ -134,4 +134,125 @@ const chatbot = asyncHandler(async (req, res, next) => {
   }
 });
 
-export default chatbot;
+const entityCategoryId =
+  "projects/fashionspace-hagm/agent/entityTypes/e12b19d7-490b-4ac3-9443-2e31fe44d09f";
+const entityTypesClient = new dialogflow.EntityTypesClient(CONFIGURATION);
+
+const updateEntityCategory = asyncHandler(async (category, synonyms) => {
+  try {
+    const [entityType] = await entityTypesClient.getEntityType({
+      name: entityCategoryId,
+    });
+
+    const newEntityValue = category;
+
+    const existingValues = entityType.entities.map((entity) => entity.value);
+    if (existingValues.includes(newEntityValue)) {
+      return;
+    }
+
+    entityType.entities.push({
+      value: newEntityValue,
+      synonyms: synonyms,
+    });
+
+    const updateEntityRequest = {
+      entityType: entityType,
+    };
+
+    await entityTypesClient.updateEntityType(updateEntityRequest);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+});
+
+const deleteEntityCategory = asyncHandler(async (category) => {
+  try {
+    const [entityType] = await entityTypesClient.getEntityType({
+      name: entityCategoryId,
+    });
+
+    const existingValues = entityType.entities.map((entity) => entity.value);
+
+    if (existingValues.includes(category)) {
+      const entityIndex = entityType.entities.findIndex(
+        (entity) => entity.value === category
+      );
+
+      entityType.entities.splice(entityIndex, 1);
+    }
+
+    const updateEntityRequest = {
+      entityType: entityType,
+    };
+
+    await entityTypesClient.updateEntityType(updateEntityRequest);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+});
+
+const entityOrderIdId =
+  "projects/fashionspace-hagm/agent/entityTypes/53b59b0c-8caa-4058-ad9c-20dd1782f6ab";
+
+const updateEntityOrderId = asyncHandler(async (orderId) => {
+  try {
+    const [entityType] = await entityTypesClient.getEntityType({
+      name: entityOrderIdId,
+    });
+
+    const newEntityValue = orderId;
+
+    const existingValues = entityType.entities.map((entity) => entity.value);
+    if (existingValues.includes(newEntityValue)) {
+      return;
+    }
+
+    entityType.entities.push({
+      value: newEntityValue,
+      synonyms: [orderId],
+    });
+
+    const updateEntityRequest = {
+      entityType: entityType,
+    };
+
+    await entityTypesClient.updateEntityType(updateEntityRequest);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+});
+
+const deleteEntityOrderId = asyncHandler(async (orderId) => {
+  try {
+    const [entityType] = await entityTypesClient.getEntityType({
+      name: entityOrderIdId,
+    });
+
+    const existingValues = entityType.entities.map((entity) => entity.value);
+
+    if (existingValues.includes(orderId)) {
+      const entityIndex = entityType.entities.findIndex(
+        (entity) => entity.value === orderId
+      );
+
+      entityType.entities.splice(entityIndex, 1);
+    }
+
+    const updateEntityRequest = {
+      entityType: entityType,
+    };
+
+    await entityTypesClient.updateEntityType(updateEntityRequest);
+  } catch (err) {
+    throw new Error(err.message);
+  }
+});
+
+export default {
+  chatbot: chatbot,
+  updateEntityCategory: updateEntityCategory,
+  deleteEntityCategory: deleteEntityCategory,
+  updateEntityOrderId: updateEntityOrderId,
+  deleteEntityOrderId: deleteEntityOrderId,
+};
