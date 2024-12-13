@@ -3,6 +3,7 @@ import dialogflow, { SessionsClient } from "@google-cloud/dialogflow";
 import { v4 as uuidv4 } from "uuid";
 import Product from "../models/product.js";
 import Category from "../models/category.js";
+import OrderTracking from "../models/orderTracking.js";
 
 const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
 const PROJECTID = CREDENTIALS.project_id;
@@ -47,10 +48,10 @@ const chatbot = asyncHandler(async (req, res, next) => {
 
       return res.status(200).json({
         message:
-          "Cảm ơn bạn đã ghé thăm FashionSpace. Dưới đây là một số sản phẩm bán chạy nhất của chúng tôi hiện nay:",
+          "Cảm ơn bạn đã ghé thăm FashionSpace. Dưới đây là một số sản phẩm bán chạy nhất của chúng mình hiện nay:",
         data: product,
         messageEnd:
-          "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho tôi biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
+          "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
       });
     }
 
@@ -58,10 +59,10 @@ const chatbot = asyncHandler(async (req, res, next) => {
       const product = await Product.find({}).sort({ createdAt: -1 }).limit(10);
       return res.status(200).json({
         message:
-          "Cảm ơn bạn đã quan tâm đến các sản phẩm mới tại FashionSpace. Dưới đây là một số sản phẩm mới nhất mà chúng tôi vừa ra mắt:",
+          "Cảm ơn bạn đã quan tâm đến các sản phẩm mới tại FashionSpace. Dưới đây là một số sản phẩm mới nhất mà chúng mình vừa ra mắt:",
         data: product,
         messageEnd:
-          "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho tôi biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
+          "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
       });
     }
 
@@ -80,7 +81,7 @@ const chatbot = asyncHandler(async (req, res, next) => {
         if (!category)
           return res.status(200).json({
             message:
-              "Cảm ơn bạn đã quan tâm đến sản phẩm của chúng tôi. Hiện tại, sản phẩm mà bạn đang tìm kiếm không có sẵn trong kho. Chúng tôi rất tiếc vì sự bất tiện này.",
+              "Cảm ơn bạn đã quan tâm đến sản phẩm của chúng mình. Hiện tại, sản phẩm mà bạn đang tìm kiếm không có sẵn trong kho. Chúng mình rất tiếc vì sự bất tiện này.",
             data: null,
             messageEnd: null,
           });
@@ -95,7 +96,7 @@ const chatbot = asyncHandler(async (req, res, next) => {
           message: `Dưới đây là một số mẫu ${categoryName} đang có sẵn tại FashionSpace, phù hợp với nhiều phong cách và nhu cầu khác nhau:`,
           data: product,
           messageEnd:
-            "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho tôi biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
+            "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
         });
       } else {
         const category = await Category.findOne({
@@ -106,7 +107,7 @@ const chatbot = asyncHandler(async (req, res, next) => {
         if (!category)
           return res.status(200).json({
             message:
-              "Cảm ơn bạn đã quan tâm đến sản phẩm của chúng tôi. Hiện tại, sản phẩm mà bạn đang tìm kiếm không có sẵn trong kho. Chúng tôi rất tiếc vì sự bất tiện này.",
+              "Cảm ơn bạn đã quan tâm đến sản phẩm của chúng mình. Hiện tại, sản phẩm mà bạn đang tìm kiếm không có sẵn trong kho. Chúng mình rất tiếc vì sự bất tiện này.",
             data: null,
             messageEnd: null,
           });
@@ -121,9 +122,23 @@ const chatbot = asyncHandler(async (req, res, next) => {
           message: `Dưới đây là một số mẫu ${categoryName} ${gender} đang có sẵn tại FashionSpace, phù hợp với nhiều phong cách và nhu cầu khác nhau:`,
           data: product,
           messageEnd:
-            "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho tôi biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
+            "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
         });
       }
+    }
+
+    if (result.fulfillmentText.substring(0, 7) === "orderId") {
+      const orderId = result.fulfillmentText.substring(10);
+      const orderTracking = await OrderTracking.find({
+        orderId: orderId,
+      });
+
+      if (!orderTracking)
+        return res
+          .status(404)
+          .json({ error: "Lịch sử giao hàng không tồn tại." });
+
+      return res.status(200).json({ data: orderTracking });
     }
 
     return res
