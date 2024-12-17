@@ -51,7 +51,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
         {
           $match: {
             productId: new mongoose.Types.ObjectId(req.query.productId),
-            rating: new mongoose.Types.ObjectId(req.query.rating),
+            rating: req.query.rating,
             userId: new mongoose.Types.ObjectId(req.query.userId),
             orderId: new mongoose.Types.ObjectId(req.query.orderId),
             reviewResponses: { $size: 0 },
@@ -80,7 +80,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
         {
           $match: {
             productId: new mongoose.Types.ObjectId(req.query.productId),
-            rating: new mongoose.Types.ObjectId(req.query.rating),
+            rating: req.query.rating,
             userId: new mongoose.Types.ObjectId(req.query.userId),
             orderId: new mongoose.Types.ObjectId(req.query.orderId),
             reviewResponses: { $ne: [] },
@@ -109,7 +109,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
       {
         $match: {
           productId: new mongoose.Types.ObjectId(req.query.productId),
-          rating: new mongoose.Types.ObjectId(req.query.rating),
+          rating: req.query.rating,
           userId: new mongoose.Types.ObjectId(req.query.userId),
           orderId: new mongoose.Types.ObjectId(req.query.orderId),
         },
