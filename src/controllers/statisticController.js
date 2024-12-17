@@ -102,7 +102,7 @@ const getStatistics = asyncHandler(async (req, res, next) => {
           },
         },
         {
-          $sort: { "_id.year": -1, "_id.month": -1 }, // Sắp xếp theo năm và tháng giảm dần
+          $sort: { "_id.year": -1, "_id.month": -1 }, 
         },
       ]);
     } else {
