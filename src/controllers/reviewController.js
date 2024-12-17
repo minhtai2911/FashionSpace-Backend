@@ -38,6 +38,15 @@ import mongoose from "mongoose";
 
 const getAllReviews = asyncHandler(async (req, res, next) => {
   try {
+    const query = {};
+    if (req.query.productId)
+      query.productId = new mongoose.Types.ObjectId(req.query.productId);
+    if (req.query.rating) query.rating = parseInt(req.query.rating);
+    if (req.query.userId)
+      query.userId = new mongoose.Types.ObjectId(req.query.userId);
+    if (req.query.orderId)
+      query.orderId = new mongoose.Types.ObjectId(req.query.orderId);
+
     if (req.query.status === "Chưa trả lời") {
       const reviews = await Review.aggregate([
         {
@@ -50,10 +59,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
         },
         {
           $match: {
-            productId: new mongoose.Types.ObjectId(req.query.productId),
-            rating: req.query.rating,
-            userId: new mongoose.Types.ObjectId(req.query.userId),
-            orderId: new mongoose.Types.ObjectId(req.query.orderId),
+            query,
             reviewResponses: { $size: 0 },
           },
         },
@@ -79,10 +85,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
         },
         {
           $match: {
-            productId: new mongoose.Types.ObjectId(req.query.productId),
-            rating: req.query.rating,
-            userId: new mongoose.Types.ObjectId(req.query.userId),
-            orderId: new mongoose.Types.ObjectId(req.query.orderId),
+            query,
             reviewResponses: { $ne: [] },
           },
         },
@@ -107,12 +110,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
         },
       },
       {
-        $match: {
-          productId: new mongoose.Types.ObjectId(req.query.productId),
-          rating: req.query.rating,
-          userId: new mongoose.Types.ObjectId(req.query.userId),
-          orderId: new mongoose.Types.ObjectId(req.query.orderId),
-        },
+        $match: query,
       },
       {
         $sort: { createdDate: -1 },
