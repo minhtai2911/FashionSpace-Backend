@@ -5,7 +5,9 @@ import chatbotController from "./chatbotController.js";
 const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
   try {
     const orderId = req.params.orderId;
-    const orderTracking = await OrderTracking.find({ orderId: orderId }).sort({ date: 1 }); 
+    const orderTracking = await OrderTracking.find({ orderId: orderId }).sort({
+      date: 1,
+    });
 
     if (!orderTracking)
       return res
@@ -14,12 +16,10 @@ const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
 
     res.status(200).json({ data: orderTracking });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
@@ -36,24 +36,28 @@ const createOrderTracking = asyncHandler(async (req, res, next) => {
       expectedDeliveryDate,
     });
 
-    if (orderTracking.status === "Đã giao" || orderTracking.status === "Đã hủy" || orderTracking.status === "Đã trả hàng") {
+    if (
+      orderTracking.status === "Đã giao" ||
+      orderTracking.status === "Đã hủy" ||
+      orderTracking.status === "Đã trả hàng"
+    ) {
       chatbotController.deleteEntityOrderId(orderTracking.orderId);
-    } 
-    
+    }
+
+    await OrderTracking.updateMany(
+      { orderId: orderTracking.orderId },
+      { $set: { currentStatus: false } }
+    );
     await orderTracking.save();
-    res
-      .status(201)
-      .json({
-        message: "Thông tin theo dõi đơn hàng đã được cập nhật!",
-        data: orderTracking,
-      });
+    res.status(201).json({
+      message: "Thông tin theo dõi đơn hàng đã được cập nhật!",
+      data: orderTracking,
+    });
   } catch (err) {
-    res
-      .status(400)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(400).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
 });
 
