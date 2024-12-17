@@ -48,56 +48,108 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
       query.orderId = new mongoose.Types.ObjectId(req.query.orderId);
 
     if (req.query.status === "Chưa trả lời") {
-      const reviews = await Review.aggregate([
-        {
-          $lookup: {
-            from: "reviewresponses",
-            localField: "_id",
-            foreignField: "reviewId",
-            as: "reviewResponses",
+      if (Object.keys(query).length !== 0) {
+        const reviews = await Review.aggregate([
+          {
+            $lookup: {
+              from: "reviewresponses",
+              localField: "_id",
+              foreignField: "reviewId",
+              as: "reviewResponses",
+            },
           },
-        },
-        {
-          $match: {
-            query,
-            reviewResponses: { $size: 0 },
+          {
+            $match: {
+              reviewResponses: { $size: 0 },
+              query,
+            },
           },
-        },
-        {
-          $sort: { createdDate: -1 },
-        },
-      ]);
+          {
+            $sort: { createdDate: -1 },
+          },
+        ]);
 
-      if (!reviews)
-        return res.status(404).json({ error: "Đánh giá không tồn tại." });
+        if (!reviews)
+          return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
-      return res.status(200).json({ data: reviews });
+        return res.status(200).json({ data: reviews });
+      } else {
+        const reviews = await Review.aggregate([
+          {
+            $lookup: {
+              from: "reviewresponses",
+              localField: "_id",
+              foreignField: "reviewId",
+              as: "reviewResponses",
+            },
+          },
+          {
+            $match: {
+              reviewResponses: { $size: 0 },
+            },
+          },
+          {
+            $sort: { createdDate: -1 },
+          },
+        ]);
+
+        if (!reviews)
+          return res.status(404).json({ error: "Đánh giá không tồn tại." });
+
+        return res.status(200).json({ data: reviews });
+      }
     }
     if (req.query.status === "Đã trả lời") {
-      const reviews = await Review.aggregate([
-        {
-          $lookup: {
-            from: "reviewresponses",
-            localField: "_id",
-            foreignField: "reviewId",
-            as: "reviewResponses",
+      if (Object.keys(query).length !== 0) {
+        const reviews = await Review.aggregate([
+          {
+            $lookup: {
+              from: "reviewresponses",
+              localField: "_id",
+              foreignField: "reviewId",
+              as: "reviewResponses",
+            },
           },
-        },
-        {
-          $match: {
-            query,
-            reviewResponses: { $ne: [] },
+          {
+            $match: {
+              query,
+              reviewResponses: { $ne: [] },
+            },
           },
-        },
-        {
-          $sort: { createdDate: -1 },
-        },
-      ]);
+          {
+            $sort: { createdDate: -1 },
+          },
+        ]);
 
-      if (!reviews)
-        return res.status(404).json({ error: "Đánh giá không tồn tại." });
+        if (!reviews)
+          return res.status(404).json({ error: "Đánh giá không tồn tại." });
 
-      return res.status(200).json({ data: reviews });
+        return res.status(200).json({ data: reviews });
+      } else {
+        const reviews = await Review.aggregate([
+          {
+            $lookup: {
+              from: "reviewresponses",
+              localField: "_id",
+              foreignField: "reviewId",
+              as: "reviewResponses",
+            },
+          },
+          {
+            $match: {
+              reviewResponses: { $ne: [] },
+            },
+          },
+          {
+            $sort: { createdDate: -1 },
+          },
+        ]);
+
+        if (!reviews)
+          return res.status(404).json({ error: "Đánh giá không tồn tại." });
+
+        return res.status(200).json({ data: reviews });
+      }
     }
 
     const reviews = await Review.aggregate([
