@@ -61,7 +61,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
           {
             $match: {
               reviewResponses: { $size: 0 },
-              query,
+              ...query,
             },
           },
           {
@@ -112,7 +112,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
           },
           {
             $match: {
-              query,
+              ...query,
               reviewResponses: { $ne: [] },
             },
           },

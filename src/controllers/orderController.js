@@ -90,16 +90,31 @@ const createOrder = asyncHandler(async (req, res, next) => {
 const getOrderByStatus = asyncHandler(async (req, res, next) => {
   try {
     const { status } = req.query;
-    const order = await Order.find({ status: status });
+    const order = OrderTracking.aggregate([
+      {
+        $lookup: {
+          from: "orders",
+          localField: "orderId",
+          foreignField: "_id",
+          as: "order",
+        },
+      },
+      {
+        $unwind: "$order",
+      },
+      {
+        $sort: { date: -1 },
+      },
+    ]);
     if (!order)
       return res.status(404).json({ error: "Đơn hàng không tồn tại." });
     res.status(200).json({ data: order });
-    } catch (err) {
-      res.status(500).json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
-    }
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
+  }
 });
 
 export default {
