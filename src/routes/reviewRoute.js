@@ -19,20 +19,20 @@ router.delete(
   reviewController.deleteReviewById
 );
 router.get(
-  "/:productId/productIdAndUserId",
+  "/productId/:productId/orderId/:orderId",
   authMiddleware.verifyToken,
-  reviewController.getReviewByProductIdAndUserId
+  reviewController.getReviewByProductIdUserIdAndOrderId
 );
 router.get(
   "/reviews/notReplied",
-  // authMiddleware.verifyToken,
-  // authMiddleware.checkPermission(["Employee"]),
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Employee"]),
   reviewController.getReviewsNotReplied
 );
 router.get(
   "/reviews/replied",
-  // authMiddleware.verifyToken,
-  // authMiddleware.checkPermission(["Employee"]),
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Employee"]),
   reviewController.getReviewsReplied
 );
 

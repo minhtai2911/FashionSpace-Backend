@@ -67,14 +67,14 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
 
 const createReview = asyncHandler(async (req, res, next) => {
   try {
-    const { productId, rating, content } = req.body;
+    const { productId, rating, content, orderId } = req.body;
 
     const userId = req.user.id;
-    if (!productId || !rating) {
+    if (!productId || !rating || !orderId || !content) {
       throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
     }
 
-    const newReview = new Review({ userId, productId, rating, content });
+    const newReview = new Review({ userId, productId, orderId, rating, content });
 
     await newReview.save();
 
@@ -190,7 +190,7 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
   }
 });
 
-const getReviewByProductIdAndUserId = asyncHandler(async (req, res, next) => {
+const getReviewByProductIdUserIdAndOrderId = asyncHandler(async (req, res, next) => {
   try {
     const review = await Review.aggregate([
       {
@@ -205,6 +205,7 @@ const getReviewByProductIdAndUserId = asyncHandler(async (req, res, next) => {
         $match: {
           productId: new mongoose.Types.ObjectId(req.params.productId),
           userId: new mongoose.Types.ObjectId(req.user.id),
+          orderId: new mongoose.Types.ObjectId(req.params.orderId),
         },
       },
       {
@@ -296,7 +297,7 @@ export default {
   updateReviewById: updateReviewById,
   deleteReviewById: deleteReviewById,
   getAllReviews: getAllReviews,
-  getReviewByProductIdAndUserId: getReviewByProductIdAndUserId,
+  getReviewByProductIdUserIdAndOrderId: getReviewByProductIdUserIdAndOrderId,
   getReviewsNotReplied: getReviewsNotReplied,
   getReviewsReplied: getReviewsReplied,
 };
