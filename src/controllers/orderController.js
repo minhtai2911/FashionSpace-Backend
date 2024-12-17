@@ -12,6 +12,7 @@ const getAllOrders = asyncHandler(async (req, res, next) => {
       query.push({ "paymentDetail.paymentMethod": req.query.paymentMethod });
     if (req.query.paymentStatus)
       query.push({ "paymentDetail.status": req.query.paymentStatus });
+    query.push({ "orderTracking.currentStatus": true });
     
     const order = await Order.aggregate([
       {
