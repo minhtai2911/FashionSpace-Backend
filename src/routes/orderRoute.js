@@ -7,7 +7,7 @@ const router = Router();
 router.get(
   "/",
   authMiddleware.verifyToken,
-  authMiddleware.checkPermission(["Admin"]),
+  authMiddleware.checkPermission(["Admin", "Employee"]),
   orderController.getAllOrders
 );
 router.get("/:id", authMiddleware.verifyToken, orderController.getOrderById);
