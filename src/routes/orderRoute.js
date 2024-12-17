@@ -4,7 +4,7 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get("/",  orderController.getAllOrders);
+router.get("/", authMiddleware.verifyToken, orderController.getAllOrders);
 router.get("/:id", authMiddleware.verifyToken, orderController.getOrderById);
 router.post("/", authMiddleware.verifyToken, orderController.createOrder);
 router.get("/get/userId", authMiddleware.verifyToken, orderController.getOrderByUserId);
