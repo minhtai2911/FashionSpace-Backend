@@ -1,8 +1,7 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import ProductColor from "../models/productColor.js";
 import ProductVariant from "../models/productVariant.js";
 
-const getAllProductColors = asyncHandler(async (req, res, next) => {
+const getAllProductColors = async (req, res, next) => {
   try {
     const productColor = await ProductColor.find({});
 
@@ -16,9 +15,9 @@ const getAllProductColors = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getProductColorById = asyncHandler(async (req, res, next) => {
+const getProductColorById = async (req, res, next) => {
   try {
     const productColor = await ProductColor.findById(req.params.id);
 
@@ -32,9 +31,9 @@ const getProductColorById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createProductColor = asyncHandler(async (req, res, next) => {
+const createProductColor = async (req, res, next) => {
   try {
     const { color } = req.body;
 
@@ -53,9 +52,9 @@ const createProductColor = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateProductColorById = asyncHandler(async (req, res, next) => {
+const updateProductColorById = async (req, res, next) => {
   try {
     const productColor = await ProductColor.findById(req.params.id);
 
@@ -75,9 +74,9 @@ const updateProductColorById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteProductColorById = asyncHandler(async (req, res, next) => {
+const deleteProductColorById = async (req, res, next) => {
   try {
     const productVariant = await ProductVariant.findOne({
       colorId: req.params.id,
@@ -101,7 +100,7 @@ const deleteProductColorById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getAllProductColors: getAllProductColors,

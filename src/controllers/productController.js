@@ -1,7 +1,6 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import Product from "../models/product.js";
 
-const getAllProducts = asyncHandler(async (req, res, next) => {
+const getAllProducts = async (req, res, next) => {
   try {
     const product = await Product.find({});
 
@@ -15,9 +14,9 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createProduct = asyncHandler(async (req, res, next) => {
+const createProduct = async (req, res, next) => {
   try {
     const { name, description, categoryId, price } = req.body;
 
@@ -42,9 +41,9 @@ const createProduct = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getProductById = asyncHandler(async (req, res, next) => {
+const getProductById = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
 
@@ -58,9 +57,9 @@ const getProductById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateProductById = asyncHandler(async (req, res, next) => {
+const updateProductById = async (req, res, next) => {
   try {
     const updateProduct = await Product.findById(req.params.id);
 
@@ -84,9 +83,9 @@ const updateProductById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateStatusProductById = asyncHandler(async (req, res, next) => {
+const updateStatusProductById = async (req, res, next) => {
   try {
     const product = await Product.findById(req.params.id);
 
@@ -105,9 +104,9 @@ const updateStatusProductById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getBestSellerProduct = asyncHandler(async (req, res, next) => {
+const getBestSellerProduct = async (req, res, next) => {
   try {
     const products = await Product.find({ soldQuantity: { $gt: 0 } })
       .sort({
@@ -121,9 +120,9 @@ const getBestSellerProduct = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getNewArrivalProduct = asyncHandler(async (req, res, next) => {
+const getNewArrivalProduct = async (req, res, next) => {
   try {
     const products = await Product.find({}).sort({ createdAt: -1 }).limit(10);
     res.status(200).json({ data: products });
@@ -133,7 +132,7 @@ const getNewArrivalProduct = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getAllProducts: getAllProducts,

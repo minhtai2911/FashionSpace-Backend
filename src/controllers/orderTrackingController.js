@@ -1,8 +1,7 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import OrderTracking from "../models/orderTracking.js";
 import chatbotController from "./chatbotController.js";
 
-const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
+const getOrderTrackingByOrderId = async (req, res, next) => {
   try {
     const orderId = req.params.orderId;
     const orderTracking = await OrderTracking.find({ orderId: orderId }).sort({
@@ -21,9 +20,9 @@ const getOrderTrackingByOrderId = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createOrderTracking = asyncHandler(async (req, res, next) => {
+const createOrderTracking = async (req, res, next) => {
   try {
     const { orderId, status, currentAddress, expectedDeliveryDate } = req.body;
 
@@ -59,7 +58,7 @@ const createOrderTracking = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getOrderTrackingByOrderId: getOrderTrackingByOrderId,

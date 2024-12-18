@@ -1,10 +1,9 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import ProductImage from "../models/productImage.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 
-const getAllProductImagesByProductId = asyncHandler(async (req, res, next) => {
+const getAllProductImagesByProductId = async (req, res, next) => {
   try {
     const productId = req.params.id;
     const productImages = await ProductImage.find({ productId });
@@ -14,9 +13,9 @@ const getAllProductImagesByProductId = asyncHandler(async (req, res, next) => {
     res.status(500).json({ error: err.message,
         message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
-});
+};
 
-const getProductImageById = asyncHandler(async (req, res, next) => {
+const getProductImageById = async (req, res, next) => {
   try {
     const productImageId = req.params.id;
     const productImage = await ProductImage.findById(productImageId);
@@ -29,9 +28,9 @@ const getProductImageById = asyncHandler(async (req, res, next) => {
     res.status(500).json({ error: err.message,
         message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
-});
+};
 
-const createProductImage = asyncHandler(async (req, res, next) => {
+const createProductImage = async (req, res, next) => {
   try {
     const productId = req.body.productId;
     let newProductImages = [];
@@ -56,9 +55,9 @@ const createProductImage = asyncHandler(async (req, res, next) => {
     res.status(500).json({ error: err.message,
         message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
-});
+};
 
-const updateProductImageById = asyncHandler(async (req, res, next) => {
+const updateProductImageById = async (req, res, next) => {
   try {
     const updateProductImage = await ProductImage.findById(req.params.id);
 
@@ -91,7 +90,7 @@ const updateProductImageById = asyncHandler(async (req, res, next) => {
     res.status(500).json({ error: err.message,
         message: "Đã xảy ra lỗi, vui lòng thử lại!", });
   }
-});
+};
 
 // const deleteProductImageByProductId = asyncHandler(async (req, res, next) => {
 //   try {

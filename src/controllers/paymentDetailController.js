@@ -1,10 +1,9 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import PaymentDetail from "../models/paymentDetail.js";
 import Order from "../models/order.js";
 import crypto from "crypto";
 import axios from "axios";
 
-const getAllPaymentDetails = asyncHandler(async (req, res, next) => {
+const getAllPaymentDetails = async (req, res, next) => {
   try {
     const paymentDetail = await PaymentDetail.find({});
 
@@ -22,9 +21,9 @@ const getAllPaymentDetails = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const getPaymentDetailById = asyncHandler(async (req, res, next) => {
+const getPaymentDetailById = async (req, res, next) => {
   try {
     const paymentDetail = await PaymentDetail.findById(req.params.id);
 
@@ -42,9 +41,9 @@ const getPaymentDetailById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const createPaymentDetail = asyncHandler(async (req, res, next) => {
+const createPaymentDetail = async (req, res, next) => {
   try {
     const { paymentMethod, status } = req.body;
 
@@ -71,9 +70,9 @@ const createPaymentDetail = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const updatePaymentDetailById = asyncHandler(async (req, res, next) => {
+const updatePaymentDetailById = async (req, res, next) => {
   try {
     const updatePaymentDetail = await PaymentDetail.findById(req.params.id);
 
@@ -102,9 +101,9 @@ const updatePaymentDetailById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const deletePaymentDetailById = asyncHandler(async (req, res, next) => {
+const deletePaymentDetailById = async (req, res, next) => {
   try {
     const deletePaymentDetail = await PaymentDetail.findByIdAndDelete(
       req.params.id
@@ -122,9 +121,9 @@ const deletePaymentDetailById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const checkoutWithMoMo = asyncHandler(async (req, res, next) => {
+const checkoutWithMoMo = async (req, res, next) => {
   try {
     const accessKey = "F8BBA842ECF85";
     const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
@@ -206,9 +205,9 @@ const checkoutWithMoMo = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const callbackPaymentDetail = asyncHandler(async (req, res, next) => {
+const callbackPaymentDetail = async (req, res, next) => {
   try {
     if (req.body.resultCode === 0) {
       const order = await Order.findById({ _id: req.body.orderId });
@@ -217,7 +216,7 @@ const callbackPaymentDetail = asyncHandler(async (req, res, next) => {
       const paymentDetail = await PaymentDetail.findById({
         _id: order.paymentDetailId,
       });
-      paymentDetail.status = "Paid";
+      paymentDetail.status = "Đã thanh toán";
       paymentDetail.save();
     }
   } catch (err) {
@@ -226,9 +225,9 @@ const callbackPaymentDetail = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const checkStatusTransaction = asyncHandler(async (req, res, next) => {
+const checkStatusTransaction = async (req, res, next) => {
   try {
     const accessKey = "F8BBA842ECF85";
     const secretKey = "K951B6PE1waDMi640xX08PD3vg6EkVlz";
@@ -262,9 +261,9 @@ const checkStatusTransaction = asyncHandler(async (req, res, next) => {
     const response = await axios(options);
 
     if (response.data.resultCode === 0) {
-      return res.status(200).json({ message: "Paid" });
+      return res.status(200).json({ message: "Đã thanh toán" });
     } else {
-      res.status(400).json("Unpaid");
+      res.status(400).json("Chưa thanh toán");
     }
   } catch (err) {
     return res
@@ -274,7 +273,7 @@ const checkStatusTransaction = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
 export default {
   getAllPaymentDetails: getAllPaymentDetails,

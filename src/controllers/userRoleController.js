@@ -1,7 +1,6 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import UserRole from "../models/userRole.js";
 
-const getAllUserRoles = asyncHandler(async (req, res, next) => {
+const getAllUserRoles = async (req, res, next) => {
   try {
     const userRoles = await UserRole.find({});
 
@@ -15,9 +14,9 @@ const getAllUserRoles = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getUserRoleById = asyncHandler(async (req, res, next) => {
+const getUserRoleById = async (req, res, next) => {
   try {
     const userRole = await UserRole.findById(req.params.id);
 
@@ -31,9 +30,9 @@ const getUserRoleById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createUserRole = asyncHandler(async (req, res, next) => {
+const createUserRole = async (req, res, next) => {
   try {
     const { roleName, description } = req.body;
 
@@ -59,9 +58,9 @@ const createUserRole = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateUserRole = asyncHandler(async (req, res, next) => {
+const updateUserRole = async (req, res, next) => {
   try {
     const userRole = await UserRole.findById(req.params.id);
 
@@ -84,9 +83,9 @@ const updateUserRole = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteUserRole = asyncHandler(async (req, res, next) => {
+const deleteUserRole = async (req, res, next) => {
   try {
     const userRole = await UserRole.findByIdAndDelete(req.params.id);
 
@@ -101,7 +100,7 @@ const deleteUserRole = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getAllUserRoles: getAllUserRoles,

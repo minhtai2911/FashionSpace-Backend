@@ -1,12 +1,11 @@
 import User from "../models/user.js";
 import UserRole from "../models/userRole.js";
 import jwt from "jsonwebtoken";
-import asyncHandler from "../middleware/asyncHandler.js";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import Otp from "../models/otp.js";
 
-const generateOTP = asyncHandler(async (req, res, next) => {
+const generateOTP = async (req, res, next) => {
   try {
     const otp = Math.floor(
       100000 + Math.random() * (999999 - 100000)
@@ -29,9 +28,9 @@ const generateOTP = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const login = asyncHandler(async (req, res, next) => {
+const login = async (req, res, next) => {
   try {
     const email = req.body.email;
     const originalPassword = req.body.password;
@@ -91,9 +90,9 @@ const login = asyncHandler(async (req, res, next) => {
       message: err.message,
     });
   }
-});
+};
 
-const signup = asyncHandler(async (req, res, next) => {
+const signup = async (req, res, next) => {
   const { email, fullName, phone, password } = req.body;
 
   if (!email || !fullName || !phone || !password) {
@@ -116,9 +115,9 @@ const signup = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
+const sendMailVerifyAccount = async (req, res, next) => {
   try {
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -147,9 +146,9 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const verifyAccount = asyncHandler(async (req, res, next) => {
+const verifyAccount = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -194,9 +193,9 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const logout = asyncHandler(async (req, res, next) => {
+const logout = async (req, res, next) => {
   try {
     const user = await User.findByIdAndUpdate(
       req.user.id,
@@ -212,9 +211,9 @@ const logout = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const refreshToken = asyncHandler(async (req, res, next) => {
+const refreshToken = async (req, res, next) => {
   try {
     const refreshToken = req.body.refreshToken;
 
@@ -237,9 +236,9 @@ const refreshToken = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const sendOTP = asyncHandler(async (req, res, next) => {
+const sendOTP = async (req, res, next) => {
   try {
     const OTP = req.body.OTP;
     const email = req.body.email;
@@ -271,9 +270,9 @@ const sendOTP = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const checkOTPByEmail = asyncHandler(async (req, res, next) => {
+const checkOTPByEmail = async (req, res, next) => {
   try {
     const otp = req.body.OTP;
     const email = req.body.email;
@@ -326,9 +325,9 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const checkEmail = asyncHandler(async (req, res, next) => {
+const checkEmail = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
@@ -343,9 +342,9 @@ const checkEmail = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const forgotPassword = asyncHandler(async (req, res, next) => {
+const forgotPassword = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     user.password = req.body.newPassword;
@@ -357,9 +356,9 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const resetPassword = asyncHandler(async (req, res, next) => {
+const resetPassword = async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id);
     const check = await bcrypt.compare(req.body.password, user.password);
@@ -378,9 +377,9 @@ const resetPassword = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const loginGoogleSuccess = asyncHandler(async (req, res, next) => {
+const loginGoogleSuccess = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
@@ -403,7 +402,7 @@ const loginGoogleSuccess = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   login: login,

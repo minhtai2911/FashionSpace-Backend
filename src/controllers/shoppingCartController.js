@@ -1,7 +1,6 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import ShoppingCart from "../models/shoppingCart.js";
 
-const getAllShoppingCarts = asyncHandler(async (req, res, next) => {
+const getAllShoppingCarts = async (req, res, next) => {
   try {
     const shoppingCart = await ShoppingCart.find({});
 
@@ -15,9 +14,9 @@ const getAllShoppingCarts = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getShoppingCartById = asyncHandler(async (req, res, next) => {
+const getShoppingCartById = async (req, res, next) => {
   try {
     const shoppingCart = await ShoppingCart.findById(req.params.id);
     if (!shoppingCart)
@@ -29,9 +28,9 @@ const getShoppingCartById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
+const getShoppingCartByUserId = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const shoppingCart = await ShoppingCart.find({ userId: userId });
@@ -44,32 +43,29 @@ const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getShoppingCartByUserIdProductVariantId = asyncHandler(
-  async (req, res, next) => {
-    try {
-      const userId = req.user.id;
-      const productVariantId = req.params.productVariantId;
-      const shoppingCart = await ShoppingCart.findOne({
-        userId,
-        productVariantId,
-      });
+const getShoppingCartByUserIdProductVariantId = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const productVariantId = req.params.productVariantId;
+    const shoppingCart = await ShoppingCart.findOne({
+      userId,
+      productVariantId,
+    });
 
-      if (!shoppingCart)
-        return res.status(404).json({ error: "Giỏ hàng không tồn tại." });
+    if (!shoppingCart)
+      return res.status(404).json({ error: "Giỏ hàng không tồn tại." });
 
-      res.status(200).json({ data: shoppingCart });
-    } catch (err) {
-      res.status(500).json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
-    }
+    res.status(200).json({ data: shoppingCart });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
-);
-
-const createShoppingCart = asyncHandler(async (req, res, next) => {
+};
+const createShoppingCart = async (req, res, next) => {
   try {
     const { productVariantId, quantity } = req.body;
     const userId = req.user.id;
@@ -109,9 +105,9 @@ const createShoppingCart = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateShoppingCartQuantityById = asyncHandler(async (req, res, next) => {
+const updateShoppingCartQuantityById = async (req, res, next) => {
   try {
     const shoppingCart = await ShoppingCart.findById(req.params.id);
 
@@ -127,9 +123,9 @@ const updateShoppingCartQuantityById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteShoppingCartById = asyncHandler(async (req, res, next) => {
+const deleteShoppingCartById = async (req, res, next) => {
   try {
     const shoppingCart = await ShoppingCart.findByIdAndDelete(req.params.id);
 
@@ -143,7 +139,7 @@ const deleteShoppingCartById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getAllShoppingCarts: getAllShoppingCarts,

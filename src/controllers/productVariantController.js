@@ -1,9 +1,8 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import ProductVariant from "../models/productVariant.js";
 import ProductColor from "../models/productColor.js";
 import ProductSize from "../models/productSize.js";
 
-const getProductVariants = asyncHandler(async (req, res, next) => {
+const getProductVariants = async (req, res, next) => {
   try {
     const productVariants = await ProductVariant.find({});
 
@@ -19,9 +18,9 @@ const getProductVariants = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getProductVariantById = asyncHandler(async (req, res, next) => {
+const getProductVariantById = async (req, res, next) => {
   try {
     const productVariant = await ProductVariant.findById(req.params.id);
 
@@ -37,32 +36,29 @@ const getProductVariantById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getProductVariantByProductIdColorIdSizeId = asyncHandler(
-  async (req, res, next) => {
-    try {
-      const productVariant = await ProductVariant.findOne({
-        productId: req.params.productId,
-        colorId: req.params.colorId,
-        sizeId: req.params.sizeId,
-      });
-      if (!productVariant)
-        return res
-          .status(404)
-          .json({ error: "Biến thể sản phẩm không tồn tại." });
+const getProductVariantByProductIdColorIdSizeId = async (req, res, next) => {
+  try {
+    const productVariant = await ProductVariant.findOne({
+      productId: req.params.productId,
+      colorId: req.params.colorId,
+      sizeId: req.params.sizeId,
+    });
+    if (!productVariant)
+      return res
+        .status(404)
+        .json({ error: "Biến thể sản phẩm không tồn tại." });
 
-      res.status(200).json({ data: productVariant });
-    } catch (err) {
-      res.status(500).json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
-    }
+    res.status(200).json({ data: productVariant });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
-);
-
-const getProductVariantsByProductId = asyncHandler(async (req, res, next) => {
+};
+const getProductVariantsByProductId = async (req, res, next) => {
   try {
     const productVariant = await ProductVariant.find({
       productId: req.params.id,
@@ -77,9 +73,9 @@ const getProductVariantsByProductId = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createProductVariant = asyncHandler(async (req, res, next) => {
+const createProductVariant = async (req, res, next) => {
   try {
     const { productId, sizeId, colorId, quantity } = req.body;
 
@@ -124,9 +120,9 @@ const createProductVariant = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateProductVariantById = asyncHandler(async (req, res, next) => {
+const updateProductVariantById = async (req, res, next) => {
   try {
     const updateProductVariant = await ProductVariant.findById(req.params.id);
 
@@ -178,9 +174,9 @@ const updateProductVariantById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteProductVariantById = asyncHandler(async (req, res, next) => {
+const deleteProductVariantById = async (req, res, next) => {
   try {
     const deleteProductVariant = await ProductVariant.findByIdAndDelete(
       req.params.id
@@ -198,29 +194,27 @@ const deleteProductVariantById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteProductVariantsByProductId = asyncHandler(
-  async (req, res, next) => {
-    try {
-      const deleteProductVariants = await ProductVariant.deleteMany({
-        productId: req.params.id,
-      });
+const deleteProductVariantsByProductId = async (req, res, next) => {
+  try {
+    const deleteProductVariants = await ProductVariant.deleteMany({
+      productId: req.params.id,
+    });
 
-      if (!deleteProductVariants)
-        return res
-          .status(404)
-          .json({ error: "Biến thể sản phẩm không tồn tại." });
+    if (!deleteProductVariants)
+      return res
+        .status(404)
+        .json({ error: "Biến thể sản phẩm không tồn tại." });
 
-      res.status(200).json({ message: "Xóa thành công!" });
-    } catch (err) {
-      res.status(500).json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
-    }
+    res.status(200).json({ message: "Xóa thành công!" });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+    });
   }
-);
+};
 
 export default {
   getProductVariants: getProductVariants,

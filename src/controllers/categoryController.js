@@ -4,7 +4,7 @@ import ProductSize from "../models/productSize.js";
 import Product from "../models/product.js";
 import chatbotController from "./chatbotController.js";
 
-const getAllCategories = asyncHandler(async (req, res, next) => {
+const getAllCategories = async (req, res, next) => {
   try {
     const category = await Category.find({});
 
@@ -22,9 +22,9 @@ const getAllCategories = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const getCategoryById = asyncHandler(async (req, res, next) => {
+const getCategoryById = async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
 
@@ -42,9 +42,9 @@ const getCategoryById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const createCategory = asyncHandler(async (req, res, next) => {
+const createCategory = async (req, res, next) => {
   try {
     const { name, gender } = req.body;
 
@@ -67,9 +67,9 @@ const createCategory = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const updateCategoryById = asyncHandler(async (req, res, next) => {
+const updateCategoryById = async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
 
@@ -101,9 +101,9 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const deleteCategoryById = asyncHandler(async (req, res, next) => {
+const deleteCategoryById = async (req, res, next) => {
   try {
     const productSize = await ProductSize.find({ categoryId: req.params.id });
 
@@ -137,7 +137,7 @@ const deleteCategoryById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
 export default {
   getAllCategories: getAllCategories,

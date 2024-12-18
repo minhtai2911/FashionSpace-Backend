@@ -1,9 +1,8 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import Statistic from "../models/statistic.js";
 import cron from "node-cron";
 import Order from "../models/order.js";
 
-const createStatistic = asyncHandler(async (req, res, next) => {
+const createStatistic = async (req, res, next) => {
   try {
     const { day, month, year } = req.body;
 
@@ -78,9 +77,9 @@ const createStatistic = asyncHandler(async (req, res, next) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
-const getStatistics = asyncHandler(async (req, res, next) => {
+const getStatistics = async (req, res, next) => {
   try {
     const query = {};
     if (req.query.year) query.year = parseInt(req.query.year);
@@ -120,7 +119,7 @@ const getStatistics = asyncHandler(async (req, res, next) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-});
+};
 
 cron.schedule("0 59 23 * * *", async () => {
   try {

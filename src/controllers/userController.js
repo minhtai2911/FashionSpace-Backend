@@ -1,11 +1,10 @@
 import User from "../models/user.js";
-import asyncHandler from "../middleware/asyncHandler.js";
 import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import UserRole from "../models/userRole.js";
 
-const getAllUsers = asyncHandler(async (req, res, next) => {
+const getAllUsers = async (req, res, next) => {
   try {
     const user = await User.find({});
 
@@ -19,9 +18,9 @@ const getAllUsers = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getUserById = asyncHandler(async (req, res, next) => {
+const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
@@ -35,9 +34,9 @@ const getUserById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateStatusUserById = asyncHandler(async (req, res, next) => {
+const updateStatusUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user)
@@ -65,9 +64,9 @@ const updateStatusUserById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateUserById = asyncHandler(async (req, res, next) => {
+const updateUserById = async (req, res, next) => {
   try {
     const role = await UserRole.findById(req.user.roleId);
     if (req.user.id !== req.params.id && role.roleName !== "Admin")
@@ -138,9 +137,9 @@ const updateUserById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createUser = asyncHandler(async (req, res, next) => {
+const createUser = async (req, res, next) => {
   try {
     const { email, fullName, phone, password, roleName } = req.body;
     if (!email || !fullName || !phone || !password || !roleName) {
@@ -162,7 +161,7 @@ const createUser = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getAllUsers: getAllUsers,

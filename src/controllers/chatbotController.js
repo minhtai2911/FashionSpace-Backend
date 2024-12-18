@@ -1,5 +1,4 @@
-import asyncHandler from "../middleware/asyncHandler.js";
-import dialogflow, { SessionsClient } from "@google-cloud/dialogflow";
+import dialogflow from "@google-cloud/dialogflow";
 import { v4 as uuidv4 } from "uuid";
 import Product from "../models/product.js";
 import Category from "../models/category.js";
@@ -17,7 +16,7 @@ const CONFIGURATION = {
 
 const sessionClient = new dialogflow.SessionsClient(CONFIGURATION);
 
-const chatbot = asyncHandler(async (req, res, next) => {
+const chatbot = async (req, res, next) => {
   try {
     const message = req.body.message;
     const sessionId = uuidv4();
@@ -147,13 +146,13 @@ const chatbot = asyncHandler(async (req, res, next) => {
   } catch (err) {
     return res.status(500).json(err.message);
   }
-});
+};
 
 const entityCategoryId =
   "projects/fashionspace-hagm/agent/entityTypes/e12b19d7-490b-4ac3-9443-2e31fe44d09f";
 const entityTypesClient = new dialogflow.EntityTypesClient(CONFIGURATION);
 
-const updateEntityCategory = asyncHandler(async (category, synonyms) => {
+const updateEntityCategory = async (category, synonyms) => {
   try {
     const [entityType] = await entityTypesClient.getEntityType({
       name: entityCategoryId,
@@ -179,9 +178,9 @@ const updateEntityCategory = asyncHandler(async (category, synonyms) => {
   } catch (err) {
     throw new Error(err.message);
   }
-});
+};
 
-const deleteEntityCategory = asyncHandler(async (category) => {
+const deleteEntityCategory = async (category) => {
   try {
     const [entityType] = await entityTypesClient.getEntityType({
       name: entityCategoryId,
@@ -205,12 +204,12 @@ const deleteEntityCategory = asyncHandler(async (category) => {
   } catch (err) {
     throw new Error(err.message);
   }
-});
+};
 
 const entityOrderIdId =
   "projects/fashionspace-hagm/agent/entityTypes/53b59b0c-8caa-4058-ad9c-20dd1782f6ab";
 
-const updateEntityOrderId = asyncHandler(async (orderId) => {
+const updateEntityOrderId = async (orderId) => {
   try {
     const [entityType] = await entityTypesClient.getEntityType({
       name: entityOrderIdId,
@@ -236,9 +235,9 @@ const updateEntityOrderId = asyncHandler(async (orderId) => {
   } catch (err) {
     throw new Error(err.message);
   }
-});
+};
 
-const deleteEntityOrderId = asyncHandler(async (orderId) => {
+const deleteEntityOrderId = async (orderId) => {
   try {
     const [entityType] = await entityTypesClient.getEntityType({
       name: entityOrderIdId,
@@ -262,7 +261,7 @@ const deleteEntityOrderId = asyncHandler(async (orderId) => {
   } catch (err) {
     throw new Error(err.message);
   }
-});
+};
 
 export default {
   chatbot: chatbot,

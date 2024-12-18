@@ -1,8 +1,7 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import ProductSize from "../models/productSize.js";
 import ProductVariant from "../models/productVariant.js";
 
-const getAllProductSizes = asyncHandler(async (req, res, next) => {
+const getAllProductSizes = async (req, res, next) => {
   try {
     const productSize = await ProductSize.find({});
 
@@ -13,9 +12,9 @@ const getAllProductSizes = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getProductSizeById = asyncHandler(async (req, res, next) => {
+const getProductSizeById = async (req, res, next) => {
   try {
     const productSize = await ProductSize.findById(req.params.id);
 
@@ -29,9 +28,9 @@ const getProductSizeById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getProductSizesByCategoryId = asyncHandler(async (req, res, next) => {
+const getProductSizesByCategoryId = async (req, res, next) => {
   try {
     const productSizes = await ProductSize.find({ categoryId: req.params.id });
 
@@ -42,9 +41,9 @@ const getProductSizesByCategoryId = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createProductSize = asyncHandler(async (req, res, next) => {
+const createProductSize = async (req, res, next) => {
   try {
     const { categoryId, size } = req.body;
 
@@ -64,9 +63,9 @@ const createProductSize = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateProductSizeById = asyncHandler(async (req, res, next) => {
+const updateProductSizeById = async (req, res, next) => {
   try {
     const productSize = await ProductSize.findById(req.params.id);
 
@@ -91,9 +90,9 @@ const updateProductSizeById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteProductSizeById = asyncHandler(async (req, res, next) => {
+const deleteProductSizeById = async (req, res, next) => {
   try {
     const productVariant = await ProductVariant.findOne({
       sizeId: req.params.id,
@@ -117,7 +116,7 @@ const deleteProductSizeById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getAllProductSizes: getAllProductSizes,

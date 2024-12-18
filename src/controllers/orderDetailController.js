@@ -1,9 +1,8 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import OrderDetail from "../models/orderDetail.js";
 import Product from "../models/product.js";
 import ProductVariant from "../models/productVariant.js";
 
-const getOrderDetailsByOrderId = asyncHandler(async (req, res, next) => {
+const getOrderDetailsByOrderId = async (req, res, next) => {
   try {
     const orderDetail = await OrderDetail.find({ orderId: req.params.orderId });
 
@@ -19,9 +18,9 @@ const getOrderDetailsByOrderId = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getOrderDetailById = asyncHandler(async (req, res, next) => {
+const getOrderDetailById = async (req, res, next) => {
   try {
     const orderDetail = await OrderDetail.findById(req.params.id);
 
@@ -37,9 +36,9 @@ const getOrderDetailById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createOrderDetail = asyncHandler(async (req, res, next) => {
+const createOrderDetail = async (req, res, next) => {
   try {
     const { orderId, productVariantId, quantity } = req.body;
 
@@ -85,7 +84,7 @@ const createOrderDetail = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getOrderDetailsByOrderId: getOrderDetailsByOrderId,

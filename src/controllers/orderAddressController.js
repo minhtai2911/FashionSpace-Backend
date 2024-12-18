@@ -1,7 +1,6 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import OrderAddress from "../models/orderAddress.js";
 
-const getAllOrderAddresses = asyncHandler(async (req, res, next) => {
+const getAllOrderAddresses = async (req, res, next) => {
   try {
     const orderAddresses = await OrderAddress.find({});
 
@@ -19,9 +18,9 @@ const getAllOrderAddresses = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const getOrderAddressById = asyncHandler(async (req, res, next) => {
+const getOrderAddressById = async (req, res, next) => {
   try {
     const orderAddress = await OrderAddress.findById(req.params.id);
 
@@ -39,9 +38,9 @@ const getOrderAddressById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const createOrderAddress = asyncHandler(async (req, res, next) => {
+const createOrderAddress = async (req, res, next) => {
   try {
     const { city, district, commune, phone, street } = req.body;
 
@@ -67,9 +66,9 @@ const createOrderAddress = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const updateOrderAddressById = asyncHandler(async (req, res, next) => {
+const updateOrderAddressById = async (req, res, next) => {
   try {
     const orderAddress = await OrderAddress.findById(req.params.id);
 
@@ -96,9 +95,9 @@ const updateOrderAddressById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
-const deleteOrderAddressById = asyncHandler(async (req, res, next) => {
+const deleteOrderAddressById = async (req, res, next) => {
   try {
     const orderAddress = await OrderAddress.findByIdAndDelete(req.params.id);
 
@@ -114,7 +113,7 @@ const deleteOrderAddressById = asyncHandler(async (req, res, next) => {
         message: "Đã xảy ra lỗi, vui lòng thử lại!",
       });
   }
-});
+};
 
 export default {
   getAllOrderAddresses: getAllOrderAddresses,

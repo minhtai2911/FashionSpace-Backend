@@ -1,7 +1,6 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import ReviewResponse from "../models/reviewResponse.js";
 
-const getReviewResponseByReviewId = asyncHandler(async (req, res, next) => {
+const getReviewResponseByReviewId = async (req, res, next) => {
   try {
     const reviewId = req.params.reviewId;
 
@@ -17,9 +16,9 @@ const getReviewResponseByReviewId = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createReviewResponse = asyncHandler(async (req, res, next) => {
+const createReviewResponse = async (req, res, next) => {
   try {
     const { reviewId, content } = req.body;
     const userId = req.user.id;
@@ -37,9 +36,9 @@ const createReviewResponse = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateReviewResponseById = asyncHandler(async (req, res, next) => {
+const updateReviewResponseById = async (req, res, next) => {
   try {
     const { content } = req.body;
     if (!content) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
@@ -59,9 +58,9 @@ const updateReviewResponseById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteReviewResponseById = asyncHandler(async (req, res, next) => {
+const deleteReviewResponseById = async (req, res, next) => {
   try {
     const reviewResponse = await ReviewResponse.findByIdAndDelete(
       req.params.id
@@ -76,7 +75,7 @@ const deleteReviewResponseById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getReviewResponseByReviewId: getReviewResponseByReviewId,

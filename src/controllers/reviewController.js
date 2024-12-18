@@ -1,4 +1,3 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import Review from "../models/review.js";
 import Product from "../models/product.js";
 import mongoose from "mongoose";
@@ -36,7 +35,7 @@ import mongoose from "mongoose";
 //   }
 // });
 
-const getAllReviews = asyncHandler(async (req, res, next) => {
+const getAllReviews = async (req, res, next) => {
   try {
     const query = {};
     if (req.query.productId)
@@ -179,9 +178,9 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createReview = asyncHandler(async (req, res, next) => {
+const createReview = async (req, res, next) => {
   try {
     const { productId, rating, content, orderId } = req.body;
 
@@ -220,9 +219,9 @@ const createReview = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getReviewById = asyncHandler(async (req, res, next) => {
+const getReviewById = async (req, res, next) => {
   try {
     const review = await Review.aggregate([
       {
@@ -250,9 +249,9 @@ const getReviewById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const updateReviewById = asyncHandler(async (req, res, next) => {
+const updateReviewById = async (req, res, next) => {
   try {
     const review = Review.findById(req.params.id);
 
@@ -285,9 +284,9 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const deleteReviewById = asyncHandler(async (req, res, next) => {
+const deleteReviewById = async (req, res, next) => {
   try {
     const review = await Review.findByIdAndDelete(req.params.id);
 
@@ -310,7 +309,7 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 // const getReviewByProductIdUserIdAndOrderId = asyncHandler(
 //   async (req, res, next) => {

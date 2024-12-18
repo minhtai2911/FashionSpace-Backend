@@ -1,9 +1,8 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import Order from "../models/order.js";
 import OrderTracking from "../models/orderTracking.js";
 import chatbotController from "./chatbotController.js";
 
-const getAllOrders = asyncHandler(async (req, res, next) => {
+const getAllOrders = async (req, res, next) => {
   try {
     const query = [];
     if (req.query.orderTrackingStatus)
@@ -50,9 +49,9 @@ const getAllOrders = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getOrderByUserId = asyncHandler(async (req, res, next) => {
+const getOrderByUserId = async (req, res, next) => {
   try {
     const userId = req.user.id;
     const order = await Order.find({ userId: userId });
@@ -65,9 +64,9 @@ const getOrderByUserId = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const getOrderById = asyncHandler(async (req, res, next) => {
+const getOrderById = async (req, res, next) => {
   try {
     const order = await Order.findById(req.params.id);
 
@@ -81,9 +80,9 @@ const getOrderById = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
-const createOrder = asyncHandler(async (req, res, next) => {
+const createOrder = async (req, res, next) => {
   try {
     const { total, paymentDetailId, orderAddressId, shippingFee } = req.body;
     const userId = req.user.id;
@@ -118,7 +117,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
       message: "Đã xảy ra lỗi, vui lòng thử lại!",
     });
   }
-});
+};
 
 export default {
   getAllOrders: getAllOrders,
