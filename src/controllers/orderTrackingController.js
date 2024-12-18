@@ -35,14 +35,6 @@ const createOrderTracking = async (req, res, next) => {
       expectedDeliveryDate,
     });
 
-    if (
-      orderTracking.status === "Đã giao" ||
-      orderTracking.status === "Đã hủy" ||
-      orderTracking.status === "Đã trả hàng"
-    ) {
-      chatbotController.deleteEntityOrderId(orderTracking.orderId);
-    }
-
     await OrderTracking.updateMany(
       { orderId: orderTracking.orderId },
       { $set: { currentStatus: false } }

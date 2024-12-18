@@ -1,4 +1,3 @@
-import asyncHandler from "../middleware/asyncHandler.js";
 import Category from "../models/category.js";
 import ProductSize from "../models/productSize.js";
 import Product from "../models/product.js";
