@@ -1,4 +1,3 @@
-import { Query } from "mongoose";
 import Product from "../models/product.js";
 
 const getAllProducts = async (req, res, next) => {
@@ -9,7 +8,6 @@ const getAllProducts = async (req, res, next) => {
     const startIndex = (page - 1) * limit;
 
     if (req.query.isActive) query.isActive = req.query.isActive;
-    if (req.query.categoryId) query.categoryId = req.query.categoryId;
     if (req.query.minPrice) query.price = { $gte: req.query.minPrice };
     if (req.query.maxPrice)
       query.price = { ...query.price, $lte: req.query.maxPrice };
