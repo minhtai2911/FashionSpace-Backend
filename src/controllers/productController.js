@@ -1,3 +1,4 @@
+import { Query } from "mongoose";
 import Product from "../models/product.js";
 
 const getAllProducts = async (req, res, next) => {
@@ -150,7 +151,9 @@ const updateStatusProductById = async (req, res, next) => {
 
 const getBestSellerProduct = async (req, res, next) => {
   try {
-    const products = await Product.find({ soldQuantity: { $gt: 0 } })
+    const query = {};
+    if (req.query.isActive) query.isActive = req.query.isActive;
+    const products = await Product.find({ soldQuantity: { $gt: 0 } }, query)
       .sort({
         soldQuantity: -1,
       })
@@ -166,7 +169,9 @@ const getBestSellerProduct = async (req, res, next) => {
 
 const getNewArrivalProduct = async (req, res, next) => {
   try {
-    const products = await Product.find({}).sort({ createdAt: -1 }).limit(10);
+    const query = {};
+    if (req.query.isActive) query.isActive = req.query.isActive;
+    const products = await Product.find(query).sort({ createdAt: -1 }).limit(10);
     res.status(200).json({ data: products });
   } catch (err) {
     res.status(500).json({
