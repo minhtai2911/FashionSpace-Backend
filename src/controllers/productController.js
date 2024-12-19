@@ -3,9 +3,9 @@ import Product from "../models/product.js";
 const getAllProducts = async (req, res, next) => {
   try {
     const query = {};
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const startIndex = (page - 1) * limit;
+    // const page = parseInt(req.query.page) || 1;
+    // const limit = parseInt(req.query.limit) || 10;
+    // const startIndex = (page - 1) * limit;
 
     if (req.query.isActive) query.isActive = req.query.isActive;
     if (req.query.minPrice) query.price = { $gte: req.query.minPrice };
@@ -16,9 +16,9 @@ const getAllProducts = async (req, res, next) => {
     if (req.query.sortName) {
       const products = await Product.find(query)
         .sort({ name: req.query.sortName })
-        .skip(startIndex)
-        .limit(limit)
-        .exec();
+        // .skip(startIndex)
+        // .limit(limit)
+        // .exec();
 
       if (!products)
         return res.status(404).json({ error: "Sản phẩm không tồn tại." });
@@ -33,19 +33,19 @@ const getAllProducts = async (req, res, next) => {
       });
     } else {
       const products = await Product.find(query)
-        .skip(startIndex)
-        .limit(limit)
-        .exec();
+        // .skip(startIndex)
+        // .limit(limit)
+        // .exec();
 
       if (!products)
         return res.status(404).json({ error: "Sản phẩm không tồn tại." });
 
       return res.status(200).json({
-        meta: {
-          totalCount: totalCount,
-          currentPage: page,
-          totalPages: Math.ceil(totalCount / limit),
-        },
+        // meta: {
+        //   totalCount: totalCount,
+        //   currentPage: page,
+        //   totalPages: Math.ceil(totalCount / limit),
+        // },
         data: products,
       });
     }
