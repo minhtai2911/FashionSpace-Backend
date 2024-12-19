@@ -1,5 +1,7 @@
 import OrderDetail from "../models/orderDetail.js";
-import tf from "@tensorflow/tfjs";
+import * as tf from "@tensorflow/tfjs-node";
+import Product from "../models/product.js";
+import ProductView from "../models/productView.js";
 
 const getUserProductData = async () => {
   try {
@@ -28,13 +30,21 @@ const getUserProductData = async () => {
       },
     ];
 
-    const dataRaw = await OrderDetail.aggregate(pipeline);
-    return dataRaw.map((item) => ({
-      userId: item.userId.toString(),
-      productId: item.productId.toString(),
-    }));
+    const productPurchase = await OrderDetail.aggregate(pipeline);
+    const productView = await ProductView.find();
+    const dataRaw = [...productPurchase, ...productView];
+
+    if (!dataRaw || dataRaw.length === 0) {
+      throw new Error("No data found from database.");
+    }
+
+    return dataRaw
+      .filter((item) => item.userId && item.productId)
+      .map((item) => ({
+        userId: item.userId.toString(),
+        productId: item.productId.toString(),
+      }));
   } catch (err) {
-    console.log(err.message);
     throw new Error("Failed to fetch data");
   }
 };
@@ -45,27 +55,32 @@ const trainModel = async () => {
 
     const userEncoder = {};
     const productEncoder = {};
+    const productDecoder = {};
 
     data.forEach((item) => {
-      if (userEncoder[item.userId] == undefined) {
+      if (item.userId && userEncoder[item.userId] == undefined) {
         userEncoder[item.userId] = Object.keys(userEncoder).length;
       }
-      if (productEncoder[item.productId] == undefined) {
-        productEncoder[item.productId] = Object.keys(productEncoder).length;
+      if (item.productId && productEncoder[item.productId] == undefined) {
+        const index = Object.keys(productEncoder).length;
+        productEncoder[item.productId] = index;
+        productDecoder[index] = item.productId;
       }
     });
+
+    if (
+      Object.keys(userEncoder).length === 0 ||
+      Object.keys(productEncoder).length === 0
+    ) {
+      throw new Error("Not enough data for training");
+    }
 
     const X = data.map((item) => ({
       user: userEncoder[item.userId],
       product: productEncoder[item.productId],
     }));
-    const y = new Array(X.length).fill(1);
 
-    const trainSize = Math.floor(0.8 * X.length);
-    const X_train = X.slice(0, trainSize);
-    const y_train = y.slice(0, trainSize);
-    const X_test = X.slice(trainSize);
-    const y_test = y.slice(trainSize);
+    const y = new Array(X.length).fill(1);
 
     const embeddingSize = 50;
 
@@ -78,7 +93,7 @@ const trainModel = async () => {
         outputDim: embeddingSize,
       })
       .apply(userInput);
-      
+
     const productEmbedding = tf.layers
       .embedding({
         inputDim: Object.keys(productEncoder).length,
@@ -89,6 +104,7 @@ const trainModel = async () => {
     const dotProduct = tf.layers
       .dot({ axes: 2 })
       .apply([userEmbedding, productEmbedding]);
+
     const output = tf.layers.flatten().apply(dotProduct);
 
     const model = tf.model({
@@ -101,45 +117,95 @@ const trainModel = async () => {
       loss: "binaryCrossentropy",
     });
 
-    const userInputData = X_train.map((item) => item.user);
-    const productInputData = X_train.map((item) => item.product);
+    const userInputData = X.map((item) => item.user);
+    const productInputData = X.map((item) => item.product);
 
-    await model.fit([userInputData, productInputData], y_train, {
+    const userInputTensor = tf.tensor2d(userInputData, [
+      userInputData.length,
+      1,
+    ]);
+    const productInputTensor = tf.tensor2d(productInputData, [
+      productInputData.length,
+      1,
+    ]);
+    const yTensor = tf.tensor2d(y, [y.length, 1]);
+
+    await model.fit([userInputTensor, productInputTensor], yTensor, {
       epochs: 5,
       batchSize: 64,
     });
 
-    return { model, userEncoder, productEncoder };
+    return { model, userEncoder, productEncoder, productDecoder };
   } catch (err) {
-    console.log(err.message);
     throw new Error("Failed to train model");
   }
 };
 
 const recommend = async (req, res, next) => {
   try {
-    const { model, userEncoder, productEncoder } = await trainModel();
+    const { model, userEncoder, productEncoder, productDecoder } =
+      await trainModel();
 
     const userIdx = userEncoder[req.user.id];
-    const productIndices = Object.values(productEncoder);
+    if (userIdx == undefined) {
+      const bestSeller = await Product.find({
+        soldQuantity: { $gt: 0 },
+        isActive: true,
+      })
+        .sort({
+          soldQuantity: -1,
+        })
+        .limit(3);
 
+      const newArrival = await Product.find({ isActive: true })
+        .sort({ createdAt: -1 })
+        .limit(2);
+
+      const products = [...bestSeller, ...newArrival];
+
+      const result = Array.from(
+        new Map(products.map((item) => [item._id.toString(), item])).values()
+      );
+
+      return res.status(200).json({ data: result });
+    }
+
+    const productIndices = Object.values(productEncoder);
     const userInputArray = new Array(productIndices.length).fill(userIdx);
     const productInputArray = productIndices;
 
-    const predictions = await model.predict([
-      userInputArray,
-      productInputArray,
+    const userInputTensor = tf.tensor2d(userInputArray, [
+      userInputArray.length,
+      1,
+    ]);
+    const productInputTensor = tf.tensor2d(productInputArray, [
+      productInputArray.length,
+      1,
     ]);
 
-    const topNIndices = predictions.argMax(-1).dataSync().slice(0, 5);
-    const topNProductIds = topNIndices.map(
-      (i) =>
-        Object.keys(productEncoder)[Object.values(productEncoder).indexOf(i)]
-    );
+    const predictions = await model.predict([
+      userInputTensor,
+      productInputTensor,
+    ]);
 
-    res.status(200).json(topNProductIds);
+    const predictionsArray = Array.from(predictions.dataSync());
+
+    const sortedIndices = predictionsArray
+      .map((value, index) => ({ value, index }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5)
+      .map((item) => item.index);
+
+    const topNProductIds = sortedIndices.map((i) => productDecoder[i]);
+
+    let result = [];
+    for (let productId of topNProductIds) {
+      const product = await Product.findById(productId);
+      result.push(product);
+    }
+
+    res.status(200).json({ data: result });
   } catch (err) {
-    console.log(err.message);
     res.status(500).json({
       error: err.message,
       message: "Đã xảy ra lỗi, vui lòng thử lại!",

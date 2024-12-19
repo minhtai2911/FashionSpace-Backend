@@ -151,7 +151,7 @@ const getBestSellerProduct = async (req, res, next) => {
   try {
     const query = {};
     if (req.query.isActive) query.isActive = req.query.isActive;
-    const products = await Product.find({ soldQuantity: { $gt: 0 } }, query)
+    const products = await Product.find({ soldQuantity: { $gt: 0 }, ...query })
       .sort({
         soldQuantity: -1,
       })
