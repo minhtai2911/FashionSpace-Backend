@@ -14,7 +14,7 @@ const getAllProducts = async (req, res, next) => {
       query.price = { ...query.price, $lte: req.query.maxPrice };
     if (req.query.search) query.name = new RegExp(req.query.search, "i");
     const totalCount = await Product.countDocuments(query);
-    if (!req.query.sortName) {
+    if (req.query.sortName) {
       const products = await Product.find(query)
         .sort({ name: req.query.sortName })
         .skip(startIndex)
