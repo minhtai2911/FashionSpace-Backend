@@ -2,12 +2,54 @@ import Product from "../models/product.js";
 
 const getAllProducts = async (req, res, next) => {
   try {
-    const product = await Product.find({});
+    const query = {};
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const startIndex = (page - 1) * limit;
 
-    if (!product)
-      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+    if (req.query.isActive) query.isActive = req.query.isActive;
+    if (req.query.categoryId) query.categoryId = req.query.categoryId;
+    if (req.query.minPrice) query.price = { $gte: req.query.minPrice };
+    if (req.query.maxPrice)
+      query.price = { ...query.price, $lte: req.query.maxPrice };
+    if (req.query.search) query.name = new RegExp(req.query.search, "i");
+    const totalCount = await Product.countDocuments(query);
+    if (!req.query.sortName) {
+      const products = await Product.find(query)
+        .sort({ name: req.query.sortName })
+        .skip(startIndex)
+        .limit(limit)
+        .exec();
 
-    return res.status(200).json({ data: product });
+      if (!products)
+        return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+
+      return res.status(200).json({
+        meta: {
+          totalCount: totalCount,
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+        data: products,
+      });
+    } else {
+      const products = await Product.find(query)
+        .skip(startIndex)
+        .limit(limit)
+        .exec();
+
+      if (!products)
+        return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+
+      return res.status(200).json({
+        meta: {
+          totalCount: totalCount,
+          currentPage: page,
+          totalPages: Math.ceil(totalCount / limit),
+        },
+        data: products,
+      });
+    }
   } catch (err) {
     res.status(500).json({
       error: err.message,
