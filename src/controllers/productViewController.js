@@ -6,11 +6,22 @@ const createProductView = async (req, res, next) => {
       return res.status(400).json({ message: "productId is required!" });
     }
 
+    const existsProductView = await ProductView.find({
+      productId: req.body.productId,
+      userId: req.user.id,
+    });
+
+    if (existsProductView) {
+      return res.status(400).json({
+        error: "ProductView already exists",
+      });
+    }
+
     const productView = new ProductView({
       productId: req.body.productId,
       userId: req.user.id,
     });
-    
+
     await productView.save();
     res.status(201).json({
       data: productView,
