@@ -2,7 +2,10 @@ import PaymentDetail from "../models/paymentDetail.js";
 import Order from "../models/order.js";
 import crypto from "crypto";
 import axios from "axios";
+import OrderAddress from "../models/orderAddress.js";
+import OrderDetail from "../models/orderDetail.js";
 import { messages } from "../config/messageHelper.js";
+import { paymentStatus } from "../config/paymentStatus.js";
 
 const getAllPaymentDetails = async (req, res, next) => {
   try {
@@ -192,8 +195,13 @@ const callbackPaymentDetail = async (req, res, next) => {
       const paymentDetail = await PaymentDetail.findById({
         _id: order.paymentDetailId,
       });
-      paymentDetail.status = "Đã thanh toán";
+      paymentDetail.status = paymentStatus.PAID;
       paymentDetail.save();
+    } else {
+      const order = await Order.findByIdAndDelete(req.body.orderId);
+      await PaymentDetail.findByIdAndDelete(order.paymentDetailId);
+      await OrderAddress.findByIdAndDelete(order.orderAddressId);
+      await OrderDetail.deleteMany({ orderId: order._id });
     }
   } catch (err) {
     throw new Error({
@@ -237,9 +245,14 @@ const checkStatusTransaction = async (req, res, next) => {
     const response = await axios(options);
 
     if (response.data.resultCode === 0) {
-      return res.status(200).json();
+      return res.status(200);
     } else {
-      res.status(400).json();
+      const order = await Order.findByIdAndDelete(req.body.orderId);
+      if (!order) res.status(200);
+      await PaymentDetail.findByIdAndDelete(order.paymentDetailId);
+      await OrderAddress.findByIdAndDelete(order.orderAddressId);
+      await OrderDetail.deleteMany({ orderId: order._id });
+      return res.status(200);
     }
   } catch (err) {
     return res.status(500).json({

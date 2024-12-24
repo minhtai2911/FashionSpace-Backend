@@ -1,6 +1,7 @@
 import Statistic from "../models/statistic.js";
 import cron from "node-cron";
 import Order from "../models/order.js";
+import { orderStatus } from "../config/orderStatus.js";
 
 const createStatistic = async (req, res, next) => {
   try {
@@ -23,7 +24,7 @@ const createStatistic = async (req, res, next) => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: { $gte: todayStart, $lt: todayEnd },
         },
       },
@@ -46,7 +47,7 @@ const createStatistic = async (req, res, next) => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: {
             $gte: todayStart,
             $lt: todayEnd,
@@ -150,7 +151,7 @@ cron.schedule("0 59 23 * * *", async () => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: { $gte: todayStart, $lt: todayEnd },
         },
       },
@@ -173,7 +174,7 @@ cron.schedule("0 59 23 * * *", async () => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: {
             $gte: todayStart,
             $lt: todayEnd,

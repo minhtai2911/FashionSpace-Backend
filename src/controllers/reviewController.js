@@ -2,6 +2,7 @@ import Review from "../models/review.js";
 import Product from "../models/product.js";
 import mongoose from "mongoose";
 import { messages } from "../config/messageHelper.js";
+import { reviewStatus } from "../config/reviewStatus.js";
 
 // const getReviewsByProductId = asyncHandler(async (req, res, next) => {
 //   try {
@@ -47,7 +48,7 @@ const getAllReviews = async (req, res, next) => {
     if (req.query.orderId)
       query.orderId = new mongoose.Types.ObjectId(req.query.orderId);
 
-    if (req.query.status === "Chưa trả lời") {
+    if (req.query.status === reviewStatus.NOT_REPLIED) {
       if (Object.keys(query).length !== 0) {
         const reviews = await Review.aggregate([
           {
@@ -97,7 +98,7 @@ const getAllReviews = async (req, res, next) => {
         return res.status(200).json({ data: reviews });
       }
     }
-    if (req.query.status === "Đã trả lời") {
+    if (req.query.status === reviewStatus.REPLIED) {
       if (Object.keys(query).length !== 0) {
         const reviews = await Review.aggregate([
           {
