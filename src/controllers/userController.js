@@ -69,15 +69,23 @@ const updateStatusUserById = async (req, res, next) => {
 const updateUserById = async (req, res, next) => {
   try {
     const role = await UserRole.findById(req.user.roleId);
-    if (req.user.id !== req.params.id && role.roleName !== "Admin")
+    if (req.user.id !== req.params.id && role.roleName !== "Admin") {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
       return res.status(403).json({
         message:
           "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên.",
       });
+    }
 
     const user = await User.findById(req.params.id);
-    if (!user)
+    if (!user) {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = path.dirname(__filename);
+      fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
       return res.status(404).json({ error: "Người dùng không tồn tại." });
+    }
 
     if (req.file) {
       if (user.avatarPath) {

@@ -92,61 +92,61 @@ const updateProductImageById = async (req, res, next) => {
   }
 };
 
-// const deleteProductImageByProductId = asyncHandler(async (req, res, next) => {
-//   try {
-//     const deleteProductImage = await ProductImage.find({
-//       productId: req.params.productId,
-//     });
+const deleteProductImageByProductId = async (req, res, next) => {
+  try {
+    const deleteProductImage = await ProductImage.find({
+      productId: req.params.productId,
+    });
 
-//     if (!deleteProductImage)
-//       return res.status(404).json({ message: "Product image not found" });
+    if (!deleteProductImage)
+      return res.status(404).json({ message: "Product image not found" });
 
-//     const __filename = fileURLToPath(import.meta.url);
-//     const __dirname = path.dirname(__filename);
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
-//     for (let i = 0; i < deleteProductImage.length; i++) {
-//       const deleteStart =
-//         deleteProductImage[i].imagePath.indexOf("\\products\\");
-//       const deleteFile =
-//         "\\public" + deleteProductImage[i].imagePath.slice(deleteStart);
-//       fs.unlinkSync(path.join(__dirname, "..", deleteFile));
-//     }
-//     await ProductImage.deleteMany({ productId: req.params.productId });
-//     res.status(200).json({ message: "Product image deleted successfully" });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message,
-        // message: "Đã xảy ra lỗi, vui lòng thử lại!", });
-//   }
-// });
+    for (let i = 0; i < deleteProductImage.length; i++) {
+      const deleteStart =
+        deleteProductImage[i].imagePath.indexOf("\\products\\");
+      const deleteFile =
+        "\\public" + deleteProductImage[i].imagePath.slice(deleteStart);
+      fs.unlinkSync(path.join(__dirname, "..", deleteFile));
+    }
+    await ProductImage.deleteMany({ productId: req.params.productId });
+    res.status(200).json({ message: "Product image deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+  }
+};
 
-// const deleteProductImageById = asyncHandler(async (req, res, next) => {
-//   try {
-//     const deleteProductImage = await ProductImage.findByIdAndDelete(
-//       req.params.id
-//     );
+const deleteProductImageById = async (req, res, next) => {
+  try {
+    const deleteProductImage = await ProductImage.findByIdAndDelete(
+      req.params.id
+    );
 
-//     if (!deleteProductImage)
-//       return res.status(404).json({ message: "Product image not found" });
+    if (!deleteProductImage)
+      return res.status(404).json({ message: "Product image not found" });
 
-//     const __filename = fileURLToPath(import.meta.url);
-//     const __dirname = path.dirname(__filename);
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
-//     const deleteStart = deleteProductImage.imagePath.indexOf("\\products\\");
-//     const deleteFile =
-//       "\\public" + deleteProductImage.imagePath.slice(deleteStart);
-//     fs.unlinkSync(path.join(__dirname, "..", deleteFile));
-//     res.status(200).json({ message: "Product image deleted successfully" });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message,
-        // message: "Đã xảy ra lỗi, vui lòng thử lại!", });
-//   }
-// });
+    const deleteStart = deleteProductImage.imagePath.indexOf("\\products\\");
+    const deleteFile =
+      "\\public" + deleteProductImage.imagePath.slice(deleteStart);
+    fs.unlinkSync(path.join(__dirname, "..", deleteFile));
+    res.status(200).json({ message: "Product image deleted successfully" });
+  } catch (err) {
+    res.status(500).json({ error: err.message,
+        message: "Đã xảy ra lỗi, vui lòng thử lại!", });
+  }
+};
 
 export default {
   getAllProductImagesByProductId: getAllProductImagesByProductId,
   getProductImageById: getProductImageById,
   createProductImage: createProductImage,
   updateProductImageById: updateProductImageById,
-  // deleteProductImageByProductId: deleteProductImageByProductId,
-  // deleteProductImageById: deleteProductImageById,
+  deleteProductImageByProductId: deleteProductImageByProductId,
+  deleteProductImageById: deleteProductImageById,
 };
