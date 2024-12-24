@@ -1,5 +1,6 @@
 import OrderTracking from "../models/orderTracking.js";
 import chatbotController from "./chatbotController.js";
+import { messages } from "../config/messageHelper.js";
 
 const getOrderTrackingByOrderId = async (req, res, next) => {
   try {
@@ -11,13 +12,13 @@ const getOrderTrackingByOrderId = async (req, res, next) => {
     if (!orderTracking)
       return res
         .status(404)
-        .json({ error: "Lịch sử giao hàng không tồn tại." });
+        .json({ error: "Not found" });
 
     res.status(200).json({ data: orderTracking });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -27,7 +28,7 @@ const createOrderTracking = async (req, res, next) => {
     const { orderId, status, currentAddress, expectedDeliveryDate } = req.body;
 
     if (!orderId || !status || !currentAddress)
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
     const orderTracking = new OrderTracking({
       orderId,
       status,
@@ -41,13 +42,13 @@ const createOrderTracking = async (req, res, next) => {
     );
     await orderTracking.save();
     res.status(201).json({
-      message: "Thông tin theo dõi đơn hàng đã được cập nhật!",
+      message: messages.MSG44,
       data: orderTracking,
     });
   } catch (err) {
     res.status(400).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

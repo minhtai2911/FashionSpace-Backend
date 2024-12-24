@@ -1,4 +1,5 @@
 import ReviewResponse from "../models/reviewResponse.js";
+import { messages } from "../config/messageHelper.js";
 
 const getReviewResponseByReviewId = async (req, res, next) => {
   try {
@@ -7,13 +8,13 @@ const getReviewResponseByReviewId = async (req, res, next) => {
     const reviewResponse = await ReviewResponse.find({ reviewId: reviewId }).sort({ createdDate: -1 }); ;
 
     if (!reviewResponse)
-      return res.status(404).json({ error: "Phản hồi không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: reviewResponse });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -23,17 +24,17 @@ const createReviewResponse = async (req, res, next) => {
     const { reviewId, content } = req.body;
     const userId = req.user.id;
     if (!reviewId || !content)
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
 
     const newReviewResponse = new ReviewResponse({ userId, reviewId, content });
     await newReviewResponse.save();
     res
       .status(201)
-      .json({ message: "Phản hồi đánh giá thành công!", data: newReviewResponse });
+      .json({ message: messages.MSG45, data: newReviewResponse });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -41,12 +42,12 @@ const createReviewResponse = async (req, res, next) => {
 const updateReviewResponseById = async (req, res, next) => {
   try {
     const { content } = req.body;
-    if (!content) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+    if (!content) throw new Error(messages.MSG1);
 
     const reviewResponse = await ReviewResponse.findById(req.params.id);
 
     if (!reviewResponse)
-      return res.status(404).json({ error: "Phản hồi không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     reviewResponse.content = content || reviewResponse.content;
     reviewResponse.createdDate = Date.now();
@@ -55,7 +56,7 @@ const updateReviewResponseById = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -66,13 +67,13 @@ const deleteReviewResponseById = async (req, res, next) => {
       req.params.id
     );
     if (!reviewResponse)
-      return res.status(404).json({ error: "Phản hồi không tồn tại" });
+      return res.status(404).json({ error: "Not found" });
 
-    res.status(200).json({ message: "Phản hồi đã được xóa thành công!" });
+    res.status(200);
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

@@ -1,4 +1,5 @@
 import OrderAddress from "../models/orderAddress.js";
+import { messages } from "../config/messageHelper.js";
 
 const getAllOrderAddresses = async (req, res, next) => {
   try {
@@ -7,7 +8,7 @@ const getAllOrderAddresses = async (req, res, next) => {
     if (!orderAddresses)
       return res
         .status(404)
-        .json({ error: "Địa chỉ giao hàng không tồn tại." });
+        .json({ error: "Not found" });
 
     res.status(200).json({ data: orderAddresses });
   } catch (err) {
@@ -15,7 +16,7 @@ const getAllOrderAddresses = async (req, res, next) => {
       .status(500)
       .json({
         error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+        message: messages.MSG5,
       });
   }
 };
@@ -27,7 +28,7 @@ const getOrderAddressById = async (req, res, next) => {
     if (!orderAddress)
       return res
         .status(404)
-        .json({ error: "Địa chỉ giao hàng không tồn tại." });
+        .json({ error: "Not found" });
 
     res.status(200).json({ data: orderAddress });
   } catch (err) {
@@ -35,7 +36,7 @@ const getOrderAddressById = async (req, res, next) => {
       .status(500)
       .json({
         error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+        message: messages.MSG5,
       });
   }
 };
@@ -45,7 +46,7 @@ const createOrderAddress = async (req, res, next) => {
     const { city, district, commune, phone, street } = req.body;
 
     if (!city || !district || !commune || !phone || !street) {
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
     }
 
     const newOrderAddress = new OrderAddress({
@@ -63,7 +64,7 @@ const createOrderAddress = async (req, res, next) => {
       .status(500)
       .json({
         error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+        message: messages.MSG5,
       });
   }
 };
@@ -75,7 +76,7 @@ const updateOrderAddressById = async (req, res, next) => {
     if (!orderAddress)
       return res
         .status(404)
-        .json({ error: "Địa chỉ giao hàng không tồn tại." });
+        .json({ error: "Not found" });
 
     const { city, district, commune, phone, street } = req.body;
 
@@ -86,39 +87,39 @@ const updateOrderAddressById = async (req, res, next) => {
     orderAddress.street = street || orderAddress.street;
 
     await orderAddress.save();
-    res.status(200).json({message: "Cập nhật thông tin giao hàng thành công!", data: orderAddress });
+    res.status(200).json({message: messages.MSG21, data: orderAddress });
   } catch (err) {
     res
       .status(500)
       .json({
         error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
+        message: messages.MSG5,
       });
   }
 };
 
-const deleteOrderAddressById = async (req, res, next) => {
-  try {
-    const orderAddress = await OrderAddress.findByIdAndDelete(req.params.id);
+// const deleteOrderAddressById = async (req, res, next) => {
+//   try {
+//     const orderAddress = await OrderAddress.findByIdAndDelete(req.params.id);
 
-    if (!orderAddress)
-      return res.status(404).json({ error: "Địa chỉ giao hàng không tồn tại." });
+//     if (!orderAddress)
+//       return res.status(404).json({ error: "Not found" });
 
-    res.status(200).json({ message: "Xóa địa chỉ giao hàng thành công!" });
-  } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
-  }
-};
+//     res.status(200).json({ message: "Xóa địa chỉ giao hàng thành công!" });
+//   } catch (err) {
+//     res
+//       .status(500)
+//       .json({
+//         error: err.message,
+//         message: messages.MSG5,
+//       });
+//   }
+// };
 
 export default {
   getAllOrderAddresses: getAllOrderAddresses,
   getOrderAddressById: getOrderAddressById,
   createOrderAddress: createOrderAddress,
   updateOrderAddressById: updateOrderAddressById,
-  deleteOrderAddressById: deleteOrderAddressById,
+  // deleteOrderAddressById: deleteOrderAddressById,
 };
