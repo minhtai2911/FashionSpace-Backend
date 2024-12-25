@@ -94,6 +94,7 @@ const chatbot = async (req, res, next) => {
         return res.status(200).json({
           message: `Dưới đây là một số mẫu ${categoryName} đang có sẵn tại FashionSpace, phù hợp với nhiều phong cách và nhu cầu khác nhau:`,
           data: product,
+          type: "Product",
           messageEnd:
             "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
         });
@@ -120,6 +121,7 @@ const chatbot = async (req, res, next) => {
         return res.status(200).json({
           message: `Dưới đây là một số mẫu ${categoryName} ${gender} đang có sẵn tại FashionSpace, phù hợp với nhiều phong cách và nhu cầu khác nhau:`,
           data: product,
+          type: "Product",
           messageEnd:
             "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
         });
@@ -137,7 +139,9 @@ const chatbot = async (req, res, next) => {
           .status(404)
           .json({ error: "Lịch sử giao hàng không tồn tại." });
 
-      return res.status(200).json({ data: orderTracking });
+      return res
+        .status(200)
+        .json({ data: orderTracking, type: "OrderTracking" });
     }
 
     return res

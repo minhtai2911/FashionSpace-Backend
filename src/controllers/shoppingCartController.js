@@ -95,7 +95,7 @@ const createShoppingCart = async (req, res, next) => {
       message: messages.MSG47,
       data: newShoppingCart,
     });
-  } catch {
+  } catch (err) {
     res.status(500).json({
       error: err.message,
       message: messages.MSG5,
