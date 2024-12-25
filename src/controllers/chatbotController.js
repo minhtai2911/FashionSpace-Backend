@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import Product from "../models/product.js";
 import Category from "../models/category.js";
 import OrderTracking from "../models/orderTracking.js";
+import OrderDetail from "../models/orderDetail.js";
 
 const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
 const PROJECTID = CREDENTIALS.project_id;
@@ -130,9 +131,10 @@ const chatbot = async (req, res, next) => {
 
     if (result.fulfillmentText.substring(0, 7) === "orderId") {
       const orderId = result.fulfillmentText.substring(10);
-      const orderTracking = await OrderTracking.find({
+      const orderTrackings = await OrderTracking.find({
         orderId: orderId,
       });
+      const orderDetails = await OrderDetail.find({ orderId: orderId });
 
       if (!orderTracking)
         return res
@@ -141,7 +143,10 @@ const chatbot = async (req, res, next) => {
 
       return res
         .status(200)
-        .json({ data: orderTracking, type: "OrderTracking" });
+        .json({
+          data: { OrderTracking: orderTrackings, OrderDetail: orderDetails },
+          type: "OrderTracking",
+        });
     }
 
     return res
