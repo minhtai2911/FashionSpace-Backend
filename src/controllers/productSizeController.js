@@ -56,7 +56,7 @@ const createProductSize = async (req, res, next) => {
       size: size,
     });
 
-    if (existingProductSize.length !== 0) {
+    if (existingProductSize) {
       return res.status(409).json({ message: messages.MSG54 });
     }
 
@@ -89,7 +89,7 @@ const updateProductSizeById = async (req, res, next) => {
       size: size,
     });
 
-    if (existingProductSize.length !== 0) {
+    if (existingProductSize) {
       return res.status(409).json({ message: messages.MSG54 });
     }
 

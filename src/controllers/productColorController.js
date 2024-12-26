@@ -39,7 +39,7 @@ const createProductColor = async (req, res, next) => {
     if (!color) throw new Error(messages.MSG1);
 
     const existingProductColor = await ProductColor.findOne({ color: color });
-    if (existingProductColor.length !== 0) {
+    if (existingProductColor) {
       return res.status(409).json({ message: messages.MSG55 });
     }
 
@@ -51,6 +51,7 @@ const createProductColor = async (req, res, next) => {
       data: newProductColor,
     });
   } catch (err) {
+    console.log(err.message);
     res.status(400).json({
       error: err.message,
       message: messages.MSG5,
@@ -67,7 +68,7 @@ const updateProductColorById = async (req, res, next) => {
     productColor.color = req.body.color || productColor.color;
 
     const existingProductColor = await ProductColor.findOne({ color: req.body.color });
-    if (existingProductColor.length !== 0) {
+    if (existingProductColor) {
       return res.status(409).json({ message: messages.MSG55 });
     }
 
