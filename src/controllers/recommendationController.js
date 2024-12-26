@@ -46,7 +46,7 @@ const getUserProductData = async () => {
         productId: item.productId.toString(),
       }));
   } catch (err) {
-    throw new Error("Failed to fetch data");
+    throw new Error(err.message);
   }
 };
 
@@ -138,7 +138,7 @@ const trainModel = async () => {
 
     return { model, userEncoder, productEncoder, productDecoder };
   } catch (err) {
-    throw new Error("Failed to train model");
+    throw new Error(err.message);
   }
 };
 
@@ -207,6 +207,8 @@ const recommend = async (req, res, next) => {
 
     res.status(200).json({ data: result });
   } catch (err) {
+    if (err.message === "No data found from database.")
+      return res.status(200).json({ data: [] });
     res.status(500).json({
       error: err.message,
       message: messages.MSG5,
