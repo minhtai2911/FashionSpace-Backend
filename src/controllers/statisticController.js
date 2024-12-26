@@ -206,7 +206,37 @@ cron.schedule("0 59 23 * * *", async () => {
   }
 });
 
+const addStatistic = async (totalPrice) => {
+  try {
+    const today = new Date();
+
+    const statistic = await Statistic.findOne({
+      day: today.getDate(),
+      month: today.getMonth() + 1,
+      year: today.getFullYear(),
+    });
+
+    if (statistic) {
+      statistic.totalOrder++;
+      statistic.totalRevenue += totalPrice;
+      await statistic.save();
+    } else {
+      const newStatistic = new Statistic({
+        day: today.getDate(),
+        month: today.getMonth() + 1,
+        year: today.getFullYear(),
+        totalOrder: 1,
+        totalRevenue: totalPrice,
+      });
+      await newStatistic.save();
+    }
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
 export default {
   createStatistic: createStatistic,
   getStatistics: getStatistics,
+  addStatistic: addStatistic,
 };

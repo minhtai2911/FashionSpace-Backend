@@ -4,6 +4,8 @@ import Product from "../models/product.js";
 import ProductVariant from "../models/productVariant.js";
 import OrderDetail from "../models/orderDetail.js";
 import { orderStatus } from "../config/orderStatus.js";
+import statisticController from "./statisticController.js";
+import Order from "../models/order.js";
 
 const getOrderTrackingByOrderId = async (req, res, next) => {
   try {
@@ -56,6 +58,11 @@ const createOrderTracking = async (req, res, next) => {
         product.soldQuantity -= orderDetail.quantity;
         await product.save();
       }
+    }
+
+    if (orderTracking.status === orderStatus.SHIPPED) {
+      const order = await Order.findById(orderId);
+      statisticController.addStatistic(order.total);
     }
 
     await orderTracking.save();
