@@ -155,11 +155,11 @@ const recommend = async (req, res, next) => {
         .sort({
           soldQuantity: -1,
         })
-        .limit(3);
+        .limit(6);
 
       const newArrival = await Product.find({ isActive: true })
         .sort({ createdAt: -1 })
-        .limit(2);
+        .limit(4);
 
       const products = [...bestSeller, ...newArrival];
 
@@ -193,7 +193,7 @@ const recommend = async (req, res, next) => {
     const sortedIndices = predictionsArray
       .map((value, index) => ({ value, index }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, 5)
+      .slice(0, 10)
       .map((item) => item.index);
 
     const topNProductIds = sortedIndices.map((i) => productDecoder[i]);
