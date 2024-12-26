@@ -50,6 +50,7 @@ const chatbot = async (req, res, next) => {
         message:
           "Cảm ơn bạn đã ghé thăm FashionSpace. Dưới đây là một số sản phẩm bán chạy nhất của chúng mình hiện nay:",
         data: product,
+        type: "Product",
         messageEnd:
           "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
       });
@@ -61,6 +62,7 @@ const chatbot = async (req, res, next) => {
         message:
           "Cảm ơn bạn đã quan tâm đến các sản phẩm mới tại FashionSpace. Dưới đây là một số sản phẩm mới nhất mà chúng mình vừa ra mắt:",
         data: product,
+        type: "Product",
         messageEnd:
           "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
       });
