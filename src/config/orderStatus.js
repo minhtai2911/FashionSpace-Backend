@@ -5,5 +5,6 @@ export const orderStatus = {
   IN_DELIVERY: "Đang giao",
   SHIPPED: "Đã giao",
   CANCELLED: "Đã hủy",
-  RETURNED: "Trả hàng",
+  RETURNED: "Đã trả hàng",
+  RETURN: "Trả hàng",
 };

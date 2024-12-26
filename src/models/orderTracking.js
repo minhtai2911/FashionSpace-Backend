@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
       "Đã hủy",
       "Trả hàng",
       "Đã nhận đơn",
+      "Đã trả hàng"
     ],
   },
   currentStatus: {
