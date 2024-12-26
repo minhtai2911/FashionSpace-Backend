@@ -86,14 +86,14 @@ const deleteCategoryById = async (req, res, next) => {
   try {
     const productSize = await ProductSize.find({ categoryId: req.params.id });
 
-    if (!productSize)
+    if (productSize)
       return res.status(400).json({
         message: messages.MSG29,
       });
 
     const product = await Product.find({ categoryId: req.params.id });
 
-    if (!product)
+    if (product)
       return res.status(400).json({
         message: messages.MSG28,
       });

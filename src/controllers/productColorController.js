@@ -83,7 +83,7 @@ const deleteProductColorById = async (req, res, next) => {
       colorId: req.params.id,
     });
 
-    if (!productVariant)
+    if (productVariant)
       return res.status(400).json({
         message:
           messages.MSG41,

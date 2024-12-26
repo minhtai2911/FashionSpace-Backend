@@ -99,7 +99,7 @@ const deleteProductSizeById = async (req, res, next) => {
       sizeId: req.params.id,
     });
 
-    if (!productVariant)
+    if (productVariant)
       return res.status(400).json({
         message:
           messages.MSG37,
