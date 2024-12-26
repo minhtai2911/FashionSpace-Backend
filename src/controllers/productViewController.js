@@ -7,7 +7,7 @@ const createProductView = async (req, res, next) => {
       return res.status(400).json({ error: "productId is required!" });
     }
 
-    const existsProductView = await ProductView.find({
+    const existsProductView = await ProductView.findOne({
       productId: req.body.productId,
       userId: req.user.id,
     });
