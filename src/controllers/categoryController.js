@@ -42,7 +42,8 @@ const createCategory = async (req, res, next) => {
     const newCategory = new Category({ name, gender });
 
     const existingCategory = await Category.find({name: name, gender: gender});
-    if (existingCategory) {
+    console.log(existingCategory);
+    if (existingCategory.length !== 0) {
       return res.status(409).json({ message: messages.MSG56 });
     }
 
@@ -69,7 +70,7 @@ const updateCategoryById = async (req, res, next) => {
     const { name, gender } = req.body;
 
     const existingCategory = await Category.find({name: name, gender: gender});
-    if (existingCategory) {
+    if (existingCategory.length !== 0) {
       return res.status(409).json({ message: messages.MSG56 });
     }
 
