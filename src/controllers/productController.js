@@ -138,7 +138,7 @@ const updateStatusProductById = async (req, res, next) => {
 
     await product.save();
     if (product.isActive)
-      res.status(200);
+      res.status(200).json();
     else res.status(200).json({ message: messages.MSG35 });
   } catch (err) {
     res.status(500).json({

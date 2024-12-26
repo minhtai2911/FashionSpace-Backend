@@ -245,14 +245,14 @@ const checkStatusTransaction = async (req, res, next) => {
     const response = await axios(options);
 
     if (response.data.resultCode === 0) {
-      return res.status(200);
+      return res.status(200).json();
     } else {
       const order = await Order.findByIdAndDelete(req.body.orderId);
-      if (!order) res.status(200);
+      if (!order) res.status(200).json();
       await PaymentDetail.findByIdAndDelete(order.paymentDetailId);
       await OrderAddress.findByIdAndDelete(order.orderAddressId);
       await OrderDetail.deleteMany({ orderId: order._id });
-      return res.status(200);
+      return res.status(200).json();
     }
   } catch (err) {
     return res.status(500).json({

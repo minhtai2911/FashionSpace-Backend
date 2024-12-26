@@ -129,7 +129,7 @@ const deleteProductImageById = async (req, res, next) => {
     const deleteFile =
       "\\public" + deleteProductImage.imagePath.slice(deleteStart);
     fs.unlinkSync(path.join(__dirname, "..", deleteFile));
-    res.status(200);
+    res.status(200).json();
   } catch (err) {
     res.status(500).json({ error: err.message, message: messages.MSG5 });
   }

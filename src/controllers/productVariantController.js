@@ -162,7 +162,7 @@ const deleteProductVariantById = async (req, res, next) => {
     if (!deleteProductVariant)
       return res.status(404).json({ error: "Not found" });
 
-    res.status(200);
+    res.status(200).json();
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -180,7 +180,7 @@ const deleteProductVariantsByProductId = async (req, res, next) => {
     if (!deleteProductVariants)
       return res.status(404).json({ error: "Not found" });
 
-    res.status(200);
+    res.status(200).json();
   } catch (err) {
     res.status(500).json({
       error: err.message,
