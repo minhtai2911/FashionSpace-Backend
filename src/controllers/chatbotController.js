@@ -131,12 +131,13 @@ const chatbot = async (req, res, next) => {
 
     if (result.fulfillmentText.substring(0, 7) === "orderId") {
       const orderId = result.fulfillmentText.substring(10);
+      console.log(orderId);
       const orderTrackings = await OrderTracking.find({
         orderId: orderId,
       });
       const orderDetails = await OrderDetail.find({ orderId: orderId });
 
-      if (!orderTracking)
+      if (!orderTrackings)
         return res
           .status(404)
           .json({ error: "Lịch sử giao hàng không tồn tại." });

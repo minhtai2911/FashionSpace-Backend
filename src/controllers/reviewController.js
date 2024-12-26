@@ -248,7 +248,7 @@ const getReviewById = async (req, res, next) => {
 
 const updateReviewById = async (req, res, next) => {
   try {
-    const review = Review.findById(req.params.id);
+    const review = await Review.findById(req.params.id);
 
     if (!review) return res.status(404).json({ error: "Not found" });
 
