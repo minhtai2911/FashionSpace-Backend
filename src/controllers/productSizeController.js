@@ -51,6 +51,15 @@ const createProductSize = async (req, res, next) => {
     if (!size || !categoryId)
       throw new Error(messages.MSG1);
 
+    const existingProductSize = await ProductSize.findOne({
+      categoryId: categoryId,
+      size: size,
+    });
+
+    if (existingProductSize) {
+      return res.status(409).json({ message: messages.MSG54 });
+    }
+
     const productSize = new ProductSize({ categoryId: categoryId, size: size });
 
     await productSize.save();
@@ -74,6 +83,15 @@ const updateProductSizeById = async (req, res, next) => {
       return res.status(404).json({ error: "Not found" });
 
     const { categoryId, size } = req.body;
+
+    const existingProductSize = await ProductSize.findOne({
+      categoryId: categoryId,
+      size: size,
+    });
+
+    if (existingProductSize) {
+      return res.status(409).json({ message: messages.MSG54 });
+    }
 
     productSize.categoryId = categoryId || productSize.categoryId;
     productSize.size = size || productSize.size;

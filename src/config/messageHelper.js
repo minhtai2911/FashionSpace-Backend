@@ -56,5 +56,8 @@ export const messages = {
   MSG50: "Số điện thoại bạn nhập không hợp lệ. Vui lòng kiểm tra lại.",
   MSG51: "Email đã tồn tại.",
   MSG52: "Đơn hàng đã được hủy thành công!",
-  MSG53: "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên."
+  MSG53: "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên.",
+  MSG54: "Kích cỡ sản phẩm đã tồn tại!",
+  MSG55: "Màu sắc sản phẩm đã tồn tại!",
+  MSG56: "Danh mục sản phẩm đã tồn tại!",
 };

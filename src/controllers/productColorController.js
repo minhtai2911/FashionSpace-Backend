@@ -6,8 +6,7 @@ const getAllProductColors = async (req, res, next) => {
   try {
     const productColor = await ProductColor.find({});
 
-    if (!productColor)
-      return res.status(404).json({ error: "Not found" });
+    if (!productColor) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: productColor });
   } catch (err) {
@@ -22,8 +21,7 @@ const getProductColorById = async (req, res, next) => {
   try {
     const productColor = await ProductColor.findById(req.params.id);
 
-    if (!productColor)
-      return res.status(404).json({ error: "Not found" });
+    if (!productColor) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: productColor });
   } catch (err) {
@@ -39,6 +37,11 @@ const createProductColor = async (req, res, next) => {
     const { color } = req.body;
 
     if (!color) throw new Error(messages.MSG1);
+
+    const existingProductColor = await ProductColor.findOne({ color: color });
+    if (existingProductColor) {
+      return res.status(409).json({ message: messages.MSG55 });
+    }
 
     const newProductColor = new ProductColor({ color: color });
 
@@ -59,10 +62,14 @@ const updateProductColorById = async (req, res, next) => {
   try {
     const productColor = await ProductColor.findById(req.params.id);
 
-    if (!productColor)
-      return res.status(404).json({ error: "Not found" });
+    if (!productColor) return res.status(404).json({ error: "Not found" });
 
     productColor.color = req.body.color || productColor.color;
+
+    const existingProductColor = await ProductColor.findOne({ color: req.body.color });
+    if (existingProductColor) {
+      return res.status(409).json({ message: messages.MSG55 });
+    }
 
     await productColor.save();
     res.status(200).json({
@@ -85,14 +92,12 @@ const deleteProductColorById = async (req, res, next) => {
 
     if (productVariant)
       return res.status(400).json({
-        message:
-          messages.MSG41,
+        message: messages.MSG41,
       });
 
     const productColor = await ProductColor.findByIdAndDelete(req.params.id);
 
-    if (!productColor)
-      return res.status(404).json({ error: "Not found" });
+    if (!productColor) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ message: messages.MSG42 });
   } catch (err) {

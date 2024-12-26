@@ -41,6 +41,11 @@ const createCategory = async (req, res, next) => {
     if (!name) throw new Error(messages.MSG1);
     const newCategory = new Category({ name, gender });
 
+    const existingCategory = await Category.find({name: name, gender: gender});
+    if (existingCategory) {
+      return res.status(409).json({ message: messages.MSG56 });
+    }
+
     await newCategory.save();
     chatbotController.updateEntityCategory(name, [name]);
     res.status(201).json({
@@ -62,6 +67,11 @@ const updateCategoryById = async (req, res, next) => {
     if (!category) return res.status(404).json({ error: "Not found" });
 
     const { name, gender } = req.body;
+
+    const existingCategory = await Category.find({name: name, gender: gender});
+    if (existingCategory) {
+      return res.status(409).json({ message: messages.MSG56 });
+    }
 
     chatbotController.deleteEntityCategory(category.name);
     chatbotController.updateEntityCategory(name, [name]);
