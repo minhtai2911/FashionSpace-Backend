@@ -4,6 +4,7 @@ import Product from "../models/product.js";
 import Category from "../models/category.js";
 import OrderTracking from "../models/orderTracking.js";
 import OrderDetail from "../models/orderDetail.js";
+import { messages } from "../config/messageHelper.js";
 
 const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
 const PROJECTID = CREDENTIALS.project_id;
@@ -78,9 +79,9 @@ const chatbot = async (req, res, next) => {
       );
 
       if (gender === "null") {
-        const category = await Category.findOne({ name: categoryName });
+        const categories = await Category.find({ name: categoryName });
 
-        if (!category)
+        if (categories.length == 0)
           return res.status(200).json({
             message:
               "Cảm ơn bạn đã quan tâm đến sản phẩm của chúng mình. Hiện tại, sản phẩm mà bạn đang tìm kiếm không có sẵn trong kho. Chúng mình rất tiếc vì sự bất tiện này.",
@@ -88,15 +89,20 @@ const chatbot = async (req, res, next) => {
             messageEnd: null,
           });
 
-        const product = await Product.find({ categoryId: category._id })
-          .sort({
-            soldQuantity: -1,
-          })
-          .limit(10);
+        let products = [];
+
+        for (let category of categories) {
+          const product = await Product.find({ categoryId: category._id })
+            .sort({
+              soldQuantity: -1,
+            })
+            .limit(10);
+          products.push(...product);
+        }
 
         return res.status(200).json({
           message: `Dưới đây là một số mẫu ${categoryName} đang có sẵn tại FashionSpace, phù hợp với nhiều phong cách và nhu cầu khác nhau:`,
-          data: product,
+          data: products,
           type: "Product",
           messageEnd:
             "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!",
@@ -144,12 +150,10 @@ const chatbot = async (req, res, next) => {
           .status(404)
           .json({ error: "Lịch sử giao hàng không tồn tại." });
 
-      return res
-        .status(200)
-        .json({
-          data: { OrderTracking: orderTrackings, OrderDetail: orderDetails },
-          type: "OrderTracking",
-        });
+      return res.status(200).json({
+        data: { OrderTracking: orderTrackings, OrderDetail: orderDetails },
+        type: "OrderTracking",
+      });
     }
 
     return res
