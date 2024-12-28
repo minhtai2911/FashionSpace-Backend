@@ -112,7 +112,7 @@ const checkoutWithMoMo = async (req, res, next) => {
     const partnerCode = "MOMO";
     const redirectUrl = `${process.env.URL_CLIENT}/orderCompleted`;
     const ipnUrl = `${process.env.LINK_NGROK}/api/v1/paymentDetail/callback`;
-    const requestType = "payWithMethod";
+    const requestType = "payWithATM";
     const amount = req.body.amount;
     const orderId = req.body.orderId;
     const requestId = orderId;
@@ -245,6 +245,14 @@ const checkStatusTransaction = async (req, res, next) => {
     const response = await axios(options);
 
     if (response.data.resultCode === 0) {
+      const order = await Order.findById({ _id: req.body.orderId });
+
+      if (!order) throw new Error("Not found");
+      const paymentDetail = await PaymentDetail.findById({
+        _id: order.paymentDetailId,
+      });
+      paymentDetail.status = paymentStatus.PAID;
+      paymentDetail.save();
       return res.status(200).json();
     } else {
       const order = await Order.findByIdAndDelete(req.body.orderId);
