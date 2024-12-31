@@ -14,7 +14,8 @@ const userSchema = new mongoose.Schema({
       "Đang xử lý",
       "Đã giao",
       "Đang giao",
-      "Đã hủy",
+      "Đã hủy bởi bạn",
+      "Đã hủy bởi người bán",
       "Trả hàng",
       "Đã nhận đơn",
       "Đã trả hàng"

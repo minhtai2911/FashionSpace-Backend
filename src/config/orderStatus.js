@@ -4,7 +4,8 @@ export const orderStatus = {
   PROCESSING: "Đang xử lý",
   IN_DELIVERY: "Đang giao",
   SHIPPED: "Đã giao",
-  CANCELLED: "Đã hủy",
+  CANCELLED_CUSTOMER: "Đã hủy bởi bạn",
+  CANCELLED_EMPLOYEE: "Đã hủy bởi người bán",
   RETURNED: "Đã trả hàng",
   RETURN: "Trả hàng",
 };

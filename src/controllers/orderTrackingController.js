@@ -43,7 +43,8 @@ const createOrderTracking = async (req, res, next) => {
     );
 
     if (
-      orderTracking.status === orderStatus.CANCELLED ||
+      orderTracking.status === orderStatus.CANCELLED_CUSTOMER ||
+      orderTracking.status === orderStatus.CANCELLED_EMPLOYEE ||
       orderTracking.status === orderStatus.RETURNED
     ) {
       const orderDetails = await OrderDetail.find({ orderId: orderId });
