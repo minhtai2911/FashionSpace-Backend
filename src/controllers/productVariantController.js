@@ -113,6 +113,16 @@ const updateProductVariantById = async (req, res, next) => {
 
     if (!updateProductVariant)
       return res.status(404).json({ error: "Not found" });
+    
+    let check = true;
+
+    if (
+      req.body.productId == updateProductVariant.productId &&
+      req.body.sizeId == updateProductVariant.sizeId &&
+      req.body.colorId == updateProductVariant.colorId
+    ) {
+      check = false;
+    }
 
     updateProductVariant.productId =
       req.body.productId || updateProductVariant.productId;
@@ -132,7 +142,7 @@ const updateProductVariantById = async (req, res, next) => {
       colorId,
     });
 
-    if (existingProductVariant) {
+    if (existingProductVariant && check) {
       const color = await ProductColor.findById(existingProductVariant.colorId);
       if (!color) return res.status(404).json({ error: "Not found" });
       const size = await ProductSize.findById(existingProductVariant.sizeId);
