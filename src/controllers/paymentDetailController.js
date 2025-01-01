@@ -6,6 +6,7 @@ import OrderAddress from "../models/orderAddress.js";
 import OrderDetail from "../models/orderDetail.js";
 import { messages } from "../config/messageHelper.js";
 import { paymentStatus } from "../config/paymentStatus.js";
+import OrderTracking from "../models/orderTracking.js";
 
 const getAllPaymentDetails = async (req, res, next) => {
   try {
@@ -112,7 +113,7 @@ const checkoutWithMoMo = async (req, res, next) => {
     const partnerCode = "MOMO";
     const redirectUrl = `${process.env.URL_CLIENT}/orderCompleted`;
     const ipnUrl = `${process.env.LINK_NGROK}/api/v1/paymentDetail/callback`;
-    const requestType = "payWithATM";
+    const requestType = "payWithMethod";
     const amount = req.body.amount;
     const orderId = req.body.orderId;
     const requestId = orderId;
@@ -202,6 +203,7 @@ const callbackPaymentDetail = async (req, res, next) => {
       await PaymentDetail.findByIdAndDelete(order.paymentDetailId);
       await OrderAddress.findByIdAndDelete(order.orderAddressId);
       await OrderDetail.deleteMany({ orderId: order._id });
+      await OrderTracking.deleteMany({ orderId: order._id });
     }
   } catch (err) {
     throw new Error({
@@ -247,7 +249,8 @@ const checkStatusTransaction = async (req, res, next) => {
     if (response.data.resultCode === 0) {
       const order = await Order.findById({ _id: req.body.orderId });
 
-      if (!order) throw new Error("Not found");
+      if (!order) return res.status(404).json();
+
       const paymentDetail = await PaymentDetail.findById({
         _id: order.paymentDetailId,
       });
@@ -256,10 +259,13 @@ const checkStatusTransaction = async (req, res, next) => {
       return res.status(200).json();
     } else {
       const order = await Order.findByIdAndDelete(req.body.orderId);
-      if (!order) res.status(200).json();
+      
+      if (!order) return res.status(404).json();
+
       await PaymentDetail.findByIdAndDelete(order.paymentDetailId);
       await OrderAddress.findByIdAndDelete(order.orderAddressId);
       await OrderDetail.deleteMany({ orderId: order._id });
+      await OrderTracking.deleteMany({ orderId: order._id });
       return res.status(200).json();
     }
   } catch (err) {
