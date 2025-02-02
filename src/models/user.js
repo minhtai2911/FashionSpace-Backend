@@ -3,6 +3,7 @@ import validator from "validator";
 import bcrypt from "bcrypt";
 import path from "path";
 import dotenv from "dotenv";
+import { messages } from "../config/messageHelper.js";
 dotenv.config();
 
 const userSchema = new mongoose.Schema(
@@ -66,11 +67,11 @@ userSchema.statics.login = async function (email, password) {
       return user;
     }
     throw new Error(
-      "Thông tin đăng nhập không chính xác. Vui lòng kiểm tra lại tên đăng nhập và mật khẩu."
+      messages.MSG2
     );
   }
   throw new Error(
-    "Thông tin đăng nhập không chính xác. Vui lòng kiểm tra lại tên đăng nhập và mật khẩu."
+    messages.MSG2
   );
 };
 

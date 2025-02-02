@@ -1,4 +1,5 @@
 import Product from "../models/product.js";
+import { messages } from "../config/messageHelper.js";
 
 const getAllProducts = async (req, res, next) => {
   try {
@@ -21,7 +22,7 @@ const getAllProducts = async (req, res, next) => {
         // .exec();
 
       if (!products)
-        return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+        return res.status(404).json({ error: "Not found" });
 
       return res.status(200).json({
         meta: {
@@ -38,7 +39,7 @@ const getAllProducts = async (req, res, next) => {
         // .exec();
 
       if (!products)
-        return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+        return res.status(404).json({ error: "Not found" });
 
       return res.status(200).json({
         // meta: {
@@ -52,7 +53,7 @@ const getAllProducts = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -62,7 +63,7 @@ const createProduct = async (req, res, next) => {
     const { name, description, categoryId, price } = req.body;
 
     if (!name || !categoryId || !price) {
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
     }
 
     const newProduct = new Product({
@@ -75,11 +76,11 @@ const createProduct = async (req, res, next) => {
     await newProduct.save();
     res
       .status(201)
-      .json({ message: "Thêm sản phẩm thành công!", data: newProduct });
+      .json({ message: messages.MSG32, data: newProduct });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -89,13 +90,13 @@ const getProductById = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
 
     if (!product)
-      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: product });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -105,7 +106,7 @@ const updateProductById = async (req, res, next) => {
     const updateProduct = await Product.findById(req.params.id);
 
     if (!updateProduct)
-      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     const { name, description, categoryId, price } = req.body;
 
@@ -117,11 +118,11 @@ const updateProductById = async (req, res, next) => {
     await updateProduct.save();
     res
       .status(200)
-      .json({ message: "Chỉnh sửa sản phẩm thành công!", data: updateProduct });
+      .json({ message: messages.MSG33, data: updateProduct });
   } catch {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -131,18 +132,18 @@ const updateStatusProductById = async (req, res, next) => {
     const product = await Product.findById(req.params.id);
 
     if (!product)
-      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     product.isActive = !product.isActive;
 
     await product.save();
     if (product.isActive)
-      res.status(200).json({ message: "Khôi phục sản phẩm thành công!" });
-    else res.status(200).json({ message: "Lưu trữ sản phẩm thành công!" });
+      res.status(200).json();
+    else res.status(200).json({ message: messages.MSG35 });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -160,7 +161,7 @@ const getBestSellerProduct = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -174,7 +175,7 @@ const getNewArrivalProduct = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

@@ -2,24 +2,24 @@ import PaymentDetail from "../models/paymentDetail.js";
 import Order from "../models/order.js";
 import crypto from "crypto";
 import axios from "axios";
+import OrderAddress from "../models/orderAddress.js";
+import OrderDetail from "../models/orderDetail.js";
+import { messages } from "../config/messageHelper.js";
+import { paymentStatus } from "../config/paymentStatus.js";
+import OrderTracking from "../models/orderTracking.js";
 
 const getAllPaymentDetails = async (req, res, next) => {
   try {
     const paymentDetail = await PaymentDetail.find({});
 
-    if (!paymentDetail)
-      return res
-        .status(404)
-        .json({ error: "Chi tiết thanh toán không tồn tại." });
+    if (!paymentDetail) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: paymentDetail });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -27,19 +27,14 @@ const getPaymentDetailById = async (req, res, next) => {
   try {
     const paymentDetail = await PaymentDetail.findById(req.params.id);
 
-    if (!paymentDetail)
-      return res
-        .status(404)
-        .json({ error: "Chi tiết thanh toán không tồn tại." });
+    if (!paymentDetail) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: paymentDetail });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -47,8 +42,7 @@ const createPaymentDetail = async (req, res, next) => {
   try {
     const { paymentMethod, status } = req.body;
 
-    if (!paymentMethod)
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+    if (!paymentMethod) throw new Error(messages.MSG1);
 
     const newPaymentDetail = new PaymentDetail({
       paymentMethod,
@@ -56,19 +50,14 @@ const createPaymentDetail = async (req, res, next) => {
     });
 
     await newPaymentDetail.save();
-    res
-      .status(201)
-      .json({
-        message: "Thanh toán của bạn đã được xử lý thành công!",
-        data: newPaymentDetail,
-      });
+    res.status(201).json({
+      data: newPaymentDetail,
+    });
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    return res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -77,9 +66,7 @@ const updatePaymentDetailById = async (req, res, next) => {
     const updatePaymentDetail = await PaymentDetail.findById(req.params.id);
 
     if (!updatePaymentDetail)
-      return res
-        .status(404)
-        .json({ error: "Chi tiết thanh toán không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     const { status } = req.body;
 
@@ -87,41 +74,36 @@ const updatePaymentDetailById = async (req, res, next) => {
     updatePaymentDetail.updatedDate = Date.now();
 
     await updatePaymentDetail.save();
-    res
-      .status(200)
-      .json({
-        message: "Thanh toán của bạn đã được xử lý thành công!",
-        data: updatePaymentDetail,
-      });
+    res.status(200).json({
+      data: updatePaymentDetail,
+    });
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    return res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
-const deletePaymentDetailById = async (req, res, next) => {
-  try {
-    const deletePaymentDetail = await PaymentDetail.findByIdAndDelete(
-      req.params.id
-    );
+// const deletePaymentDetailById = async (req, res, next) => {
+//   try {
+//     const deletePaymentDetail = await PaymentDetail.findByIdAndDelete(
+//       req.params.id
+//     );
 
-    if (!deletePaymentDetail)
-      return res.status(404).json({ error: "Chi tiết thanh toán không tồn tại." });
+//     if (!deletePaymentDetail)
+//       return res.status(404).json({ error: "Not found" });
 
-    res.status(200).json({ message: "Xóa thành công!" });
-  } catch (err) {
-    return res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
-  }
-};
+//     res.status(200).json({ message: "Xóa thành công!" });
+//   } catch (err) {
+//     return res
+//       .status(500)
+//       .json({
+//         error: err.message,
+//         message: messages.MSG5,
+//       });
+//   }
+// };
 
 const checkoutWithMoMo = async (req, res, next) => {
   try {
@@ -198,12 +180,10 @@ const checkoutWithMoMo = async (req, res, next) => {
     const response = await axios(options);
     res.status(200).json(response.data);
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    return res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -212,17 +192,23 @@ const callbackPaymentDetail = async (req, res, next) => {
     if (req.body.resultCode === 0) {
       const order = await Order.findById({ _id: req.body.orderId });
 
-      if (!order) throw new Error("Order not found");
+      if (!order) throw new Error("Not found");
       const paymentDetail = await PaymentDetail.findById({
         _id: order.paymentDetailId,
       });
-      paymentDetail.status = "Đã thanh toán";
+      paymentDetail.status = paymentStatus.PAID;
       paymentDetail.save();
+    } else {
+      const order = await Order.findByIdAndDelete(req.body.orderId);
+      await PaymentDetail.findByIdAndDelete(order.paymentDetailId);
+      await OrderAddress.findByIdAndDelete(order.orderAddressId);
+      await OrderDetail.deleteMany({ orderId: order._id });
+      await OrderTracking.deleteMany({ orderId: order._id });
     }
   } catch (err) {
     throw new Error({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -261,17 +247,32 @@ const checkStatusTransaction = async (req, res, next) => {
     const response = await axios(options);
 
     if (response.data.resultCode === 0) {
-      return res.status(200).json({ message: "Đã thanh toán" });
+      const order = await Order.findById({ _id: req.body.orderId });
+
+      if (!order) return res.status(404).json();
+
+      const paymentDetail = await PaymentDetail.findById({
+        _id: order.paymentDetailId,
+      });
+      paymentDetail.status = paymentStatus.PAID;
+      paymentDetail.save();
+      return res.status(200).json();
     } else {
-      res.status(400).json("Chưa thanh toán");
+      const order = await Order.findByIdAndDelete(req.body.orderId);
+      
+      if (!order) return res.status(404).json();
+
+      await PaymentDetail.findByIdAndDelete(order.paymentDetailId);
+      await OrderAddress.findByIdAndDelete(order.orderAddressId);
+      await OrderDetail.deleteMany({ orderId: order._id });
+      await OrderTracking.deleteMany({ orderId: order._id });
+      return res.status(200).json();
     }
   } catch (err) {
-    return res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    return res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -280,7 +281,7 @@ export default {
   getPaymentDetailById: getPaymentDetailById,
   createPaymentDetail: createPaymentDetail,
   updatePaymentDetailById: updatePaymentDetailById,
-  deletePaymentDetailById: deletePaymentDetailById,
+  // deletePaymentDetailById: deletePaymentDetailById,
   checkoutWithMoMo: checkoutWithMoMo,
   callbackPaymentDetail: callbackPaymentDetail,
   checkStatusTransaction: checkStatusTransaction,

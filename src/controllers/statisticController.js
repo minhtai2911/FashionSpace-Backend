@@ -1,6 +1,8 @@
 import Statistic from "../models/statistic.js";
 import cron from "node-cron";
 import Order from "../models/order.js";
+import { orderStatus } from "../config/orderStatus.js";
+import { messages } from "../config/messageHelper.js";
 
 const createStatistic = async (req, res, next) => {
   try {
@@ -23,7 +25,7 @@ const createStatistic = async (req, res, next) => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: { $gte: todayStart, $lt: todayEnd },
         },
       },
@@ -46,7 +48,7 @@ const createStatistic = async (req, res, next) => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: {
             $gte: todayStart,
             $lt: todayEnd,
@@ -150,7 +152,7 @@ cron.schedule("0 59 23 * * *", async () => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: { $gte: todayStart, $lt: todayEnd },
         },
       },
@@ -173,7 +175,7 @@ cron.schedule("0 59 23 * * *", async () => {
       },
       {
         $match: {
-          "orderTrackings.status": "Đã giao",
+          "orderTrackings.status": orderStatus.SHIPPED,
           createdDate: {
             $gte: todayStart,
             $lt: todayEnd,
@@ -205,7 +207,37 @@ cron.schedule("0 59 23 * * *", async () => {
   }
 });
 
+const addStatistic = async (totalPrice) => {
+  try {
+    const today = new Date();
+
+    const statistic = await Statistic.findOne({
+      day: today.getDate(),
+      month: today.getMonth() + 1,
+      year: today.getFullYear(),
+    });
+
+    if (statistic) {
+      statistic.totalOrder++;
+      statistic.totalRevenue += totalPrice;
+      await statistic.save();
+    } else {
+      const newStatistic = new Statistic({
+        day: today.getDate(),
+        month: today.getMonth() + 1,
+        year: today.getFullYear(),
+        totalOrder: 1,
+        totalRevenue: totalPrice,
+      });
+      await newStatistic.save();
+    }
+  } catch (err) {
+    throw new Error(err.message);
+  }
+}
+
 export default {
   createStatistic: createStatistic,
   getStatistics: getStatistics,
+  addStatistic: addStatistic,
 };

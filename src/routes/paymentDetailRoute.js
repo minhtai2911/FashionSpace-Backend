@@ -6,7 +6,7 @@ const router = Router();
 
 router.get("/", paymentDetailController.getAllPaymentDetails);
 router.get("/:id", paymentDetailController.getPaymentDetailById);
-router.delete("/:id", authMiddleware.verifyToken, paymentDetailController.deletePaymentDetailById);
+// router.delete("/:id", authMiddleware.verifyToken, paymentDetailController.deletePaymentDetailById);
 router.put("/:id", authMiddleware.verifyToken, authMiddleware.checkPermission(["Employee"]), paymentDetailController.updatePaymentDetailById);
 router.post("/", authMiddleware.verifyToken, paymentDetailController.createPaymentDetail);
 router.post("/checkoutWithMoMo", authMiddleware.verifyToken, paymentDetailController.checkoutWithMoMo);

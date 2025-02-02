@@ -1,6 +1,7 @@
 import OrderDetail from "../models/orderDetail.js";
 import Product from "../models/product.js";
 import ProductVariant from "../models/productVariant.js";
+import { messages } from "../config/messageHelper.js";
 
 const getOrderDetailsByOrderId = async (req, res, next) => {
   try {
@@ -9,13 +10,13 @@ const getOrderDetailsByOrderId = async (req, res, next) => {
     if (!orderDetail)
       return res
         .status(404)
-        .json({ error: "Chi tiết đơn hàng không tồn tại." });
+        .json({ error: "Not found" });
 
     res.status(200).json({ data: orderDetail });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -27,13 +28,13 @@ const getOrderDetailById = async (req, res, next) => {
     if (!orderDetail)
       return res
         .status(404)
-        .json({ error: "Chi tiết đơn hàng không tồn tại." });
+        .json({ error: "Not found" });
 
     res.status(200).json({ data: orderDetail });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -43,20 +44,20 @@ const createOrderDetail = async (req, res, next) => {
     const { orderId, productVariantId, quantity } = req.body;
 
     if (!orderId || !productVariantId || !quantity)
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
 
     const productVariant = await ProductVariant.findById(productVariantId);
 
     if (!productVariant)
       return res
         .status(404)
-        .json({ error: "Biến thể sản phẩm không tồn tại." });
+        .json({ error: "Not found" });
 
     if (productVariant.quantity < quantity) {
       const product = await Product.findById(productVariant.productId);
       return res
         .status(409)
-        .json({ message: `Sản phẩm ${product.name} không đủ số lượng trong kho.` });
+        .json({ message: messages.MSG46 });
     }
 
     productVariant.quantity = productVariant.quantity - quantity;
@@ -65,7 +66,7 @@ const createOrderDetail = async (req, res, next) => {
     const product = await Product.findById(productVariant.productId);
 
     if (!product)
-      return res.status(404).json({ error: "Sản phẩm không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     product.soldQuantity = product.soldQuantity + quantity;
     await product.save();
@@ -81,7 +82,7 @@ const createOrderDetail = async (req, res, next) => {
   } catch (err) {
     return res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

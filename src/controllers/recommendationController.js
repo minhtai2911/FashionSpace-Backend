@@ -2,6 +2,7 @@ import OrderDetail from "../models/orderDetail.js";
 import * as tf from "@tensorflow/tfjs-node";
 import Product from "../models/product.js";
 import ProductView from "../models/productView.js";
+import { messages } from "../config/messageHelper.js";
 
 const getUserProductData = async () => {
   try {
@@ -45,7 +46,7 @@ const getUserProductData = async () => {
         productId: item.productId.toString(),
       }));
   } catch (err) {
-    throw new Error("Failed to fetch data");
+    throw new Error(err.message);
   }
 };
 
@@ -137,7 +138,7 @@ const trainModel = async () => {
 
     return { model, userEncoder, productEncoder, productDecoder };
   } catch (err) {
-    throw new Error("Failed to train model");
+    throw new Error(err.message);
   }
 };
 
@@ -155,11 +156,11 @@ const recommend = async (req, res, next) => {
         .sort({
           soldQuantity: -1,
         })
-        .limit(3);
+        .limit(6);
 
       const newArrival = await Product.find({ isActive: true })
         .sort({ createdAt: -1 })
-        .limit(2);
+        .limit(4);
 
       const products = [...bestSeller, ...newArrival];
 
@@ -193,7 +194,7 @@ const recommend = async (req, res, next) => {
     const sortedIndices = predictionsArray
       .map((value, index) => ({ value, index }))
       .sort((a, b) => b.value - a.value)
-      .slice(0, 5)
+      .slice(0, 10)
       .map((item) => item.index);
 
     const topNProductIds = sortedIndices.map((i) => productDecoder[i]);
@@ -206,9 +207,11 @@ const recommend = async (req, res, next) => {
 
     res.status(200).json({ data: result });
   } catch (err) {
+    if (err.message === "No data found from database.")
+      return res.status(200).json({ data: [] });
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

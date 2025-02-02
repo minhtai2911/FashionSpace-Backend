@@ -1,6 +1,7 @@
 import Order from "../models/order.js";
 import OrderTracking from "../models/orderTracking.js";
 import chatbotController from "./chatbotController.js";
+import { messages } from "../config/messageHelper.js";
 
 const getAllOrders = async (req, res, next) => {
   try {
@@ -40,13 +41,13 @@ const getAllOrders = async (req, res, next) => {
     ]);
 
     if (!order)
-      return res.status(404).json({ error: "Đơn hàng không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: order });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -56,12 +57,12 @@ const getOrderByUserId = async (req, res, next) => {
     const userId = req.user.id;
     const order = await Order.find({ userId: userId });
     if (!order)
-      return res.status(404).json({ error: "Đơn hàng không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
     res.status(200).json({ data: order });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -71,13 +72,13 @@ const getOrderById = async (req, res, next) => {
     const order = await Order.findById(req.params.id);
 
     if (!order)
-      return res.status(404).json({ error: "Đơn hàng không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: order });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -93,7 +94,7 @@ const createOrder = async (req, res, next) => {
       shippingFee === undefined ||
       shippingFee === null
     )
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
 
     const newOrder = new Order({
       userId,
@@ -110,11 +111,11 @@ const createOrder = async (req, res, next) => {
 
     chatbotController.updateEntityOrderId(newOrder._id);
     await newOrder.save();
-    res.status(201).json({ message: "Đặt hàng thành công!", data: newOrder });
+    res.status(201).json({ message: messages.MSG19, data: newOrder });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

@@ -2,24 +2,20 @@ import Category from "../models/category.js";
 import ProductSize from "../models/productSize.js";
 import Product from "../models/product.js";
 import chatbotController from "./chatbotController.js";
+import { messages } from "../config/messageHelper.js";
 
 const getAllCategories = async (req, res, next) => {
   try {
     const category = await Category.find({});
 
-    if (!category)
-      return res
-        .status(404)
-        .json({ error: "Danh mục sản phẩm không tồn tại." });
+    if (!category) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: category });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -27,19 +23,14 @@ const getCategoryById = async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
 
-    if (!category)
-      return res
-        .status(404)
-        .json({ error: "Danh mục sản phẩm không tồn tại." });
+    if (!category) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: category });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -47,24 +38,25 @@ const createCategory = async (req, res, next) => {
   try {
     const { name, gender } = req.body;
 
-    if (!name) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+    if (!name) throw new Error(messages.MSG1);
     const newCategory = new Category({ name, gender });
+
+    const existingCategory = await Category.findOne({name: name, gender: gender});
+    if (existingCategory) {
+      return res.status(409).json({ message: messages.MSG56 });
+    }
 
     await newCategory.save();
     chatbotController.updateEntityCategory(name, [name]);
-    res
-      .status(201)
-      .json({
-        message: "Thêm danh mục sản phẩm thành công!",
-        data: newCategory,
-      });
+    res.status(201).json({
+      message: messages.MSG31,
+      data: newCategory,
+    });
   } catch (err) {
-    res
-      .status(400)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -72,12 +64,14 @@ const updateCategoryById = async (req, res, next) => {
   try {
     const category = await Category.findById(req.params.id);
 
-    if (!category)
-      return res
-        .status(404)
-        .json({ error: "Danh mục sản phẩm không tồn tại." });
+    if (!category) return res.status(404).json({ error: "Not found" });
 
     const { name, gender } = req.body;
+
+    const existingCategory = await Category.findOne({name: name, gender: gender});
+    if (existingCategory) {
+      return res.status(409).json({ message: messages.MSG56 });
+    }
 
     chatbotController.deleteEntityCategory(category.name);
     chatbotController.updateEntityCategory(name, [name]);
@@ -86,19 +80,15 @@ const updateCategoryById = async (req, res, next) => {
     category.gender = gender || category.gender;
 
     await category.save();
-    res
-      .status(200)
-      .json({
-        message: "Chỉnh sửa danh mục sản phẩm thành công!",
-        data: category,
-      });
+    res.status(200).json({
+      message: messages.MSG26,
+      data: category,
+    });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 
@@ -106,35 +96,28 @@ const deleteCategoryById = async (req, res, next) => {
   try {
     const productSize = await ProductSize.find({ categoryId: req.params.id });
 
-    if (!productSize)
+    if (productSize)
       return res.status(400).json({
-        message:
-          "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với các kích cỡ sản phẩm.",
+        message: messages.MSG29,
       });
 
     const product = await Product.find({ categoryId: req.params.id });
 
-    if (!product)
+    if (product)
       return res.status(400).json({
-        message:
-          "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với sản phẩm.",
+        message: messages.MSG28,
       });
 
     const category = await Category.findByIdAndDelete(req.params.id);
 
-    if (!category)
-      return res
-        .status(404)
-        .json({ error: "Danh mục sản phẩm không tồn tại." });
+    if (!category) return res.status(404).json({ error: "Not found" });
     chatbotController.deleteEntityCategory(category.name);
-    res.status(200).json({ message: "Xóa danh mục sản phẩm thành công!" });
+    res.status(200).json({ message: messages.MSG30 });
   } catch (err) {
-    res
-      .status(500)
-      .json({
-        error: err.message,
-        message: "Đã xảy ra lỗi, vui lòng thử lại!",
-      });
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
   }
 };
 

@@ -1,21 +1,19 @@
 import ProductVariant from "../models/productVariant.js";
 import ProductColor from "../models/productColor.js";
 import ProductSize from "../models/productSize.js";
+import { messages } from "../config/messageHelper.js";
 
 const getProductVariants = async (req, res, next) => {
   try {
     const productVariants = await ProductVariant.find({});
 
-    if (!productVariants)
-      return res
-        .status(404)
-        .json({ error: "Biến thể sản phẩm không tồn tại." });
+    if (!productVariants) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: productVariants });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -24,16 +22,13 @@ const getProductVariantById = async (req, res, next) => {
   try {
     const productVariant = await ProductVariant.findById(req.params.id);
 
-    if (!productVariant)
-      return res
-        .status(404)
-        .json({ error: "Biến thể sản phẩm không tồn tại." });
+    if (!productVariant) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: productVariant });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -45,16 +40,13 @@ const getProductVariantByProductIdColorIdSizeId = async (req, res, next) => {
       colorId: req.params.colorId,
       sizeId: req.params.sizeId,
     });
-    if (!productVariant)
-      return res
-        .status(404)
-        .json({ error: "Biến thể sản phẩm không tồn tại." });
+    if (!productVariant) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: productVariant });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -64,13 +56,12 @@ const getProductVariantsByProductId = async (req, res, next) => {
       productId: req.params.id,
     });
 
-    if (!productVariant)
-      return res.status(404).json({ error: "Biến thể sản phẩm không tồn tại" });
+    if (!productVariant) return res.status(404).json({ error: "Not found" });
     res.status(200).json({ data: productVariant });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -80,7 +71,7 @@ const createProductVariant = async (req, res, next) => {
     const { productId, sizeId, colorId, quantity } = req.body;
 
     if (!productId || !sizeId || !colorId || !quantity)
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
 
     const existingProductVariant = await ProductVariant.findOne({
       productId,
@@ -90,15 +81,9 @@ const createProductVariant = async (req, res, next) => {
 
     if (existingProductVariant) {
       const color = await ProductColor.findById(existingProductVariant.colorId);
-      if (!color)
-        return res
-          .status(404)
-          .json({ error: "Màu sắc sản phẩm không tồn tại." });
+      if (!color) return res.status(404).json({ error: "Not found" });
       const size = await ProductSize.findById(existingProductVariant.sizeId);
-      if (!size)
-        return res
-          .status(404)
-          .json({ error: "Kích cỡ sản phẩm không tồn tại." });
+      if (!size) return res.status(404).json({ error: "Not found" });
 
       return res.status(409).json({
         message: `Sản phẩm với kích cỡ ${size.size} và màu sắc ${color.color} đã tồn tại. Vui lòng kiểm tra lại!`,
@@ -117,7 +102,7 @@ const createProductVariant = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -127,9 +112,17 @@ const updateProductVariantById = async (req, res, next) => {
     const updateProductVariant = await ProductVariant.findById(req.params.id);
 
     if (!updateProductVariant)
-      return res
-        .status(404)
-        .json({ error: "Biến thể sản phẩm không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
+    
+    let check = true;
+
+    if (
+      req.body.productId == updateProductVariant.productId &&
+      req.body.sizeId == updateProductVariant.sizeId &&
+      req.body.colorId == updateProductVariant.colorId
+    ) {
+      check = false;
+    }
 
     updateProductVariant.productId =
       req.body.productId || updateProductVariant.productId;
@@ -149,17 +142,11 @@ const updateProductVariantById = async (req, res, next) => {
       colorId,
     });
 
-    if (existingProductVariant) {
+    if (existingProductVariant && check) {
       const color = await ProductColor.findById(existingProductVariant.colorId);
-      if (!color)
-        return res
-          .status(404)
-          .json({ error: "Màu sắc sản phẩm không tồn tại." });
+      if (!color) return res.status(404).json({ error: "Not found" });
       const size = await ProductSize.findById(existingProductVariant.sizeId);
-      if (!size)
-        return res
-          .status(404)
-          .json({ error: "Kích cỡ sản phẩm không tồn tại." });
+      if (!size) return res.status(404).json({ error: "Not found" });
 
       return res.status(409).json({
         message: `Sản phẩm với kích cỡ ${size.size} và màu sắc ${color.color} đã tồn tại. Vui lòng kiểm tra lại!`,
@@ -171,7 +158,7 @@ const updateProductVariantById = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -183,15 +170,13 @@ const deleteProductVariantById = async (req, res, next) => {
     );
 
     if (!deleteProductVariant)
-      return res
-        .status(404)
-        .json({ error: "Biến thể sản phẩm không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
-    res.status(200).json({ message: "Xóa thành công!" });
+    res.status(200).json();
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -203,15 +188,13 @@ const deleteProductVariantsByProductId = async (req, res, next) => {
     });
 
     if (!deleteProductVariants)
-      return res
-        .status(404)
-        .json({ error: "Biến thể sản phẩm không tồn tại." });
+      return res.status(404).json({ error: "Not found" });
 
-    res.status(200).json({ message: "Xóa thành công!" });
+    res.status(200).json();
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

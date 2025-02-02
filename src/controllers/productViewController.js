@@ -1,12 +1,13 @@
 import ProductView from "../models/productView.js";
+import { messages } from "../config/messageHelper.js";
 
 const createProductView = async (req, res, next) => {
   try {
     if (!req.body.productId) {
-      return res.status(400).json({ message: "productId is required!" });
+      return res.status(400).json({ error: "productId is required!" });
     }
 
-    const existsProductView = await ProductView.find({
+    const existsProductView = await ProductView.findOne({
       productId: req.body.productId,
       userId: req.user.id,
     });
@@ -29,7 +30,7 @@ const createProductView = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

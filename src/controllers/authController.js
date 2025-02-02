@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import Otp from "../models/otp.js";
+import { messages } from "../config/messageHelper.js";
 
 const generateOTP = async (req, res, next) => {
   try {
@@ -25,7 +26,7 @@ const generateOTP = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -36,7 +37,7 @@ const login = async (req, res, next) => {
     const originalPassword = req.body.password;
 
     if (!email || !originalPassword) {
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
     }
 
     const user = await User.login(email, originalPassword);
@@ -47,12 +48,9 @@ const login = async (req, res, next) => {
     }
 
     if (!user.isActive) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên.",
-        });
+      return res.status(400).json({
+        message: messages.MSG53,
+      });
     }
 
     const accessToken = jwt.sign(
@@ -82,12 +80,13 @@ const login = async (req, res, next) => {
     const { password, ...data } = user._doc;
 
     return res.status(200).json({
-      message: "Đăng nhập thành công!",
+      message: messages.MSG3,
       data: { ...data, accessToken },
     });
   } catch (err) {
     res.status(500).json({
-      message: err.message,
+      error: err.message,
+      message: messages.MSG5,
     });
   }
 };
@@ -96,11 +95,11 @@ const signup = async (req, res, next) => {
   const { email, fullName, phone, password } = req.body;
 
   if (!email || !fullName || !phone || !password) {
-    throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+    throw new Error(messages.MSG1);
   }
   const exists = await User.findOne({ email: email });
 
-  if (exists) return res.status(409).json({ message: "Email đã tồn tại." });
+  if (exists) return res.status(409).json({ message: messages.MSG51 });
 
   const role = await UserRole.findOne({ roleName: "Customer" });
   const roleId = role._id;
@@ -108,11 +107,11 @@ const signup = async (req, res, next) => {
   try {
     await user.save();
     const { password, ...data } = user._doc;
-    res.status(201).json({ message: "Đăng ký thành công!", data: data });
+    res.status(201).json({ message: messages.MSG16, data: data });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -137,13 +136,11 @@ const sendMailVerifyAccount = async (req, res, next) => {
       <a href="${process.env.URL_CLIENT}/verify/${req.body.id}">Nhấn vào đây để xác nhận email của bạn.</a>
       `,
     });
-    res
-      .status(200)
-      .json({ message: "Liên kết xác thực đã được gửi thành công!" });
+    res.status(200).json({ message: messages.MSG4 });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -152,8 +149,7 @@ const verifyAccount = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
 
-    if (!user)
-      return res.status(404).json({ error: "Người dùng không tồn tại." });
+    if (!user) return res.status(404).json({ error: "Not found" });
 
     user.isActive = true;
 
@@ -184,13 +180,12 @@ const verifyAccount = async (req, res, next) => {
     const { password, ...data } = user._doc;
 
     res.status(200).json({
-      message: "Xác thực tài khoản thành công!",
       data: { ...data, accessToken },
     });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -204,11 +199,11 @@ const logout = async (req, res, next) => {
       },
       { new: true }
     );
-    res.status(200).json({ message: "Đăng xuất thành công!" });
+    res.status(200).json({ message: messages.MSG7 });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -219,7 +214,7 @@ const refreshToken = async (req, res, next) => {
 
     jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, data) => {
       if (err) {
-        return res.status(403).json({ error: "Refresh token không hợp lệ!" });
+        return res.status(403).json({ error: "Refresh token is invalid!" });
       }
       const accessToken = jwt.sign(
         { id: data.id, roleId: data.roleId },
@@ -233,7 +228,7 @@ const refreshToken = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -262,12 +257,12 @@ const sendOTP = async (req, res, next) => {
       `,
     });
     res.status(200).json({
-      message: "Mã OTP đã được gửi thành công!",
+      message: messages.MSG9,
     });
   } catch (err) {
     return res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -285,7 +280,7 @@ const checkOTPByEmail = async (req, res, next) => {
     const check = await bcrypt.compare(otp, otpList[otpList.length - 1].otp);
 
     if (!check) {
-      return res.status(400).json({ message: "Mã OTP không hợp lệ!" });
+      return res.status(400).json({ message: messages.MSG10 });
     }
 
     const user = await User.findOne({ email: email });
@@ -316,13 +311,11 @@ const checkOTPByEmail = async (req, res, next) => {
 
     const { password, ...data } = user._doc;
 
-    res
-      .status(200)
-      .json({ message: "Mã OTP hợp lệ!", data: { ...data, accessToken } });
+    res.status(200).json({ data: { ...data, accessToken } });
   } catch (err) {
     return res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -332,14 +325,14 @@ const checkEmail = async (req, res, next) => {
     const user = await User.findOne({ email: req.body.email });
 
     if (!user) {
-      return res.status(404).json({ message: "Email không tồn tại." });
+      return res.status(404).json({ message: messages.MSG8 });
     }
 
-    res.status(200).json({ message: "Email đã tồn tại." });
+    res.status(200).json({ message: messages.MSG51 });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -349,11 +342,11 @@ const forgotPassword = async (req, res, next) => {
     const user = await User.findById(req.user.id);
     user.password = req.body.newPassword;
     await user.save();
-    res.status(200).json({ message: "Đặt lại mật khẩu thành công!" });
+    res.status(200).json({ message: messages.MSG11 });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -363,18 +356,15 @@ const resetPassword = async (req, res, next) => {
     const user = await User.findById(req.user.id);
     const check = await bcrypt.compare(req.body.password, user.password);
 
-    if (!check)
-      return res
-        .status(400)
-        .json({ message: "Mật khẩu cũ không đúng. Vui lòng thử lại!" });
+    if (!check) return res.status(400).json({ message: messages.MSG13 });
 
     user.password = req.body.newPassword;
     await user.save();
-    res.status(200).json({ message: "Đổi mật khẩu thành công!" });
+    res.status(200).json({ message: messages.MSG14 });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -383,15 +373,13 @@ const loginGoogleSuccess = async (req, res, next) => {
   try {
     const user = await User.findOne({ email: req.body.email });
 
-    if (!user)
-      return res.status(404).json({ error: "Người dùng không tồn tại." });
+    if (!user) return res.status(404).json({ error: "Not found" });
 
     const check = await bcrypt.compare(user._id.toString(), req.body.token);
 
     if (!check)
       return res.status(403).json({
-        message:
-          "Phiên đăng nhập không hợp lệ. Bạn cần đăng nhập lại để tiếp tục.",
+        message: "Token expired",
       });
 
     const { password, ...data } = user._doc;
@@ -399,7 +387,7 @@ const loginGoogleSuccess = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };

@@ -1,6 +1,8 @@
 import Review from "../models/review.js";
 import Product from "../models/product.js";
 import mongoose from "mongoose";
+import { messages } from "../config/messageHelper.js";
+import { reviewStatus } from "../config/reviewStatus.js";
 
 // const getReviewsByProductId = asyncHandler(async (req, res, next) => {
 //   try {
@@ -30,7 +32,7 @@ import mongoose from "mongoose";
 //   } catch (err) {
 //     res.status(500).json({
 //       error: err.message,
-//       message: "Đã xảy ra lỗi, vui lòng thử lại!",
+//       message: messages.MSG5,
 //     });
 //   }
 // });
@@ -46,7 +48,7 @@ const getAllReviews = async (req, res, next) => {
     if (req.query.orderId)
       query.orderId = new mongoose.Types.ObjectId(req.query.orderId);
 
-    if (req.query.status === "Chưa trả lời") {
+    if (req.query.status === reviewStatus.NOT_REPLIED) {
       if (Object.keys(query).length !== 0) {
         const reviews = await Review.aggregate([
           {
@@ -68,8 +70,7 @@ const getAllReviews = async (req, res, next) => {
           },
         ]);
 
-        if (!reviews)
-          return res.status(404).json({ error: "Đánh giá không tồn tại." });
+        if (!reviews) return res.status(404).json({ error: "Not found" });
 
         return res.status(200).json({ data: reviews });
       } else {
@@ -92,13 +93,12 @@ const getAllReviews = async (req, res, next) => {
           },
         ]);
 
-        if (!reviews)
-          return res.status(404).json({ error: "Đánh giá không tồn tại." });
+        if (!reviews) return res.status(404).json({ error: "Not found" });
 
         return res.status(200).json({ data: reviews });
       }
     }
-    if (req.query.status === "Đã trả lời") {
+    if (req.query.status === reviewStatus.REPLIED) {
       if (Object.keys(query).length !== 0) {
         const reviews = await Review.aggregate([
           {
@@ -120,8 +120,7 @@ const getAllReviews = async (req, res, next) => {
           },
         ]);
 
-        if (!reviews)
-          return res.status(404).json({ error: "Đánh giá không tồn tại." });
+        if (!reviews) return res.status(404).json({ error: "Not found" });
 
         return res.status(200).json({ data: reviews });
       } else {
@@ -144,8 +143,7 @@ const getAllReviews = async (req, res, next) => {
           },
         ]);
 
-        if (!reviews)
-          return res.status(404).json({ error: "Đánh giá không tồn tại." });
+        if (!reviews) return res.status(404).json({ error: "Not found" });
 
         return res.status(200).json({ data: reviews });
       }
@@ -168,14 +166,13 @@ const getAllReviews = async (req, res, next) => {
       },
     ]);
 
-    if (!reviews)
-      return res.status(404).json({ error: "Đánh giá không tồn tại." });
+    if (!reviews) return res.status(404).json({ error: "Not found" });
 
     return res.status(200).json({ data: reviews });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -186,7 +183,7 @@ const createReview = async (req, res, next) => {
 
     const userId = req.user.id;
     if (!productId || !rating || !orderId || !content) {
-      throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+      throw new Error(messages.MSG1);
     }
 
     const newReview = new Review({
@@ -200,8 +197,7 @@ const createReview = async (req, res, next) => {
     await newReview.save();
 
     const product = await Product.findById(productId);
-    if (!product)
-      return res.status(404).json({ message: "Sản phẩm không tồn tại" });
+    if (!product) return res.status(404).json({ error: "Not found" });
 
     product.totalReview = product.totalReview + 1;
     product.rating =
@@ -210,13 +206,13 @@ const createReview = async (req, res, next) => {
     await product.save();
 
     res.status(201).json({
-      message: "Đánh giá của bạn đã được gửi thành công!",
+      message: messages.MSG20,
       data: newReview,
     });
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -239,28 +235,26 @@ const getReviewById = async (req, res, next) => {
       },
     ]);
 
-    if (!review)
-      return res.status(404).json({ error: "Đánh giá không tồn tại." });
+    if (!review) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json(review);
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
 
 const updateReviewById = async (req, res, next) => {
   try {
-    const review = Review.findById(req.params.id);
+    const review = await Review.findById(req.params.id);
 
-    if (!review)
-      return res.status(404).json({ error: "Đánh giá không tồn tại" });
+    if (!review) return res.status(404).json({ error: "Not found" });
 
     const { rating, content } = req.body;
 
-    if (!rating) throw new Error("Vui lòng điền đầy đủ thông tin bắt buộc!");
+    if (!rating) throw new Error(messages.MSG1);
 
     const product = await Product.findById(review.productId);
     product.rating =
@@ -281,7 +275,7 @@ const updateReviewById = async (req, res, next) => {
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -290,8 +284,7 @@ const deleteReviewById = async (req, res, next) => {
   try {
     const review = await Review.findByIdAndDelete(req.params.id);
 
-    if (!review)
-      return res.status(404).json({ error: "Đánh giá không tồn tại." });
+    if (!review) return res.status(404).json({ error: "Not found" });
 
     const product = await Product.findById(review.productId);
     product.totalReview = product.totalReview - 1;
@@ -300,13 +293,11 @@ const deleteReviewById = async (req, res, next) => {
       product.totalReview;
     await product.save();
 
-    res
-      .status(200)
-      .json({ message: "Đánh giá của bạn đã được xóa thành công!" });
+    res.status(200).json();
   } catch (err) {
     res.status(500).json({
       error: err.message,
-      message: "Đã xảy ra lỗi, vui lòng thử lại!",
+      message: messages.MSG5,
     });
   }
 };
@@ -342,7 +333,7 @@ const deleteReviewById = async (req, res, next) => {
 //     } catch (err) {
 //       res.status(500).json({
 //         error: err.message,
-//         message: "Đã xảy ra lỗi, vui lòng thử lại!",
+//         message: messages.MSG5,
 //       });
 //     }
 //   }
@@ -376,7 +367,7 @@ const deleteReviewById = async (req, res, next) => {
 //   } catch (err) {
 //     res.status(500).json({
 //       error: err.message,
-//       message: "Đã xảy ra lỗi, vui lòng thử lại!",
+//       message: messages.MSG5,
 //     });
 //   }
 // });
@@ -408,7 +399,7 @@ const deleteReviewById = async (req, res, next) => {
 //   } catch (err) {
 //     res.status(500).json({
 //       error: err.message,
-//       message: "Đã xảy ra lỗi, vui lòng thử lại!",
+//       message: messages.MSG5,
 //     });
 //   }
 // });
