@@ -1,15 +1,13 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  categoryId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "Category",
+const userSchema = new mongoose.Schema(
+  {
+    size: {
+      type: String,
+      required: true,
+    },
   },
-  size: {
-    type: String,
-    required: true,
-  },
-});
+  { timestamps: true }
+);
 
 export default mongoose.model("ProductSize", userSchema);
