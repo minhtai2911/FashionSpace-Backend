@@ -57,7 +57,7 @@ const login = async (req, res, next) => {
       { id: user._id, roleId: user.roleId },
       process.env.ACCESS_TOKEN_SECRET,
       {
-        expiresIn: "30s",
+        expiresIn: "3000000000000s",
       }
     );
 

@@ -4,8 +4,8 @@ const userSchema = new mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
       ref: "User",
+      default: null
     },
     city: {
       type: String,

@@ -2,44 +2,14 @@ import Review from "../models/review.js";
 import Product from "../models/product.js";
 import mongoose from "mongoose";
 import { messages } from "../config/messageHelper.js";
-import { reviewStatus } from "../config/reviewStatus.js";
-
-// const getReviewsByProductId = asyncHandler(async (req, res, next) => {
-//   try {
-//     const reviews = await Review.aggregate([
-//       {
-//         $lookup: {
-//           from: "reviewresponses",
-//           localField: "_id",
-//           foreignField: "reviewId",
-//           as: "reviewResponses",
-//         },
-//       },
-//       {
-//         $match: {
-//           productId: new mongoose.Types.ObjectId(req.params.productId),
-//         },
-//       },
-//       {
-//         $sort: { createdDate: -1 },
-//       },
-//     ]);
-
-//     if (!reviews)
-//       return res.status(404).json({ error: "Đánh giá không tồn tại." });
-
-//     res.status(200).json({ data: reviews });
-//   } catch (err) {
-//     res.status(500).json({
-//       error: err.message,
-//       message: messages.MSG5,
-//     });
-//   }
-// });
 
 const getAllReviews = async (req, res, next) => {
   try {
     const query = {};
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     if (req.query.productId)
       query.productId = new mongoose.Types.ObjectId(req.query.productId);
     if (req.query.rating) query.rating = parseInt(req.query.rating);
@@ -47,128 +17,23 @@ const getAllReviews = async (req, res, next) => {
       query.userId = new mongoose.Types.ObjectId(req.query.userId);
     if (req.query.orderId)
       query.orderId = new mongoose.Types.ObjectId(req.query.orderId);
+    if (req.query.status) query.status = req.query.status;
 
-    if (req.query.status === reviewStatus.NOT_REPLIED) {
-      if (Object.keys(query).length !== 0) {
-        const reviews = await Review.aggregate([
-          {
-            $lookup: {
-              from: "reviewresponses",
-              localField: "_id",
-              foreignField: "reviewId",
-              as: "reviewResponses",
-            },
-          },
-          {
-            $match: {
-              reviewResponses: { $size: 0 },
-              ...query,
-            },
-          },
-          {
-            $sort: { createdDate: -1 },
-          },
-        ]);
+    const totalCount = await Review.countDocuments(query);
+    const reviews = await Review.find(query)
+      .sort({ createdDate: -1 })
+      .skip(skip)
+      .limit(limit)
+      .exec();
 
-        if (!reviews) return res.status(404).json({ error: "Not found" });
-
-        return res.status(200).json({ data: reviews });
-      } else {
-        const reviews = await Review.aggregate([
-          {
-            $lookup: {
-              from: "reviewresponses",
-              localField: "_id",
-              foreignField: "reviewId",
-              as: "reviewResponses",
-            },
-          },
-          {
-            $match: {
-              reviewResponses: { $size: 0 },
-            },
-          },
-          {
-            $sort: { createdDate: -1 },
-          },
-        ]);
-
-        if (!reviews) return res.status(404).json({ error: "Not found" });
-
-        return res.status(200).json({ data: reviews });
-      }
-    }
-    if (req.query.status === reviewStatus.REPLIED) {
-      if (Object.keys(query).length !== 0) {
-        const reviews = await Review.aggregate([
-          {
-            $lookup: {
-              from: "reviewresponses",
-              localField: "_id",
-              foreignField: "reviewId",
-              as: "reviewResponses",
-            },
-          },
-          {
-            $match: {
-              ...query,
-              reviewResponses: { $ne: [] },
-            },
-          },
-          {
-            $sort: { createdDate: -1 },
-          },
-        ]);
-
-        if (!reviews) return res.status(404).json({ error: "Not found" });
-
-        return res.status(200).json({ data: reviews });
-      } else {
-        const reviews = await Review.aggregate([
-          {
-            $lookup: {
-              from: "reviewresponses",
-              localField: "_id",
-              foreignField: "reviewId",
-              as: "reviewResponses",
-            },
-          },
-          {
-            $match: {
-              reviewResponses: { $ne: [] },
-            },
-          },
-          {
-            $sort: { createdDate: -1 },
-          },
-        ]);
-
-        if (!reviews) return res.status(404).json({ error: "Not found" });
-
-        return res.status(200).json({ data: reviews });
-      }
-    }
-
-    const reviews = await Review.aggregate([
-      {
-        $lookup: {
-          from: "reviewresponses",
-          localField: "_id",
-          foreignField: "reviewId",
-          as: "reviewResponses",
-        },
+    res.status(200).json({
+      meta: {
+        totalCount: totalCount,
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
       },
-      {
-        $match: query,
-      },
-      {
-        $sort: { createdDate: -1 },
-      },
-    ]);
-
-    if (!reviews) return res.status(404).json({ error: "Not found" });
-
-    return res.status(200).json({ data: reviews });
+      data: reviews,
+    });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -180,11 +45,19 @@ const getAllReviews = async (req, res, next) => {
 const createReview = async (req, res, next) => {
   try {
     const { productId, rating, content, orderId } = req.body;
-
     const userId = req.user.id;
+
     if (!productId || !rating || !orderId || !content) {
       throw new Error(messages.MSG1);
     }
+
+    const existingReview = await Review.findOne({
+      userId,
+      productId,
+      orderId,
+    });
+
+    if (existingReview) return res.status(409).json({});
 
     const newReview = new Review({
       userId,
@@ -205,7 +78,7 @@ const createReview = async (req, res, next) => {
       product.totalReview;
     await product.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       message: messages.MSG20,
       data: newReview,
     });
@@ -219,21 +92,7 @@ const createReview = async (req, res, next) => {
 
 const getReviewById = async (req, res, next) => {
   try {
-    const review = await Review.aggregate([
-      {
-        $lookup: {
-          from: "reviewresponses",
-          localField: "_id",
-          foreignField: "reviewId",
-          as: "reviewResponses",
-        },
-      },
-      {
-        $match: {
-          _id: new mongoose.Types.ObjectId(req.params.id),
-        },
-      },
-    ]);
+    const review = await Review.findById(req.params.id);
 
     if (!review) return res.status(404).json({ error: "Not found" });
 
@@ -264,12 +123,11 @@ const updateReviewById = async (req, res, next) => {
 
     review.rating = rating || review.rating;
     review.content = content || review.content;
-    review.createdAt = Date.now();
 
     await review.save();
 
     res.status(200).json({
-      message: "Đánh giá của bạn đã được cập nhật thành công!",
+      message: messages.MSG59,
       data: review,
     });
   } catch (err) {
@@ -293,7 +151,7 @@ const deleteReviewById = async (req, res, next) => {
       product.totalReview;
     await product.save();
 
-    res.status(200).json();
+    res.status(200).json({ message: messages.MSG60 });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -302,116 +160,32 @@ const deleteReviewById = async (req, res, next) => {
   }
 };
 
-// const getReviewByProductIdUserIdAndOrderId = asyncHandler(
-//   async (req, res, next) => {
-//     try {
-//       const review = await Review.aggregate([
-//         {
-//           $lookup: {
-//             from: "reviewresponses",
-//             localField: "_id",
-//             foreignField: "reviewId",
-//             as: "reviewResponses",
-//           },
-//         },
-//         {
-//           $match: {
-//             productId: new mongoose.Types.ObjectId(req.params.productId),
-//             userId: new mongoose.Types.ObjectId(req.user.id),
-//             orderId: new mongoose.Types.ObjectId(req.params.orderId),
-//           },
-//         },
-//         {
-//           $sort: { createdDate: -1 },
-//         },
-//       ]);
+const createResponse = async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const content = req.body.content;
+    const reviewId = req.body.reviewId;
 
-//       if (!review)
-//         return res.status(404).json({ error: "Đánh giá không tồn tại." });
+    const review = await Review.findById(reviewId);
+    if (!review) return res.status(404).json({ error: "Not found" });
 
-//       res.status(200).json({ data: review });
-//     } catch (err) {
-//       res.status(500).json({
-//         error: err.message,
-//         message: messages.MSG5,
-//       });
-//     }
-//   }
-// );
+    review.response.push({ userId, content });
+    review.save();
 
-// const getReviewsNotReplied = asyncHandler(async (req, res, next) => {
-//   try {
-//     const reviews = await Review.aggregate([
-//       {
-//         $lookup: {
-//           from: "reviewresponses",
-//           localField: "_id",
-//           foreignField: "reviewId",
-//           as: "reviewResponses",
-//         },
-//       },
-//       {
-//         $match: {
-//           reviewResponses: { $size: 0 },
-//         },
-//       },
-//       {
-//         $sort: { createdDate: 1 },
-//       },
-//     ]);
-
-//     if (!reviews)
-//       return res.status(404).json({ error: "Đánh giá không tồn tại" });
-
-//     res.status(200).json({ data: reviews });
-//   } catch (err) {
-//     res.status(500).json({
-//       error: err.message,
-//       message: messages.MSG5,
-//     });
-//   }
-// });
-// const getReviewsReplied = asyncHandler(async (req, res, next) => {
-//   try {
-//     const reviews = await Review.aggregate([
-//       {
-//         $lookup: {
-//           from: "reviewresponses",
-//           localField: "_id",
-//           foreignField: "reviewId",
-//           as: "reviewResponses",
-//         },
-//       },
-//       {
-//         $match: {
-//           reviewResponses: { $ne: [] },
-//         },
-//       },
-//       {
-//         $sort: { createdDate: -1 },
-//       },
-//     ]);
-
-//     if (!reviews)
-//       return res.status(404).json({ error: "Đánh giá không tồn tại" });
-
-//     res.status(200).json({ data: reviews });
-//   } catch (err) {
-//     res.status(500).json({
-//       error: err.message,
-//       message: messages.MSG5,
-//     });
-//   }
-// });
+    res.status(200).json({ message: messages.MSG45, data: review });
+  } catch (err) {
+    res.status(500).json({
+      error: err.message,
+      message: messages.MSG5,
+    });
+  }
+};
 
 export default {
-  // getReviewsByProductId,
   createReview: createReview,
   getReviewById: getReviewById,
   updateReviewById: updateReviewById,
   deleteReviewById: deleteReviewById,
   getAllReviews: getAllReviews,
-  // getReviewByProductIdUserIdAndOrderId: getReviewByProductIdUserIdAndOrderId,
-  // getReviewsNotReplied: getReviewsNotReplied,
-  // getReviewsReplied: getReviewsReplied,
+  createResponse: createResponse,
 };

@@ -13,24 +13,20 @@ const verifyToken = (req, res, next) => {
       next();
     });
   } else {
-    return res
-      .status(401)
-      .json({
-        error: "Bạn chưa được xác thực",
-        message: "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại!",
-      });
+    return res.status(401).json({
+      error: "Bạn chưa được xác thực",
+      message: "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại!",
+    });
   }
 };
 
 const checkPermission = (permission) => {
   return async (req, res, next) => {
     if (!req.user) {
-      return res
-        .status(401)
-        .json({
-          error: "Bạn chưa được xác thực.",
-          message: "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại!",
-        });
+      return res.status(401).json({
+        error: "Bạn chưa được xác thực.",
+        message: "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại!",
+      });
     }
 
     const role = await UserRole.findById(req.user.roleId);
@@ -40,12 +36,10 @@ const checkPermission = (permission) => {
     }
 
     if (!permission.includes(role.roleName)) {
-      return res
-        .status(403)
-        .json({
-          message:
-            "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên.",
-        });
+      return res.status(403).json({
+        message:
+          "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên.",
+      });
     }
     next();
   };

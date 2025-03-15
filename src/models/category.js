@@ -11,12 +11,7 @@ const userSchema = new mongoose.Schema(
       enum: ["Nam", "Nữ", "Unisex"],
       required: true,
     },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    status: {
+    isActive: {
       type: Boolean,
       default: true,
     },

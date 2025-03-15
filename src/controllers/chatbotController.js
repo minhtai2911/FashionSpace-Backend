@@ -2,8 +2,7 @@ import dialogflow from "@google-cloud/dialogflow";
 import { v4 as uuidv4 } from "uuid";
 import Product from "../models/product.js";
 import Category from "../models/category.js";
-import OrderTracking from "../models/orderTracking.js";
-import OrderDetail from "../models/orderDetail.js";
+import Order from "../models/order.js";
 import { messages } from "../config/messageHelper.js";
 
 const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
@@ -139,19 +138,18 @@ const chatbot = async (req, res, next) => {
 
     if (result.fulfillmentText.substring(0, 7) === "orderId") {
       const orderId = result.fulfillmentText.substring(10);
-      console.log(orderId);
-      const orderTrackings = await OrderTracking.find({
-        orderId: orderId,
-      });
-      const orderDetails = await OrderDetail.find({ orderId: orderId });
+      const orderTracking = await Order.findById(
+        { _id: orderId },
+        { deliveryInfo, orderItems }
+      );
 
-      if (!orderTrackings)
+      if (!orderTracking)
         return res
           .status(404)
           .json({ error: "Lịch sử giao hàng không tồn tại." });
 
       return res.status(200).json({
-        data: { OrderTracking: orderTrackings, OrderDetail: orderDetails },
+        data: orderTracking,
         type: "OrderTracking",
       });
     }
@@ -160,7 +158,7 @@ const chatbot = async (req, res, next) => {
       .status(200)
       .json({ message: result.fulfillmentText, data: null, messageEnd: null });
   } catch (err) {
-    return res.status(500).json(err.message);
+    return res.status(500).json({ error: err.message, message: messages.MSG5 });
   }
 };
 

@@ -7,12 +7,61 @@ import { messages } from "../config/messageHelper.js";
 
 const getAllUsers = async (req, res, next) => {
   try {
-    const user = await User.find({});
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
-    if (!user)
-      return res.status(404).json({ error: "Not found" });
+    const query = {};
+    if (req.query.isActive) query.isActive = req.query.isActive;
 
-    res.status(200).json({ data: user });
+    const searchRegex = req.query.search
+      ? new RegExp(req.query.search, "i")
+      : null;
+
+    const pipeline = [
+      {
+        $lookup: {
+          from: "userroles",
+          localField: "roleId",
+          foreignField: "_id",
+          as: "userRoleInfo",
+        },
+      },
+      { $unwind: "$userRoleInfo" },
+      {
+        $match: {
+          ...(req.query.roleName && {
+            "userRoleInfo.roleName": req.query.roleName,
+          }),
+          ...(req.query.isActive && {
+            isActive: req.query.isActive === "true",
+          }),
+          ...(searchRegex && {
+            $or: [{ fullName: searchRegex }, { email: searchRegex }],
+          }),
+        },
+      },
+      { $skip: skip },
+      { $limit: limit },
+    ];
+
+    const totalCountPipeline = [...pipeline];
+    totalCountPipeline.splice(-2);
+    const totalCount = await User.aggregate([
+      ...totalCountPipeline,
+      { $count: "count" },
+    ]);
+
+    const user = await User.aggregate(pipeline);
+
+    return res.status(200).json({
+      meta: {
+        totalCount: totalCount[0]?.count || 0,
+        currentPage: page,
+        totalPages: Math.ceil((totalCount[0]?.count || 0) / limit),
+      },
+      data: user,
+    });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -23,10 +72,9 @@ const getAllUsers = async (req, res, next) => {
 
 const getUserById = async (req, res, next) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).populate("roleId");
 
-    if (!user)
-      return res.status(404).json({ error: "Not found" });
+    if (!user) return res.status(404).json({ error: "Not found" });
 
     res.status(200).json({ data: user });
   } catch (err) {
@@ -40,8 +88,7 @@ const getUserById = async (req, res, next) => {
 const updateStatusUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
-    if (!user)
-      return res.status(404).json({ error: "Not found" });
+    if (!user) return res.status(404).json({ error: "Not found" });
 
     const updateUser = await User.findByIdAndUpdate(
       req.params.id,
@@ -56,9 +103,8 @@ const updateStatusUserById = async (req, res, next) => {
       return res
         .status(200)
         .json({ message: messages.MSG27, data: updateUser });
-    res
-      .status(200)
-      .json({ message: "Khôi phục người dùng thành công!", data: updateUser });
+
+    res.status(200).json({ message: messages.MSG58, data: updateUser });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -71,9 +117,11 @@ const updateUserById = async (req, res, next) => {
   try {
     const role = await UserRole.findById(req.user.roleId);
     if (req.user.id !== req.params.id && role.roleName !== "Admin") {
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-      fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
+      if (req.file) {
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
+      }
       return res.status(403).json({
         message:
           "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên.",
@@ -82,9 +130,11 @@ const updateUserById = async (req, res, next) => {
 
     const user = await User.findById(req.params.id);
     if (!user) {
-      const __filename = fileURLToPath(import.meta.url);
-      const __dirname = path.dirname(__filename);
-      fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
+      if (req.file) {
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        fs.unlinkSync(path.join(__dirname, "../..", req.file.path));
+      }
       return res.status(404).json({ error: "Not found" });
     }
 
@@ -92,16 +142,16 @@ const updateUserById = async (req, res, next) => {
       if (user.avatarPath) {
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
-        const deleteStart = user.avatarPath.indexOf("\\avatars\\");
-        const deleteFile = "\\public" + user.avatarPath.slice(deleteStart);
+        const deleteStart = user.avatarPath.indexOf("/avatars");
+        const deleteFile = "/public" + user.avatarPath.slice(deleteStart);
 
-        if ("\\public\\avatars\\avatar.jpg" != deleteFile)
+        if ("/public/avatars/avatar.jpg" != deleteFile)
           fs.unlinkSync(path.join(__dirname, "..", deleteFile));
       }
-      let filePath = req.file.path;
-      const start = filePath.indexOf("\\avatars\\");
+      let filePath = req.file.path.replace(/\\/g, "/");
+      const start = filePath.indexOf("avatars");
       filePath = filePath.slice(start);
-      const avatarPath = path.join(process.env.URL_SERVER, filePath);
+      const avatarPath = `${process.env.URL_SERVER}/${filePath}`;
 
       const newUser = await User.findByIdAndUpdate(
         req.params.id,
@@ -161,9 +211,7 @@ const createUser = async (req, res, next) => {
     const roleId = role._id;
     const newUser = new User({ email, fullName, phone, roleId, password });
     await newUser.save();
-    res
-      .status(201)
-      .json({ message: messages.MSG22, data: newUser });
+    res.status(201).json({ message: messages.MSG22, data: newUser });
   } catch (err) {
     res.status(500).json({
       error: err.message,

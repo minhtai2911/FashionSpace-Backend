@@ -1,21 +1,6 @@
 import ShoppingCart from "../models/shoppingCart.js";
 import { messages } from "../config/messageHelper.js";
 
-const getAllShoppingCarts = async (req, res, next) => {
-  try {
-    const shoppingCart = await ShoppingCart.find({});
-
-    if (!shoppingCart) return res.status(404).json({ error: "Not found" });
-
-    res.status(200).json({ data: shoppingCart });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
-
 const getShoppingCartById = async (req, res, next) => {
   try {
     const shoppingCart = await ShoppingCart.findById(req.params.id);
@@ -31,10 +16,27 @@ const getShoppingCartById = async (req, res, next) => {
 
 const getShoppingCartByUserId = async (req, res, next) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
     const userId = req.user.id;
-    const shoppingCart = await ShoppingCart.find({ userId: userId });
-    if (!shoppingCart) return res.status(404).json({ error: "Not found" });
-    res.status(200).json({ data: shoppingCart });
+
+    const totalCount = await ShoppingCart.countDocuments({ userId: userId });
+    const shoppingCart = await ShoppingCart.find({ userId: userId })
+      .populate("productVariantId")
+      .skip(skip)
+      .limit(limit)
+      .exec();
+
+    res.status(200).json({
+      meta: {
+        totalCount: totalCount,
+        currentPage: page,
+        totalPages: Math.ceil(totalCount / limit),
+      },
+      data: shoppingCart,
+    });
   } catch (err) {
     res.status(500).json({
       error: err.message,
@@ -43,25 +45,6 @@ const getShoppingCartByUserId = async (req, res, next) => {
   }
 };
 
-const getShoppingCartByUserIdProductVariantId = async (req, res, next) => {
-  try {
-    const userId = req.user.id;
-    const productVariantId = req.params.productVariantId;
-    const shoppingCart = await ShoppingCart.findOne({
-      userId,
-      productVariantId,
-    });
-
-    if (!shoppingCart) return res.status(404).json({ error: "Not found" });
-
-    res.status(200).json({ data: shoppingCart });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
 const createShoppingCart = async (req, res, next) => {
   try {
     const { productVariantId, quantity } = req.body;
@@ -137,12 +120,9 @@ const deleteShoppingCartById = async (req, res, next) => {
 };
 
 export default {
-  getAllShoppingCarts: getAllShoppingCarts,
   getShoppingCartById: getShoppingCartById,
   getShoppingCartByUserId: getShoppingCartByUserId,
   createShoppingCart: createShoppingCart,
   updateShoppingCartQuantityById: updateShoppingCartQuantityById,
   deleteShoppingCartById: deleteShoppingCartById,
-  getShoppingCartByUserIdProductVariantId:
-    getShoppingCartByUserIdProductVariantId,
 };

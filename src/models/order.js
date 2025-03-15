@@ -7,7 +7,7 @@ const userSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
-    orderItem: [
+    orderItems: [
       {
         productId: {
           type: mongoose.Schema.Types.ObjectId,
@@ -23,6 +23,10 @@ const userSchema = new mongoose.Schema(
           type: Number,
           required: true,
         },
+        price: {
+          type: Number,
+          required: true,
+        }
       },
     ],
     totalPrice: {
@@ -55,18 +59,30 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    status: {
-      type: String,
-      default: "Đang chờ",
-      enum: [
-        "Đang chờ",
-        "Đang xử lý",
-        "Đã giao",
-        "Đang giao",
-        "Đã hủy",
-        "Đã trả hàng",
-        "Đã nhận đơn",
-      ],
+    deliveryInfo: [
+      {
+        status: {
+          type: String,
+          default: "Đang chờ",
+          enum: [
+            "Đang chờ",
+            "Đang xử lý",
+            "Đã giao",
+            "Đang giao",
+            "Đã hủy",
+            "Đã trả hàng",
+            "Đã nhận đơn",
+          ],
+        },
+        deliveryAddress: {
+          type: String,
+          default: null,
+        },
+      },
+    ],
+    expectedDeliveryDate: {
+      type: Date,
+      default: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     },
   },
   { timestamps: true }

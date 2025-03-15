@@ -1,4 +1,3 @@
-import OrderDetail from "../models/orderDetail.js";
 import * as tf from "@tensorflow/tfjs-node";
 import Product from "../models/product.js";
 import ProductView from "../models/productView.js";
@@ -31,9 +30,10 @@ const getUserProductData = async () => {
       },
     ];
 
-    const productPurchase = await OrderDetail.aggregate(pipeline);
+    // const productPurchase = await OrderDetail.aggregate(pipeline);
     const productView = await ProductView.find();
-    const dataRaw = [...productPurchase, ...productView];
+    // const dataRaw = [...productPurchase, ...productView];
+    const dataRaw = [...productView];
 
     if (!dataRaw || dataRaw.length === 0) {
       throw new Error("No data found from database.");

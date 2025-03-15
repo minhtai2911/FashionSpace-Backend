@@ -15,7 +15,22 @@ router.post("/", authMiddleware.verifyToken, orderController.createOrder);
 router.get(
   "/get/userId",
   authMiddleware.verifyToken,
-  orderController.getOrderByUserId
+  orderController.getAllOrdersByUserId
+);
+router.post("/checkoutWithMoMo", orderController.checkoutWithMoMo);
+router.post("/callback", orderController.callbackMoMo);
+router.post("/checkStatusTransaction", orderController.checkStatusTransaction);
+router.put(
+  "/deliveryInfo/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Employee"]),
+  orderController.updateDeliveryInfoById
+);
+router.put(
+  "/paymentStatus/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Employee"]),
+  orderController.updatePaymentStatusById
 );
 
 export default router;

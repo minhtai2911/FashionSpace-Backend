@@ -1,5 +1,4 @@
 import Statistic from "../models/statistic.js";
-import cron from "node-cron";
 import Order from "../models/order.js";
 import { orderStatus } from "../config/orderStatus.js";
 import { messages } from "../config/messageHelper.js";
@@ -11,73 +10,50 @@ const createStatistic = async (req, res, next) => {
     const todayStart = new Date(year, month - 1, day);
     const todayEnd = new Date(year, month - 1, day + 1);
 
-    const totalOrder = await Order.aggregate([
-      {
-        $lookup: {
-          from: "ordertrackings",
-          localField: "_id",
-          foreignField: "orderId",
-          as: "orderTrackings",
-        },
+    const totalOrder = await Order.countDocuments({
+      $expr: {
+        $eq: [
+          { $arrayElemAt: ["$deliveryInfo.status", -1] },
+          orderStatus.SHIPPED,
+        ],
       },
-      {
-        $unwind: "$orderTrackings",
-      },
-      {
-        $match: {
-          "orderTrackings.status": orderStatus.SHIPPED,
-          createdDate: { $gte: todayStart, $lt: todayEnd },
-        },
-      },
-      {
-        $count: "totalOrders",
-      },
-    ]);
+      updatedAt: { $gte: todayStart, $lt: todayEnd },
+    });
 
     const totalRevenue = await Order.aggregate([
       {
-        $lookup: {
-          from: "ordertrackings",
-          localField: "_id",
-          foreignField: "orderId",
-          as: "orderTrackings",
-        },
-      },
-      {
-        $unwind: "$orderTrackings",
-      },
-      {
         $match: {
-          "orderTrackings.status": orderStatus.SHIPPED,
-          createdDate: {
-            $gte: todayStart,
-            $lt: todayEnd,
+          $expr: {
+            $eq: [
+              { $arrayElemAt: ["$deliveryInfo.status", -1] },
+              orderStatus.SHIPPED,
+            ],
           },
+          updatedAt: { $gte: todayStart, $lt: todayEnd },
         },
       },
       {
         $group: {
           _id: null,
-          totalRevenue: { $sum: "$total" },
+          totalRevenue: { $sum: "$finalPrice" },
         },
       },
     ]);
 
     if (!totalRevenue[0]) totalRevenue[0] = { totalRevenue: 0 };
-    if (!totalOrder[0]) totalOrder[0] = { totalOrders: 0 };
 
     const statistic = new Statistic({
       day: day,
       month: month,
       year: year,
-      totalOrder: totalOrder[0].totalOrders,
+      totalOrder: totalOrder,
       totalRevenue: totalRevenue[0].totalRevenue,
     });
 
     await statistic.save();
     res.status(201).json({ data: statistic });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: err.message, message: messages.MSG5 });
   }
 };
 
@@ -103,7 +79,7 @@ const getStatistics = async (req, res, next) => {
           },
         },
         {
-          $sort: { "_id.year": -1, "_id.month": -1 }, 
+          $sort: { "_id.year": -1, "_id.month": -1 },
         },
       ]);
     } else {
@@ -119,95 +95,11 @@ const getStatistics = async (req, res, next) => {
 
     res.status(200).json({ data: statistics });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ error: err.message, message: messages.MSG5 });
   }
 };
 
-cron.schedule("0 59 23 * * *", async () => {
-  try {
-    const today = new Date();
-
-    const todayStart = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate()
-    );
-    const todayEnd = new Date(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate() + 1
-    );
-
-    const totalOrder = await Order.aggregate([
-      {
-        $lookup: {
-          from: "ordertrackings",
-          localField: "_id",
-          foreignField: "orderId",
-          as: "orderTrackings",
-        },
-      },
-      {
-        $unwind: "$orderTrackings",
-      },
-      {
-        $match: {
-          "orderTrackings.status": orderStatus.SHIPPED,
-          createdDate: { $gte: todayStart, $lt: todayEnd },
-        },
-      },
-      {
-        $count: "totalOrders",
-      },
-    ]);
-
-    const totalRevenue = await Order.aggregate([
-      {
-        $lookup: {
-          from: "ordertrackings",
-          localField: "_id",
-          foreignField: "orderId",
-          as: "orderTrackings",
-        },
-      },
-      {
-        $unwind: "$orderTrackings",
-      },
-      {
-        $match: {
-          "orderTrackings.status": orderStatus.SHIPPED,
-          createdDate: {
-            $gte: todayStart,
-            $lt: todayEnd,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: null,
-          totalRevenue: { $sum: "$total" },
-        },
-      },
-    ]);
-
-    if (!totalRevenue[0]) totalRevenue[0] = { totalRevenue: 0 };
-    if (!totalOrder[0]) totalOrder[0] = { totalOrders: 0 };
-
-    const statistic = new Statistic({
-      day: day,
-      month: month,
-      year: year,
-      totalOrder: totalOrder[0].totalOrders,
-      totalRevenue: totalRevenue[0].totalRevenue,
-    });
-
-    await statistic.save();
-  } catch (error) {
-    throw new Error(error.message);
-  }
-});
-
-const addStatistic = async (totalPrice) => {
+export const addOrderToReport = async (finalPrice) => {
   try {
     const today = new Date();
 
@@ -219,7 +111,7 @@ const addStatistic = async (totalPrice) => {
 
     if (statistic) {
       statistic.totalOrder++;
-      statistic.totalRevenue += totalPrice;
+      statistic.totalRevenue += finalPrice;
       await statistic.save();
     } else {
       const newStatistic = new Statistic({
@@ -227,17 +119,16 @@ const addStatistic = async (totalPrice) => {
         month: today.getMonth() + 1,
         year: today.getFullYear(),
         totalOrder: 1,
-        totalRevenue: totalPrice,
+        totalRevenue: finalPrice,
       });
       await newStatistic.save();
     }
   } catch (err) {
     throw new Error(err.message);
   }
-}
+};
 
 export default {
   createStatistic: createStatistic,
   getStatistics: getStatistics,
-  addStatistic: addStatistic,
 };

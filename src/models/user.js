@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
     roleId: {
       type: mongoose.Schema.Types.ObjectId,
       require: true,
-      ref: "Role",
+      ref: "UserRole",
     },
     password: {
       type: String,
@@ -37,7 +37,7 @@ const userSchema = new mongoose.Schema(
     },
     avatarPath: {
       type: String,
-      default: path.join(process.env.URL_SERVER + "/avatars//avatar.jpg"),
+      default: `${process.env.URL_SERVER}/avatars/avatar.jpg`,
     },
     isActive: {
       type: Boolean,

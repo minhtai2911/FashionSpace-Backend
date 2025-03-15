@@ -7,15 +7,13 @@ const userSchema = new mongoose.Schema(
       required: true,
       ref: "Product",
     },
-    sizeId: {
-      type: mongoose.Schema.Types.ObjectId,
+    size: {
+      type: String,
       required: true,
-      ref: "Size",
     },
-    colorId: {
-      type: mongoose.Schema.Types.ObjectId,
+    color: {
+      type: String,
       required: true,
-      ref: "Color",
     },
     stock: {
       type: Number,

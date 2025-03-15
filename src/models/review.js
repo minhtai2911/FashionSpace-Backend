@@ -25,6 +25,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    status: {
+      type: String,
+      default: "Chưa trả lời",
+      enum: ["Chưa trả lời", "Đã trả lời"],
+    },
     response: [
       {
         userId: {
