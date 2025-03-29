@@ -1,142 +1,138 @@
 import Category from "../models/category.js";
-import Product from "../models/product.js";
 import chatbotController from "./chatbotController.js";
 import { messages } from "../config/messageHelper.js";
-import category from "../models/category.js";
+import invalidateCache from "../utils/changeCache.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
-const getAllCategories = async (req, res, next) => {
-  try {
-    const query = {};
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+const getAllCategories = asyncHandler(async (req, res, next) => {
+  const query = {};
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
 
-    if (req.query.isActive) query.isActive = req.query.isActive;
-    if (req.query.search) query.name = new RegExp(req.query.search, "i");
+  if (req.query.isActive) query.isActive = req.query.isActive;
+  if (req.query.search) query.name = new RegExp(req.query.search, "i");
 
-    const totalCount = await Category.countDocuments(query);
-    const category = await Category.find(query).skip(skip).limit(limit).exec();
+  const cacheKey = `categories:${page}:${limit}:${query.isActive || "null"}:${
+    query.name || "null"
+  }`;
+  const cachedCategories = await req.redisClient.get(cacheKey);
 
-    res.status(200).json({
-      meta: {
-        totalCount: totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      },
-      data: category,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  if (cachedCategories) {
+    return res.status(200).json(JSON.parse(cachedCategories));
   }
-};
 
-const getCategoryById = async (req, res, next) => {
-  try {
-    const category = await Category.findById(req.params.id);
+  const totalCount = await Category.countDocuments(query);
+  const category = await Category.find(query).skip(skip).limit(limit).exec();
 
-    if (!category) return res.status(404).json({ error: "Not found" });
+  const result = {
+    meta: {
+      totalCount: totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+    data: category,
+  };
 
-    res.status(200).json({ data: category });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
+
+  res.status(200).json(result);
+});
+
+const getCategoryById = asyncHandler(async (req, res, next) => {
+  const cacheKey = `category:${req.params.id}`;
+  const cachedCategory = await req.redisClient.get(cacheKey);
+
+  if (cachedCategory) {
+    return res.status(200).json(JSON.parse(cachedCategory));
   }
-};
 
-const createCategory = async (req, res, next) => {
-  try {
-    const { name, gender } = req.body;
+  const category = await Category.findById(req.params.id);
 
-    if (!name) throw new Error(messages.MSG1);
+  if (!category) return res.status(404).json({ error: "Not found" });
 
-    const existingCategory = await Category.findOne({
-      name: name,
-      gender: gender,
-    });
+  await req.redisClient.setex(cacheKey, 3600, JSON.stringify(category));
+  res.status(200).json({ data: category });
+});
 
-    if (existingCategory) {
-      return res.status(409).json({ message: messages.MSG56 });
-    }
+const createCategory = asyncHandler(async (req, res, next) => {
+  const { name, gender } = req.body;
 
-    const newCategory = new Category({ name, gender });
+  if (!name) throw new Error(messages.MSG1);
 
-    chatbotController.updateEntityCategory(name, [name]);
-    await newCategory.save();
+  const existingCategory = await Category.findOne({
+    name: name,
+    gender: gender,
+  });
 
-    res.status(201).json({
-      message: messages.MSG31,
-      data: newCategory,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  if (existingCategory) {
+    return res.status(409).json({ message: messages.MSG56 });
   }
-};
 
-const updateCategoryById = async (req, res, next) => {
-  try {
-    const category = await Category.findById(req.params.id);
+  const newCategory = new Category({ name, gender });
 
-    if (!category) return res.status(404).json({ error: "Not found" });
+  chatbotController.updateEntityCategory(name, [name]);
+  await newCategory.save();
+  await invalidateCache(
+    req,
+    "category",
+    "categories",
+    newCategory._id.toString()
+  );
 
-    const { name, gender } = req.body;
+  res.status(201).json({
+    message: messages.MSG31,
+    data: newCategory,
+  });
+});
 
-    const existingCategory = await Category.findOne({
-      name: name,
-      gender: gender,
-    });
+const updateCategoryById = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
 
-    if (
-      existingCategory &&
-      existingCategory._id.toString() == category._id.toString()
-    ) {
-      return res.status(409).json({ message: messages.MSG56 });
-    }
+  if (!category) return res.status(404).json({ error: "Not found" });
 
-    chatbotController.deleteEntityCategory(category.name);
-    chatbotController.updateEntityCategory(name, [name]);
+  const { name, gender } = req.body;
 
-    category.name = name || category.name;
-    category.gender = gender || category.gender;
+  const existingCategory = await Category.findOne({
+    name: name,
+    gender: gender,
+  });
 
-    await category.save();
-    res.status(200).json({
-      message: messages.MSG26,
-      data: category,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  if (
+    existingCategory &&
+    existingCategory._id.toString() == category._id.toString()
+  ) {
+    return res.status(409).json({ message: messages.MSG56 });
   }
-};
 
-const updateStatusCategoryById = async (req, res, next) => {
-  try {
-    const category = await Category.findById(req.params.id);
+  chatbotController.deleteEntityCategory(category.name);
+  chatbotController.updateEntityCategory(name, [name]);
 
-    if (!category) return res.status(404).json({ error: "Not found" });
+  category.name = name || category.name;
+  category.gender = gender || category.gender;
 
-    category.isActive = !category.isActive;
+  await category.save();
+  await invalidateCache(req, "category", "categories", category._id.toString());
 
-    await category.save();
-    if (category.isActive) res.status(200).json({ message: messages.MSG29 });
-    else res.status(200).json({ message: messages.MSG30 });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+  res.status(200).json({
+    message: messages.MSG26,
+    data: category,
+  });
+});
+
+const updateStatusCategoryById = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
+
+  if (!category) return res.status(404).json({ error: "Not found" });
+
+  category.isActive = !category.isActive;
+
+  await category.save();
+  await invalidateCache(req, "category", "categories", category._id.toString());
+
+  if (category.isActive) res.status(200).json({ message: messages.MSG29 });
+  else res.status(200).json({ message: messages.MSG30 });
+});
 
 export default {
   getAllCategories: getAllCategories,

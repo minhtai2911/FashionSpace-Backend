@@ -3,133 +3,126 @@ import { messages } from "../config/messageHelper.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
+import asyncHandler from "../middleware/asyncHandler.js";
+import invalidateCache from "../utils/changeCache.js";
 
-const getAllProducts = async (req, res, next) => {
-  try {
-    const query = {};
+const getAllProducts = asyncHandler(async (req, res, next) => {
+  const query = {};
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    let sortBy = "name";
-    let sortOrder = "asc";
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
+  let sortBy = "name";
+  let sortOrder = "asc";
 
-    if (req.query.isActive) query.isActive = req.query.isActive;
-    if (req.query.minPrice) query.price = { $gte: req.query.minPrice };
-    if (req.query.maxPrice)
-      query.price = { ...query.price, $lte: req.query.maxPrice };
-    if (req.query.search) query.name = new RegExp(req.query.search, "i");
-    if (req.query.sortBy) sortBy = req.query.sortBy;
-    if (req.query.sortOrder) sortOrder = req.query.sortOrder;
+  if (req.query.isActive) query.isActive = req.query.isActive;
+  if (req.query.minPrice) query.price = { $gte: req.query.minPrice };
+  if (req.query.maxPrice)
+    query.price = { ...query.price, $lte: req.query.maxPrice };
+  if (req.query.search) query.name = new RegExp(req.query.search, "i");
+  if (req.query.sortBy) sortBy = req.query.sortBy;
+  if (req.query.sortOrder) sortOrder = req.query.sortOrder;
 
-    const totalCount = await Product.countDocuments(query);
+  const cacheKey = `products:${page}:${limit}:${sortOrder}:${sortBy}:${
+    query.isActive || "null"
+  }:${req.query.minPrice || "null"}:${req.query.maxPrice || "null"}:${
+    query.name || "null"
+  }`;
+  const cachedProducts = await req.redisClient.get(cacheKey);
 
-    const products = await Product.find(query)
-      .populate("categoryId", "name")
-      .sort({ [sortBy]: sortOrder })
-      .skip(skip)
-      .limit(limit)
-      .exec();
-
-    return res.status(200).json({
-      meta: {
-        totalCount: totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      },
-      data: products,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  if (cachedProducts) {
+    return res.status(200).json(JSON.parse(cachedProducts));
   }
-};
 
-const createProduct = async (req, res, next) => {
-  try {
-    const { name, description, categoryId, price, discountPrice } = req.body;
+  const totalCount = await Product.countDocuments(query);
 
-    if (!name || !description || !categoryId || !price) {
-      throw new Error(messages.MSG1);
-    }
+  const products = await Product.find(query)
+    .populate("categoryId", "name")
+    .sort({ [sortBy]: sortOrder })
+    .skip(skip)
+    .limit(limit)
+    .exec();
 
-    const newProduct = new Product({
-      name,
-      description,
-      categoryId,
-      price,
-      discountPrice,
-    });
+  const result = {
+    meta: {
+      totalCount: totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+    data: products,
+  };
 
-    await newProduct.save();
-    res.status(201).json({ message: messages.MSG32, data: newProduct });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
+
+  return res.status(200).json(result);
+});
+
+const createProduct = asyncHandler(async (req, res, next) => {
+  const { name, description, categoryId, price, discountPrice } = req.body;
+
+  if (!name || !description || !categoryId || !price) {
+    throw new Error(messages.MSG1);
   }
-};
 
-const getProductById = async (req, res, next) => {
-  try {
-    const product = await Product.findById(req.params.id);
+  const newProduct = new Product({
+    name,
+    description,
+    categoryId,
+    price,
+    discountPrice,
+  });
 
-    if (!product) return res.status(404).json({ error: "Not found" });
+  await newProduct.save();
+  invalidateCache(req, "product", "products", newProduct._id.toString());
+  res.status(201).json({ message: messages.MSG32, data: newProduct });
+});
 
-    res.status(200).json({ data: product });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+const getProductById = asyncHandler(async (req, res, next) => {
+  const cacheKey = `order:${req.params.id}`;
+  const cachedProduct = await req.redisClient.get(cacheKey);
+
+  if (cachedProduct) {
+    return res.status(200).json(JSON.parse(cachedProduct));
   }
-};
 
-const updateProductById = async (req, res, next) => {
-  try {
-    const updateProduct = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id);
 
-    if (!updateProduct) return res.status(404).json({ error: "Not found" });
+  if (!product) return res.status(404).json({ error: "Not found" });
 
-    const { name, description, categoryId, price, discountPrice } = req.body;
+  await req.redisClient.setex(cacheKey, 3600, JSON.stringify(product));
+  res.status(200).json({ data: product });
+});
 
-    updateProduct.name = name || updateProduct.name;
-    updateProduct.description = description || updateProduct.description;
-    updateProduct.categoryId = categoryId || updateProduct.categoryId;
-    updateProduct.price = price || updateProduct.price;
-    updateProduct.discountPrice = discountPrice || updateProduct.discountPrice;
+const updateProductById = asyncHandler(async (req, res, next) => {
+  const updateProduct = await Product.findById(req.params.id);
 
-    await updateProduct.save();
-    res.status(200).json({ message: messages.MSG33, data: updateProduct });
-  } catch {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+  if (!updateProduct) return res.status(404).json({ error: "Not found" });
 
-const updateStatusProductById = async (req, res, next) => {
-  try {
-    const product = await Product.findById(req.params.id);
+  const { name, description, categoryId, price, discountPrice } = req.body;
 
-    if (!product) return res.status(404).json({ error: "Not found" });
+  updateProduct.name = name || updateProduct.name;
+  updateProduct.description = description || updateProduct.description;
+  updateProduct.categoryId = categoryId || updateProduct.categoryId;
+  updateProduct.price = price || updateProduct.price;
+  updateProduct.discountPrice = discountPrice || updateProduct.discountPrice;
 
-    product.isActive = !product.isActive;
+  await updateProduct.save();
+  invalidateCache(req, "product", "products", updateProduct._id.toString());
+  res.status(200).json({ message: messages.MSG33, data: updateProduct });
+});
 
-    await product.save();
-    if (product.isActive) res.status(200).json({ message: messages.MSG29 });
-    else res.status(200).json({ message: messages.MSG35 });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+const updateStatusProductById = asyncHandler(async (req, res, next) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) return res.status(404).json({ error: "Not found" });
+
+  product.isActive = !product.isActive;
+
+  await product.save();
+  invalidateCache(req, "product", "products", product._id.toString());
+  if (product.isActive) res.status(200).json({ message: messages.MSG29 });
+  else res.status(200).json({ message: messages.MSG35 });
+});
 
 const createImages = async (req, res, next) => {
   try {
@@ -146,6 +139,7 @@ const createImages = async (req, res, next) => {
       product.images.push(imagePath);
     }
     await product.save();
+    invalidateCache(req, "product", "products", product._id.toString());
     res.status(201).json({ data: product });
   } catch (err) {
     const __filename = fileURLToPath(import.meta.url);
@@ -160,28 +154,21 @@ const createImages = async (req, res, next) => {
   }
 };
 
-const deleteImageById = async (req, res, next) => {
-  try {
-    const productId = req.params.productId;
-    const index = req.params.index;
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: "Not found" });
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    const deleteStart = product.images[index].indexOf("/products");
-    const deleteFile =
-      "\\public" + product.images[index].slice(deleteStart);
-    fs.unlinkSync(path.join(__dirname, "..", deleteFile));
-    product.images.splice(index, 1);
-    await product.save();
-    res.status(200).json({ data: product });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+const deleteImageById = asyncHandler(async (req, res, next) => {
+  const productId = req.params.productId;
+  const index = req.params.index;
+  const product = await Product.findById(productId);
+  if (!product) return res.status(404).json({ error: "Not found" });
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const deleteStart = product.images[index].indexOf("/products");
+  const deleteFile = "\\public" + product.images[index].slice(deleteStart);
+  fs.unlinkSync(path.join(__dirname, "..", deleteFile));
+  product.images.splice(index, 1);
+  await product.save();
+  invalidateCache(req, "product", "products", product._id.toString());
+  res.status(200).json({ data: product });
+});
 
 export default {
   getAllProducts: getAllProducts,

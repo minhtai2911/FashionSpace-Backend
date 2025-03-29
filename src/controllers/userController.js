@@ -4,114 +4,92 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import UserRole from "../models/userRole.js";
 import { messages } from "../config/messageHelper.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
-const getAllUsers = async (req, res, next) => {
-  try {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+const getAllUsers = asyncHandler(async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
 
-    const query = {};
-    if (req.query.isActive) query.isActive = req.query.isActive;
+  const query = {};
+  if (req.query.isActive) query.isActive = req.query.isActive;
 
-    const searchRegex = req.query.search
-      ? new RegExp(req.query.search, "i")
-      : null;
+  const searchRegex = req.query.search
+    ? new RegExp(req.query.search, "i")
+    : null;
 
-    const pipeline = [
-      {
-        $lookup: {
-          from: "userroles",
-          localField: "roleId",
-          foreignField: "_id",
-          as: "userRoleInfo",
-        },
+  const pipeline = [
+    {
+      $lookup: {
+        from: "userroles",
+        localField: "roleId",
+        foreignField: "_id",
+        as: "userRoleInfo",
       },
-      { $unwind: "$userRoleInfo" },
-      {
-        $match: {
-          ...(req.query.roleName && {
-            "userRoleInfo.roleName": req.query.roleName,
-          }),
-          ...(req.query.isActive && {
-            isActive: req.query.isActive === "true",
-          }),
-          ...(searchRegex && {
-            $or: [{ fullName: searchRegex }, { email: searchRegex }],
-          }),
-        },
+    },
+    { $unwind: "$userRoleInfo" },
+    {
+      $match: {
+        ...(req.query.roleName && {
+          "userRoleInfo.roleName": req.query.roleName,
+        }),
+        ...(req.query.isActive && {
+          isActive: req.query.isActive === "true",
+        }),
+        ...(searchRegex && {
+          $or: [{ fullName: searchRegex }, { email: searchRegex }],
+        }),
       },
-      { $skip: skip },
-      { $limit: limit },
-    ];
+    },
+    { $skip: skip },
+    { $limit: limit },
+  ];
 
-    const totalCountPipeline = [...pipeline];
-    totalCountPipeline.splice(-2);
-    const totalCount = await User.aggregate([
-      ...totalCountPipeline,
-      { $count: "count" },
-    ]);
+  const totalCountPipeline = [...pipeline];
+  totalCountPipeline.splice(-2);
+  const totalCount = await User.aggregate([
+    ...totalCountPipeline,
+    { $count: "count" },
+  ]);
 
-    const user = await User.aggregate(pipeline);
+  const user = await User.aggregate(pipeline);
 
-    return res.status(200).json({
-      meta: {
-        totalCount: totalCount[0]?.count || 0,
-        currentPage: page,
-        totalPages: Math.ceil((totalCount[0]?.count || 0) / limit),
+  return res.status(200).json({
+    meta: {
+      totalCount: totalCount[0]?.count || 0,
+      currentPage: page,
+      totalPages: Math.ceil((totalCount[0]?.count || 0) / limit),
+    },
+    data: user,
+  });
+});
+
+const getUserById = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id).populate("roleId");
+
+  if (!user) return res.status(404).json({ error: "Not found" });
+
+  res.status(200).json({ data: user });
+});
+
+const updateStatusUserById = asyncHandler(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user) return res.status(404).json({ error: "Not found" });
+
+  const updateUser = await User.findByIdAndUpdate(
+    req.params.id,
+    {
+      $set: {
+        isActive: !user.isActive,
       },
-      data: user,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+    },
+    { new: true }
+  );
+  if (!updateUser.isActive)
+    return res.status(200).json({ message: messages.MSG27, data: updateUser });
 
-const getUserById = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.id).populate("roleId");
-
-    if (!user) return res.status(404).json({ error: "Not found" });
-
-    res.status(200).json({ data: user });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
-
-const updateStatusUserById = async (req, res, next) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ error: "Not found" });
-
-    const updateUser = await User.findByIdAndUpdate(
-      req.params.id,
-      {
-        $set: {
-          isActive: !user.isActive,
-        },
-      },
-      { new: true }
-    );
-    if (!updateUser.isActive)
-      return res
-        .status(200)
-        .json({ message: messages.MSG27, data: updateUser });
-
-    res.status(200).json({ message: messages.MSG58, data: updateUser });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+  res.status(200).json({ message: messages.MSG58, data: updateUser });
+});
 
 const updateUserById = async (req, res, next) => {
   try {
@@ -198,27 +176,20 @@ const updateUserById = async (req, res, next) => {
   }
 };
 
-const createUser = async (req, res, next) => {
-  try {
-    const { email, fullName, phone, password, roleName } = req.body;
-    if (!email || !fullName || !phone || !password || !roleName) {
-      throw new Error(messages.MSG1);
-    }
-    const exists = await User.findOne({ email: email });
-    if (exists) return res.status(400).json({ message: messages.MSG51 });
-    const role = await UserRole.findOne({ roleName: roleName });
-    if (!role) return res.status(400).json({ error: "Not found" });
-    const roleId = role._id;
-    const newUser = new User({ email, fullName, phone, roleId, password });
-    await newUser.save();
-    res.status(201).json({ message: messages.MSG22, data: newUser });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+const createUser = asyncHandler(async (req, res, next) => {
+  const { email, fullName, phone, password, roleName } = req.body;
+  if (!email || !fullName || !phone || !password || !roleName) {
+    throw new Error(messages.MSG1);
   }
-};
+  const exists = await User.findOne({ email: email });
+  if (exists) return res.status(400).json({ message: messages.MSG51 });
+  const role = await UserRole.findOne({ roleName: roleName });
+  if (!role) return res.status(400).json({ error: "Not found" });
+  const roleId = role._id;
+  const newUser = new User({ email, fullName, phone, roleId, password });
+  await newUser.save();
+  res.status(201).json({ message: messages.MSG22, data: newUser });
+});
 
 export default {
   getAllUsers: getAllUsers,

@@ -1,7 +1,8 @@
 import ProductView from "../models/productView.js";
 import { messages } from "../config/messageHelper.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
-const createProductView = async (req, res, next) => {
+const createProductView = asyncHandler(async (req, res, next) => {
   try {
     if (!req.body.productId) {
       return res.status(400).json({ error: "productId is required!" });
@@ -33,7 +34,7 @@ const createProductView = async (req, res, next) => {
       message: messages.MSG5,
     });
   }
-};
+});
 
 export default {
   createProductView: createProductView,

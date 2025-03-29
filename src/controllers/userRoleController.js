@@ -1,48 +1,35 @@
 import UserRole from "../models/userRole.js";
 import { messages } from "../config/messageHelper.js";
+import asyncHandler from "../middleware/asyncHandler.js";
 
-const getAllUserRoles = async (req, res, next) => {
-  try {
-    const query = {};
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
+const getAllUserRoles = asyncHandler(async (req, res, next) => {
+  const query = {};
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
 
-    if (req.query.search) query.roleName = new RegExp(req.query.search, "i");
+  if (req.query.search) query.roleName = new RegExp(req.query.search, "i");
 
-    const totalCount = await UserRole.countDocuments(query);
-    const userRoles = await UserRole.find(query).skip(skip).limit(limit).exec();
+  const totalCount = await UserRole.countDocuments(query);
+  const userRoles = await UserRole.find(query).skip(skip).limit(limit).exec();
 
-    res.status(200).json({
-      meta: {
-        totalCount: totalCount,
-        currentPage: page,
-        totalPages: Math.ceil(totalCount / limit),
-      },
-      data: userRoles,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+  res.status(200).json({
+    meta: {
+      totalCount: totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+    data: userRoles,
+  });
+});
 
-const getUserRoleById = async (req, res, next) => {
-  try {
-    const userRole = await UserRole.findById(req.params.id);
+const getUserRoleById = asyncHandler(async (req, res, next) => {
+  const userRole = await UserRole.findById(req.params.id);
 
-    if (!userRole) return res.status(404).json({ error: "Not found" });
+  if (!userRole) return res.status(404).json({ error: "Not found" });
 
-    res.status(200).json({ data: userRole });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+  res.status(200).json({ data: userRole });
+});
 
 // const createUserRole = async (req, res, next) => {
 //   try {

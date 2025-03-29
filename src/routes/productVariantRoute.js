@@ -4,7 +4,6 @@ import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
 
-router.get("/", productVariantController.getAllProductVariants);
 router.get("/:id", productVariantController.getProductVariantById); 
 router.post("/", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), productVariantController.createProductVariant);
 router.put("/:id", authMiddleware.verifyToken, authMiddleware.checkPermission(["Admin"]), productVariantController.updateProductVariantById);
