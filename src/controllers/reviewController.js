@@ -4,6 +4,8 @@ import mongoose from "mongoose";
 import { messages } from "../config/messageHelper.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 import invalidateCache from "../utils/changeCache.js";
+import analyzeSentiment from "../utils/analyzeSentiment.js";
+import banOffensiveComment from "../utils/banOffensiveComment.js";
 
 const getAllReviews = asyncHandler(async (req, res, next) => {
   const query = {};
@@ -75,6 +77,26 @@ const createReview = asyncHandler(async (req, res, next) => {
     content,
   });
 
+  if (banOffensiveComment(newReview.content)) {
+    return res.status(403).json({ message: messages.MSG61 });
+  }
+
+  const sentiment = await analyzeSentiment(newReview.content);
+
+  switch (sentiment) {
+    case "NEG":
+      newReview.type = "Tiêu cực";
+      break;
+    case "NEU":
+      newReview.type = "Trung lập";
+      break;
+    case "POS":
+      newReview.type = "Tích cực";
+      break;
+    default:
+      throw new Error("Error");
+  }
+
   await newReview.save();
 
   const product = await Product.findById(productId);
@@ -120,12 +142,32 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
   product.rating =
     (product.rating * product.totalReview - review.rating + rating) /
     product.totalReview;
-  await product.save();
 
   review.rating = rating || review.rating;
   review.content = content || review.content;
 
+  if (banOffensiveComment(review.content)) {
+    return res.status(403).json({ message: messages.MSG61 });
+  }
+
+  const sentiment = await analyzeSentiment(review.content);
+
+  switch (sentiment) {
+    case "NEG":
+      review.type = "Tiêu cực";
+      break;
+    case "NEU":
+      review.type = "Trung lập";
+      break;
+    case "POS":
+      review.type = "Tích cực";
+      break;
+    default:
+      throw new Error("Error");
+  }
+
   await review.save();
+  await product.save();
   invalidateCache(req, "review", "reviews", review._id.toString());
   res.status(200).json({
     message: messages.MSG59,
@@ -152,6 +194,10 @@ const createResponse = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
   const content = req.body.content;
   const reviewId = req.body.reviewId;
+
+  if (banOffensiveComment(content)) {
+    return res.status(403).json({ message: messages.MSG62 });
+  }
 
   const review = await Review.findById(reviewId);
   if (!review) return res.status(404).json({ error: "Not found" });

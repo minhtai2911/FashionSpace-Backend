@@ -47,6 +47,15 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    type: {
+      type: String,
+      required: true,
+      enum: ["Tiêu cực", "Tích cực", "Trung lập"],
+    },
   },
   { timestamps: true }
 );
