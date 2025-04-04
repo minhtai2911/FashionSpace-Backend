@@ -23,5 +23,17 @@ router.delete(
   authMiddleware.verifyToken,
   reviewController.deleteReviewById
 );
+router.put(
+  "/hide/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission["Admin"],
+  reviewController.hideReviewById
+);
+router.put(
+  "/unhide/:id",
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission["Admin"],
+  reviewController.unhideReviewById
+);
 
 export default router;

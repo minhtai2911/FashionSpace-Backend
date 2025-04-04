@@ -208,6 +208,32 @@ const createResponse = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: messages.MSG45, data: review });
 });
 
+const hideReviewById = asyncHandler(async (req, res, next) => {
+  const review = await Review.findById(req.params.id);
+
+  if (!review) return res.status(404).json({ error: "Not found" });
+
+  review.isActive = false;
+
+  await review.save();
+
+  invalidateCache(req, "review", "reviews", review._id.toString());
+  res.status(200).json({ message: messages.MSG58 });
+});
+
+const unhideReviewById = asyncHandler(async (req, res, next) => {
+  const review = await Review.findById(req.params.id);
+
+  if (!review) return res.status(404).json({ error: "Not found" });
+
+  review.isActive = true;
+
+  await review.save();
+  
+  invalidateCache(req, "review", "reviews", review._id.toString());
+  res.status(200).json({ message: messages.MSG58 });
+});
+
 export default {
   createReview: createReview,
   getReviewById: getReviewById,
@@ -215,4 +241,6 @@ export default {
   deleteReviewById: deleteReviewById,
   getAllReviews: getAllReviews,
   createResponse: createResponse,
+  hideReviewById: hideReviewById,
+  unhideReviewById: unhideReviewById,
 };
