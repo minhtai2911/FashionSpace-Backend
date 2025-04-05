@@ -65,5 +65,7 @@ export const messages = {
   MSG59: "Đánh giá của bạn đã được cập nhật thành công!",
   MSG60: "Xóa đánh giá thành công!",
   MSG61: "Đánh giá của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!",
-  MSG62: "Phản hồi của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!"
+  MSG62: "Phản hồi của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!",
+  MSG63: "Ẩn đánh giá thành công!",
+  MSG64: "Hiển thị đánh giá thành công!",
 };
