@@ -1,6 +1,6 @@
 import { Router } from "express";
 import reviewController from "../controllers/reviewController.js";
-import authMiddleware from "../middleware/authMiddleware.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 
 const router = Router();
 
@@ -26,13 +26,13 @@ router.delete(
 router.put(
   "/hide/:id",
   authMiddleware.verifyToken,
-  authMiddleware.checkPermission["Admin"],
+  authMiddleware.checkPermission(["Admin"]),
   reviewController.hideReviewById
 );
 router.put(
   "/unhide/:id",
   authMiddleware.verifyToken,
-  authMiddleware.checkPermission["Admin"],
+  authMiddleware.checkPermission(["Admin"]),
   reviewController.unhideReviewById
 );
 

@@ -3,7 +3,7 @@ import { messages } from "../config/messageHelper.js";
 import { fileURLToPath } from "url";
 import path from "path";
 import fs from "fs";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import invalidateCache from "../utils/changeCache.js";
 
 const getAllProducts = asyncHandler(async (req, res, next) => {

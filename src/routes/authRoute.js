@@ -1,8 +1,8 @@
 import { Router } from "express";
 import authController from "../controllers/authController.js";
-import passport from "../middleware/passport.js";
+import passport from "../middlewares/passport.js";
 import dotenv from "dotenv";
-import authMiddleware from "../middleware/authMiddleware.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 import bcrypt from "bcrypt";
 
 const router = Router();

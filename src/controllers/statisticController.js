@@ -2,7 +2,7 @@ import Statistic from "../models/statistic.js";
 import Order from "../models/order.js";
 import { orderStatus } from "../config/orderStatus.js";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const createStatistic = asyncHandler(async (req, res, next) => {
   const { day, month, year } = req.body;

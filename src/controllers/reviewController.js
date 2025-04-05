@@ -2,7 +2,7 @@ import Review from "../models/review.js";
 import Product from "../models/product.js";
 import mongoose from "mongoose";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import invalidateCache from "../utils/changeCache.js";
 import analyzeSentiment from "../utils/analyzeSentiment.js";
 import banOffensiveComment from "../utils/banOffensiveComment.js";

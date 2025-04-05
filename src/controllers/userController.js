@@ -4,7 +4,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import UserRole from "../models/userRole.js";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const getAllUsers = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;

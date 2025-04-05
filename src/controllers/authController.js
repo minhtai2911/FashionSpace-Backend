@@ -6,7 +6,7 @@ import Otp from "../models/otp.js";
 import { messages } from "../config/messageHelper.js";
 import generateTokens from "../utils/generateToken.js";
 import RefreshToken from "../models/refreshToken.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const generateOTP = async (req, res, next) => {
   try {
