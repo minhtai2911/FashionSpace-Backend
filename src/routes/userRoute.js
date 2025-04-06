@@ -1,7 +1,7 @@
 import { Router } from "express";
 import userController from "../controllers/userController.js";
-import authMiddleware from "../middleware/authMiddleware.js";
-import { uploadAvatar } from "../middleware/upload.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import { uploadAvatar } from "../middlewares/upload.js";
 
 const router = Router();
 

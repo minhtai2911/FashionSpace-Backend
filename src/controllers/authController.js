@@ -6,7 +6,7 @@ import Otp from "../models/otp.js";
 import { messages } from "../config/messageHelper.js";
 import generateTokens from "../utils/generateToken.js";
 import RefreshToken from "../models/refreshToken.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const generateOTP = async (req, res, next) => {
   try {
@@ -45,7 +45,7 @@ const login = asyncHandler(async (req, res, next) => {
   const role = await UserRole.findById(user.roleId);
 
   if (!user.isActive && role.roleName === "Customer") {
-    return res.status(400).json({ data: user });
+    return res.status(400).json({ data: user.email });
   }
 
   if (!user.isActive) {

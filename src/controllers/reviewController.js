@@ -2,7 +2,7 @@ import Review from "../models/review.js";
 import Product from "../models/product.js";
 import mongoose from "mongoose";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import invalidateCache from "../utils/changeCache.js";
 import analyzeSentiment from "../utils/analyzeSentiment.js";
 import banOffensiveComment from "../utils/banOffensiveComment.js";
@@ -218,7 +218,7 @@ const hideReviewById = asyncHandler(async (req, res, next) => {
   await review.save();
 
   invalidateCache(req, "review", "reviews", review._id.toString());
-  res.status(200).json({ message: messages.MSG58 });
+  res.status(200).json({ message: messages.MSG63 });
 });
 
 const unhideReviewById = asyncHandler(async (req, res, next) => {
@@ -231,7 +231,7 @@ const unhideReviewById = asyncHandler(async (req, res, next) => {
   await review.save();
   
   invalidateCache(req, "review", "reviews", review._id.toString());
-  res.status(200).json({ message: messages.MSG58 });
+  res.status(200).json({ message: messages.MSG64 });
 });
 
 export default {

@@ -1,7 +1,7 @@
 import ProductVariant from "../models/productVariant.js";
 import { messages } from "../config/messageHelper.js";
 import invalidateCache from "../utils/changeCache.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const getProductVariantById = asyncHandler(async (req, res, next) => {
   const cacheKey = `productVariant:${req.params.id}`;

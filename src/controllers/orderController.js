@@ -5,7 +5,7 @@ import mongoose from "mongoose";
 import { paymentStatus } from "../config/paymentStatus.js";
 import { orderStatus } from "../config/orderStatus.js";
 import { addOrderToReport } from "../controllers/statisticController.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const getAllOrders = asyncHandler(async (req, res, next) => {
   const query = {};

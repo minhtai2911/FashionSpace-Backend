@@ -1,6 +1,6 @@
 import ProductView from "../models/productView.js";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const createProductView = asyncHandler(async (req, res, next) => {
   try {

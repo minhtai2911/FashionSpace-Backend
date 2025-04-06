@@ -1,6 +1,6 @@
 import UserRole from "../models/userRole.js";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const getAllUserRoles = asyncHandler(async (req, res, next) => {
   const query = {};

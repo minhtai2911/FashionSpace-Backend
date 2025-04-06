@@ -2,7 +2,7 @@ import Category from "../models/category.js";
 import chatbotController from "./chatbotController.js";
 import { messages } from "../config/messageHelper.js";
 import invalidateCache from "../utils/changeCache.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const getAllCategories = asyncHandler(async (req, res, next) => {
   const query = {};

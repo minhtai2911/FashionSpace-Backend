@@ -4,7 +4,7 @@ import Product from "../models/product.js";
 import Category from "../models/category.js";
 import Order from "../models/order.js";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
 const PROJECTID = CREDENTIALS.project_id;

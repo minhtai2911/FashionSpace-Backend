@@ -1,6 +1,6 @@
 import UserAddress from "../models/userAddress.js";
 import { messages } from "../config/messageHelper.js";
-import asyncHandler from "../middleware/asyncHandler.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
 
 const createUserAddress = asyncHandler(async (req, res, next) => {
   const { userId, city, district, commune, street, phone } = req.body;
