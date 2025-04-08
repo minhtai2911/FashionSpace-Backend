@@ -126,7 +126,7 @@ const getReviewById = asyncHandler(async (req, res, next) => {
 
   if (!review) return res.status(404).json({ error: "Not found" });
   await req.redisClient.setex(cacheKey, 3600, JSON.stringify(review));
-  res.status(200).json(review);
+  res.status(200).json({ data: review });
 });
 
 const updateReviewById = asyncHandler(async (req, res, next) => {
@@ -229,7 +229,7 @@ const unhideReviewById = asyncHandler(async (req, res, next) => {
   review.isActive = true;
 
   await review.save();
-  
+
   invalidateCache(req, "review", "reviews", review._id.toString());
   res.status(200).json({ message: messages.MSG64 });
 });

@@ -5,7 +5,6 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 import cookieParser from "cookie-parser";
 import passport from "passport";
-import session from "express-session";
 import helmet from "helmet";
 import Redis from "ioredis";
 import { RateLimiterRedis } from "rate-limiter-flexible";
@@ -31,24 +30,10 @@ import userAddressRoute from "./routes/userAddressRoute.js";
 const app = express();
 const redisClient = new Redis(process.env.REDIS_URL);
 
-app.use(
-  session({
-    secret: process.env.KEY_SESSION,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false, maxAge: 60 * 60 * 1000 },
-  })
-);
-
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static("src/public"));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-app.use(helmet());
 app.use(
   cors({
     origin: "http://localhost:3000",
@@ -57,6 +42,8 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+app.use(helmet());
+app.use(passport.initialize());
 
 dotenv.config();
 const PORT = process.env.PORT || 8000;

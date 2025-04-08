@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
         price: {
           type: Number,
           required: true,
-        }
+        },
       },
     ],
     totalPrice: {
@@ -77,6 +77,10 @@ const userSchema = new mongoose.Schema(
         deliveryAddress: {
           type: String,
           default: null,
+        },
+        deliveryDate: {
+          type: Date,
+          default: Date.now(),
         },
       },
     ],

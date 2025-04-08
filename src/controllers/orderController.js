@@ -6,6 +6,7 @@ import { paymentStatus } from "../config/paymentStatus.js";
 import { orderStatus } from "../config/orderStatus.js";
 import { addOrderToReport } from "../controllers/statisticController.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import sendDeliveryInfo from "../utils/sendDeliveryInfo.js";
 
 const getAllOrders = asyncHandler(async (req, res, next) => {
   const query = {};
@@ -167,7 +168,6 @@ const createOrder = asyncHandler(async (req, res, next) => {
     finalPrice,
     userAddressId,
     shippingFee,
-    paymentStatus,
     paymentMethod,
     deliveryInfo,
     expectedDeliveryDate,
@@ -349,6 +349,14 @@ const checkStatusTransaction = asyncHandler(async (req, res, next) => {
   }
 });
 
+const sendMailDeliveryInfo = asyncHandler(async (req, res, next) => {
+  const { orderId, email } = req.body;
+  const order = await Order.findById(orderId);
+
+  await sendDeliveryInfo(email, order);
+  res.status(200).json({});
+});
+
 export default {
   getAllOrders: getAllOrders,
   getOrderById: getOrderById,
@@ -359,4 +367,5 @@ export default {
   checkoutWithMoMo: checkoutWithMoMo,
   callbackMoMo: callbackMoMo,
   checkStatusTransaction: checkStatusTransaction,
+  sendMailDeliveryInfo: sendMailDeliveryInfo,
 };

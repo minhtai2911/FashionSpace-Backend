@@ -44,8 +44,12 @@ const login = asyncHandler(async (req, res, next) => {
   const user = await User.login(email, originalPassword);
   const role = await UserRole.findById(user.roleId);
 
+  if (!role) {
+    res.status(404).json({ error: "Not found" });
+  }
+
   if (!user.isActive && role.roleName === "Customer") {
-    return res.status(400).json({ data: user.email });
+    return res.status(400).json({ message: "Tài khoản chưa được xác thực!" });
   }
 
   if (!user.isActive) {
@@ -70,9 +74,21 @@ const signup = asyncHandler(async (req, res, next) => {
   }
   const exists = await User.findOne({ email: email });
 
-  if (exists) return res.status(409).json({ message: messages.MSG51 });
+  if (exists && exists.password)
+    return res.status(409).json({ message: messages.MSG51 });
+  
+  if (exists) {
+    exists.password = password;
+    exists.save();
+    return res.status(201).json({ message: messages.MSG16 });
+  }
 
   const role = await UserRole.findOne({ roleName: "Customer" });
+
+  if (!role) {
+    res.status(404).json({ error: "Not found" });
+  }
+
   const roleId = role._id;
   const user = new User({ email, fullName, phone, roleId, password });
 
@@ -184,8 +200,10 @@ const refreshToken = asyncHandler(async (req, res, next) => {
   await RefreshToken.deleteOne({ _id: storedToken._id });
 
   res.status(200).json({
-    accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
+    data: {
+      accessToken: newAccessToken,
+      refreshToken: newRefreshToken,
+    },
   });
   logger.info("Refresh Token thành công!", user._id);
 });
@@ -239,16 +257,6 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
   res.status(200).json({ data: { accessToken, refreshToken } });
 });
 
-const checkEmail = asyncHandler(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
-
-  if (!user) {
-    return res.status(404).json({ message: messages.MSG8 });
-  }
-
-  res.status(200).json({ message: messages.MSG51 });
-});
-
 const forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   user.password = req.body.newPassword;
@@ -267,22 +275,6 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: messages.MSG14 });
 });
 
-const loginGoogleSuccess = asyncHandler(async (req, res, next) => {
-  const user = await User.findOne({ email: req.body.email });
-
-  if (!user) return res.status(404).json({ error: "Not found" });
-
-  const check = await bcrypt.compare(user._id.toString(), req.body.token);
-
-  if (!check)
-    return res.status(403).json({
-      message: "Token đã quá hạn",
-    });
-
-  const { password, ...data } = user._doc;
-  res.status(200).json({ data });
-});
-
 export default {
   login: login,
   signup: signup,
@@ -291,10 +283,8 @@ export default {
   generateOTP: generateOTP,
   sendOTP: sendOTP,
   checkOTPByEmail: checkOTPByEmail,
-  checkEmail: checkEmail,
   forgotPassword: forgotPassword,
   resetPassword: resetPassword,
   verifyAccount: verifyAccount,
   sendMailVerifyAccount: sendMailVerifyAccount,
-  loginGoogleSuccess: loginGoogleSuccess,
 };

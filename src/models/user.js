@@ -1,10 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import path from "path";
-import dotenv from "dotenv";
 import { messages } from "../config/messageHelper.js";
-dotenv.config();
 
 const userSchema = new mongoose.Schema(
   {
@@ -33,11 +30,17 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+    },
+    googleId: {
+      type: String,
     },
     avatarPath: {
       type: String,
-      default: `${process.env.URL_SERVER}/avatars/avatar.jpg`,
+      default: `https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg`,
+    },
+    publicId: {
+      type: String,
+      default: `avatar_kn6ynb`,
     },
     isActive: {
       type: Boolean,
@@ -56,19 +59,21 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.statics.login = async function (email, password) {
-  const user = await this.findOne({ email });
-  if (user) {
-    const auth = await bcrypt.compare(password, user.password);
-    if (auth) {
-      return user;
+  try {
+    const user = await this.findOne({ email });
+    if (!user) {
+      throw new Error(messages.MSG2);
     }
-    throw new Error(
-      messages.MSG2
-    );
+
+    const check = await bcrypt.compare(password, user.password);
+    if (!check) {
+      throw new Error(messages.MSG2);
+    }
+    
+    return user;
+  } catch (err) {
+    throw new Error(messages.MSG2);
   }
-  throw new Error(
-    messages.MSG2
-  );
 };
 
 export default mongoose.model("User", userSchema);

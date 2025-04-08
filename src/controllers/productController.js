@@ -1,14 +1,11 @@
 import Product from "../models/product.js";
 import { messages } from "../config/messageHelper.js";
-import { fileURLToPath } from "url";
-import path from "path";
-import fs from "fs";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import invalidateCache from "../utils/changeCache.js";
+import cloudinary from "../utils/cloudinary.js";
 
 const getAllProducts = asyncHandler(async (req, res, next) => {
   const query = {};
-
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
@@ -124,47 +121,35 @@ const updateStatusProductById = asyncHandler(async (req, res, next) => {
   else res.status(200).json({ message: messages.MSG35 });
 });
 
-const createImages = async (req, res, next) => {
-  try {
-    const productId = req.body.productId;
+const createImages = asyncHandler(async (req, res, next) => {
+  const productId = req.body.productId;
 
-    const product = await Product.findById(productId);
-    if (!product) return res.status(404).json({ error: "Not found" });
+  const product = await Product.findById(productId);
+  if (!product) return res.status(404).json({ error: "Not found" });
 
-    for (let i = 0; i < req.files.length; i++) {
-      let imagePath = req.files[i].path.replace(/\\/g, "/");
-      const start = imagePath.indexOf("products");
-      imagePath = imagePath.slice(start);
-      imagePath = `${process.env.URL_SERVER}/${imagePath}`;
-      product.images.push(imagePath);
-    }
-    await product.save();
-    invalidateCache(req, "product", "products", product._id.toString());
-    res.status(201).json({ data: product });
-  } catch (err) {
-    const __filename = fileURLToPath(import.meta.url);
-    const __dirname = path.dirname(__filename);
-    for (let i = 0; i < req.files.length; i++) {
-      fs.unlinkSync(path.join(__dirname, "../..", req.files[i].path));
-    }
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
+  for (let i = 0; i < req.files.length; i++) {
+    let image = await cloudinary.uploadImageToCloudinary(req.files[i].path);
+
+    product.images.push({
+      url: image.url,
+      publicId: image.public_id,
     });
   }
-};
+  await product.save();
+  invalidateCache(req, "product", "products", product._id.toString());
+  res.status(201).json({ data: product });
+});
 
 const deleteImageById = asyncHandler(async (req, res, next) => {
   const productId = req.params.productId;
-  const index = req.params.index;
+  const publicId = req.params.publicId;
+
   const product = await Product.findById(productId);
   if (!product) return res.status(404).json({ error: "Not found" });
-  const __filename = fileURLToPath(import.meta.url);
-  const __dirname = path.dirname(__filename);
-  const deleteStart = product.images[index].indexOf("/products");
-  const deleteFile = "\\public" + product.images[index].slice(deleteStart);
-  fs.unlinkSync(path.join(__dirname, "..", deleteFile));
-  product.images.splice(index, 1);
+
+  await cloudinary.deleteImageFromCloudinary(publicId);
+  
+  product.images = product.images.filter(image => image.publicId !== publicId);
   await product.save();
   invalidateCache(req, "product", "products", product._id.toString());
   res.status(200).json({ data: product });
