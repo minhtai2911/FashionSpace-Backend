@@ -6,7 +6,7 @@ const statusVal = [
   {
     icon: `
       <img
-        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134437/pending_srk4ix.jpg"
+        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184763/pending_rrh2aq.png"
         width="24" height="24"
         style="display: inline-block; vertical-align: middle;"
         alt="PENDING"
@@ -17,7 +17,7 @@ const statusVal = [
   {
     icon: `
       <img
-        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134437/accepted_gpljec.jpg"
+        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184763/accepted_fm558i.png"
         width="24" height="24"
         style="display: inline-block; vertical-align: middle;"
         alt="ACCEPTED"
@@ -28,7 +28,7 @@ const statusVal = [
   {
     icon: `
       <img
-        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134437/processing_ebfznb.jpg"
+        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184762/processing_bweba3.png"
         width="24" height="24"
         style="display: inline-block; vertical-align: middle;"
         alt="PROCESSING"
@@ -39,7 +39,7 @@ const statusVal = [
   {
     icon: `
       <img
-        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134436/in_delivery_dmruys.jpg"
+        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184762/in_delivery_khxoy7.png"
         width="24" height="24"
         style="display: inline-block; vertical-align: middle;"
         alt="IN_DELIVERY"
@@ -50,7 +50,7 @@ const statusVal = [
   {
     icon: `
       <img
-        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134437/shipped_wjcsuh.jpg"
+        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184762/shipped_gigyvw.png"
         width="24" height="24"
         style="display: inline-block; vertical-align: middle;"
         alt="SHIPPED"
@@ -61,7 +61,7 @@ const statusVal = [
   {
     icon: `
       <img
-        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134437/cancelled_t7dprb.jpg"
+        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184762/cancelled_uusa0h.png"
         width="24" height="24"
         style="display: inline-block; vertical-align: middle;"
         alt="CANCELLED_EMPLOYEE"
@@ -72,7 +72,7 @@ const statusVal = [
   {
     icon: `
       <img
-        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134437/cancelled_t7dprb.jpg"
+        src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184762/cancelled_uusa0h.png"
         width="24" height="24"
         style="display: inline-block; vertical-align: middle;"
         alt="CANCELLED_YOU"
@@ -124,7 +124,7 @@ const deliveryInfoComponent = async (order) => {
           </p>
           <div style="margin-top: 0.75rem; text-align: center;">
             <img
-              src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744134944/checked_pmjrok.jpg"
+              src="https://res.cloudinary.com/dffy6tds8/image/upload/v1744184762/checked_a4i2j1.png"
               width="24" height="24"
               style="display: inline-block; vertical-align: middle;"
               alt="CHECKED"
