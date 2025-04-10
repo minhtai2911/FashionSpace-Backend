@@ -7,6 +7,7 @@ import { messages } from "../config/messageHelper.js";
 import generateTokens from "../utils/generateToken.js";
 import RefreshToken from "../models/refreshToken.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import logger from "../utils/logger.js";
 
 const generateOTP = async (req, res, next) => {
   try {
