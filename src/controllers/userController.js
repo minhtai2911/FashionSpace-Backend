@@ -90,8 +90,7 @@ const updateStatusUserById = asyncHandler(async (req, res, next) => {
 });
 
 const updateUserById = asyncHandler(async (req, res, next) => {
-  const role = await UserRole.findById(req.user.roleId);
-  if (req.user.id !== req.params.id && role.roleName !== "Admin") {
+  if (req.user.id !== req.params.id && req.user.roleName !== "Admin") {
     return res.status(403).json({
       message:
         "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên.",

@@ -77,7 +77,7 @@ const signup = asyncHandler(async (req, res, next) => {
 
   if (exists && exists.password)
     return res.status(409).json({ message: messages.MSG51 });
-  
+
   if (exists) {
     exists.password = password;
     exists.save();
@@ -145,6 +145,7 @@ const logout = asyncHandler(async (req, res, next) => {
 
   const storedToken = await RefreshToken.findOneAndDelete({
     token: refreshToken,
+    userId: req.user.id,
   });
 
   if (!storedToken) {
