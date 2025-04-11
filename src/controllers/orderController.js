@@ -123,6 +123,8 @@ const getOrderById = asyncHandler(async (req, res, next) => {
       deliveryInfo: 1,
       finalPrice: 1,
       createdAt: 1,
+      shippingFee: 1,
+      expectedDeliveryDate: 1,
     },
   });
 
