@@ -6,6 +6,7 @@ import asyncHandler from "../middlewares/asyncHandler.js";
 import invalidateCache from "../utils/changeCache.js";
 import analyzeSentiment from "../utils/analyzeSentiment.js";
 import banOffensiveComment from "../utils/banOffensiveComment.js";
+import { reviewStatus } from "../config/reviewStatus.js";
 
 const getAllReviews = asyncHandler(async (req, res, next) => {
   const query = {};
@@ -15,6 +16,7 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
 
   if (req.query.productId)
     query.productId = new mongoose.Types.ObjectId(req.query.productId);
+  if (req.query.isActive) query.isActive = req.query.isActive;
   if (req.query.rating) query.rating = parseInt(req.query.rating);
   if (req.query.userId)
     query.userId = new mongoose.Types.ObjectId(req.query.userId);
@@ -24,9 +26,9 @@ const getAllReviews = asyncHandler(async (req, res, next) => {
 
   const cacheKey = `reviews:${page}:${limit}:${query.productId || "null"}:${
     query.rating || "null"
-  }:${query.userId || "null"}:${query.orderId || "null"}:${
-    query.status || "null"
-  }`;
+  }:${query.isActive || "null"}:${query.userId || "null"}:${
+    query.orderId || "null"
+  }:${query.status || "null"}`;
   const cachedReviews = await req.redisClient.get(cacheKey);
 
   if (cachedReviews) {
@@ -203,6 +205,7 @@ const createResponse = asyncHandler(async (req, res, next) => {
   if (!review) return res.status(404).json({ error: "Not found" });
 
   review.response.push({ userId, content });
+  review.status = reviewStatus.REPLIED;
   review.save();
   invalidateCache(req, "review", "reviews", review._id.toString());
   res.status(200).json({ message: messages.MSG45, data: review });

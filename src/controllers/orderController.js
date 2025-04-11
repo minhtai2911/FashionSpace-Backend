@@ -7,6 +7,8 @@ import { orderStatus } from "../config/orderStatus.js";
 import { addOrderToReport } from "../controllers/statisticController.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import sendDeliveryInfo from "../utils/sendDeliveryInfo.js";
+import Product from "../models/product.js";
+import ProductVariant from "../models/productVariant.js";
 
 const getAllOrders = asyncHandler(async (req, res, next) => {
   const query = {};
@@ -188,15 +190,43 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
 
   order.expectedDeliveryDate =
     expectedDeliveryDate || order.expectedDeliveryDate;
+
+  if (!status || !deliveryAddress) throw new Error(messages.MSG1);
+
   order.deliveryInfo.push({
     status,
     deliveryAddress,
   });
 
+  if (status === orderStatus.ACCEPTED) {
+    for (let orderItem of order.orderItems) {
+      const productVariant = await ProductVariant.findById(
+        orderItem.productVariantId
+      );
+      productVariant.stock -= orderItem.quantity;
+      await productVariant.save();
+    }
+  }
+
+  if (status === orderStatus.RETURNED) {
+    for (let orderItem of order.orderItems) {
+      const productVariant = await ProductVariant.findById(
+        orderItem.productVariantId
+      );
+      productVariant.stock += orderItem.quantity;
+      await productVariant.save();
+    }
+  }
+
   if (
     status === orderStatus.SHIPPED &&
     order.paymentStatus === paymentStatus.PAID
   ) {
+    for (let orderItem of order.orderItems) {
+      const product = await Product.findById(orderItem.productId);
+      product.soldQuantity += orderItem.quantity;
+      await product.save();
+    }
     addOrderToReport(order.finalPrice);
   }
 
