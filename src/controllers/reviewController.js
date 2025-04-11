@@ -108,6 +108,7 @@ const createReview = asyncHandler(async (req, res, next) => {
   product.rating =
     (rating + product.rating * (product.totalReview - 1)) / product.totalReview;
   await product.save();
+  invalidateCache(req, "product", "products", product._id.toString());
   invalidateCache(req, "review", "reviews", newReview._id.toString());
 
   return res.status(201).json({
@@ -170,6 +171,7 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
 
   await review.save();
   await product.save();
+  invalidateCache(req, "product", "products", product._id.toString());
   invalidateCache(req, "review", "reviews", review._id.toString());
   res.status(200).json({
     message: messages.MSG59,

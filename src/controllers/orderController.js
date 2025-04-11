@@ -9,6 +9,7 @@ import asyncHandler from "../middlewares/asyncHandler.js";
 import sendDeliveryInfo from "../utils/sendDeliveryInfo.js";
 import Product from "../models/product.js";
 import ProductVariant from "../models/productVariant.js";
+import invalidateCache from "../utils/changeCache.js";
 
 const getAllOrders = asyncHandler(async (req, res, next) => {
   const query = {};
@@ -205,6 +206,7 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
       );
       productVariant.stock -= orderItem.quantity;
       await productVariant.save();
+      invalidateCache(req, "productVariant", "productVariants", productVariant._id.toString());
     }
   }
 
@@ -215,17 +217,16 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
       );
       productVariant.stock += orderItem.quantity;
       await productVariant.save();
+      invalidateCache(req, "productVariant", "productVariants", productVariant._id.toString());
     }
   }
 
-  if (
-    status === orderStatus.SHIPPED &&
-    order.paymentStatus === paymentStatus.PAID
-  ) {
+  if (status === orderStatus.SHIPPED) {
     for (let orderItem of order.orderItems) {
       const product = await Product.findById(orderItem.productId);
       product.soldQuantity += orderItem.quantity;
       await product.save();
+      invalidateCache(req, "product", "products", product._id.toString());
     }
     addOrderToReport(order.finalPrice);
   }
