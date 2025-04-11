@@ -83,6 +83,7 @@ const getAllOrdersByUserId = asyncHandler(async (req, res, next) => {
       expectedDeliveryDate: 1,
       orderItems: 1,
       paymentStatus: 1,
+      deliveryInfo: 1,
     }
   )
     .skip(skip)
