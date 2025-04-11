@@ -75,7 +75,7 @@ const createProduct = asyncHandler(async (req, res, next) => {
 });
 
 const getProductById = asyncHandler(async (req, res, next) => {
-  const cacheKey = `order:${req.params.id}`;
+  const cacheKey = `product:${req.params.id}`;
   const cachedProduct = await req.redisClient.get(cacheKey);
 
   if (cachedProduct) {
