@@ -299,11 +299,13 @@ const loginGoogleSuccess = asyncHandler(async (req, res, next) => {
   const data = await req.redisClient.get(token);
 
   if (!data) {
+    logger.warn("Token expired!");
     return res.status(403).json({
-      message: "Token expired",
+      message: "Token expired!",
     });
   }
 
+  logger.info("Xác thực token thành công!");
   return res.status(200).json({ data: JSON.parse(data) });
 });
 
@@ -319,5 +321,5 @@ export default {
   resetPassword: resetPassword,
   verifyAccount: verifyAccount,
   sendMailVerifyAccount: sendMailVerifyAccount,
-  loginGoogleSuccess: loginGoogleSuccess
+  loginGoogleSuccess: loginGoogleSuccess,
 };
