@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from "uuid";
 import Product from "../models/product.js";
 import Category from "../models/category.js";
 import Order from "../models/order.js";
-import { messages } from "../config/messageHelper.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 
 const CREDENTIALS = JSON.parse(process.env.CREDENTIALS);
@@ -43,6 +42,7 @@ const chatbot = asyncHandler(async (req, res, next) => {
       })
       .limit(10);
 
+    logger.info("Chatbot xử lí phản hồi thành công!");
     return res.status(200).json({
       message:
         "Cảm ơn bạn đã ghé thăm FashionSpace. Dưới đây là một số sản phẩm bán chạy nhất của chúng mình hiện nay:",
@@ -55,6 +55,8 @@ const chatbot = asyncHandler(async (req, res, next) => {
 
   if (result.fulfillmentText === "New Arrival") {
     const product = await Product.find({}).sort({ createdAt: -1 }).limit(10);
+
+    logger.info("Chatbot xử lí phản hồi thành công!");
     return res.status(200).json({
       message:
         "Cảm ơn bạn đã quan tâm đến các sản phẩm mới tại FashionSpace. Dưới đây là một số sản phẩm mới nhất mà chúng mình vừa ra mắt:",
@@ -77,13 +79,15 @@ const chatbot = asyncHandler(async (req, res, next) => {
     if (gender === "null") {
       const categories = await Category.find({ name: categoryName });
 
-      if (categories.length == 0)
+      if (categories.length == 0) {
+        logger.info("Chatbot xử lí phản hồi thành công!");
         return res.status(200).json({
           message:
             "Cảm ơn bạn đã quan tâm đến sản phẩm của chúng mình. Hiện tại, sản phẩm mà bạn đang tìm kiếm không có sẵn trong kho. Chúng mình rất tiếc vì sự bất tiện này.",
           data: null,
           messageEnd: null,
         });
+      }
 
       let products = [];
 
@@ -96,6 +100,7 @@ const chatbot = asyncHandler(async (req, res, next) => {
         products.push(...product);
       }
 
+      logger.info("Chatbot xử lí phản hồi thành công!");
       return res.status(200).json({
         message: `Dưới đây là một số mẫu ${categoryName} đang có sẵn tại FashionSpace, phù hợp với nhiều phong cách và nhu cầu khác nhau:`,
         data: products,
@@ -109,13 +114,15 @@ const chatbot = asyncHandler(async (req, res, next) => {
         gender: gender,
       });
 
-      if (!category)
+      if (!category) {
+        logger.info("Chatbot xử lí phản hồi thành công!");
         return res.status(200).json({
           message:
             "Cảm ơn bạn đã quan tâm đến sản phẩm của chúng mình. Hiện tại, sản phẩm mà bạn đang tìm kiếm không có sẵn trong kho. Chúng mình rất tiếc vì sự bất tiện này.",
           data: null,
           messageEnd: null,
         });
+      }
 
       const product = await Product.find({ categoryId: category._id })
         .sort({
@@ -123,6 +130,7 @@ const chatbot = asyncHandler(async (req, res, next) => {
         })
         .limit(10);
 
+      logger.info("Chatbot xử lí phản hồi thành công!");
       return res.status(200).json({
         message: `Dưới đây là một số mẫu ${categoryName} ${gender} đang có sẵn tại FashionSpace, phù hợp với nhiều phong cách và nhu cầu khác nhau:`,
         data: product,

@@ -4,7 +4,13 @@ import asyncHandler from "../middlewares/asyncHandler.js";
 
 const getShoppingCartById = asyncHandler(async (req, res, next) => {
   const shoppingCart = await ShoppingCart.findById(req.params.id);
-  if (!shoppingCart) return res.status(404).json({ error: "Not found" });
+
+  if (!shoppingCart) {
+    logger.warn("Giỏ hàng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  logger.info("Lấy giỏ hàng thành công!");
   res.status(200).json({ data: shoppingCart });
 });
 
@@ -22,6 +28,7 @@ const getShoppingCartByUserId = asyncHandler(async (req, res, next) => {
     .limit(limit)
     .exec();
 
+  logger.info("Lấy giỏ hàng thành công", { userId, page, limit });
   res.status(200).json({
     meta: {
       totalCount: totalCount,
@@ -37,6 +44,7 @@ const createShoppingCart = asyncHandler(async (req, res, next) => {
   const userId = req.user.id;
 
   if (!userId || !productVariantId || !quantity) {
+    logger.warn(messages.MSG1);
     throw new Error(messages.MSG1);
   }
 
@@ -48,6 +56,7 @@ const createShoppingCart = asyncHandler(async (req, res, next) => {
   if (existingShoppingCart) {
     existingShoppingCart.quantity += quantity;
     await existingShoppingCart.save();
+    logger.info(messages.MSG47);
     return res.status(200).json({
       message: messages.MSG47,
       data: existingShoppingCart,
@@ -61,6 +70,7 @@ const createShoppingCart = asyncHandler(async (req, res, next) => {
   });
 
   await newShoppingCart.save();
+  logger.info(messages.MSG47);
   res.status(201).json({
     message: messages.MSG47,
     data: newShoppingCart,
@@ -70,18 +80,26 @@ const createShoppingCart = asyncHandler(async (req, res, next) => {
 const updateShoppingCartQuantityById = asyncHandler(async (req, res, next) => {
   const shoppingCart = await ShoppingCart.findById(req.params.id);
 
-  if (!shoppingCart) return res.status(404).json({ error: "Not found" });
+  if (!shoppingCart) {
+    logger.warn("Giỏ hàng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
 
   shoppingCart.quantity = req.body.quantity || shoppingCart.quantity;
   await shoppingCart.save();
+  logger.info("Cập nhật giỏ hàng thành công");
   res.status(200).json({ data: shoppingCart });
 });
 
 const deleteShoppingCartById = asyncHandler(async (req, res, next) => {
   const shoppingCart = await ShoppingCart.findByIdAndDelete(req.params.id);
 
-  if (!shoppingCart) res.status(404).json({ error: "Not found" });
+  if (!shoppingCart) {
+    logger.warn("Giỏ hàng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
 
+  logger.info("Xóa giỏ hàng thành công!");
   res.status(200).json({ message: messages.MSG18 });
 });
 

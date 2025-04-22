@@ -9,36 +9,29 @@ import RefreshToken from "../models/refreshToken.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import logger from "../utils/logger.js";
 
-const generateOTP = async (req, res, next) => {
-  try {
-    const otp = Math.floor(
-      100000 + Math.random() * (999999 - 100000)
-    ).toString();
+const generateOTP = asyncHandler(async (req, res, next) => {
+  const otp = Math.floor(100000 + Math.random() * (999999 - 100000)).toString();
 
-    const salt = await bcrypt.genSalt();
-    const hashedOTP = await bcrypt.hash(otp, salt);
-    const email = req.body.email;
+  const salt = await bcrypt.genSalt();
+  const hashedOTP = await bcrypt.hash(otp, salt);
+  const email = req.body.email;
 
-    const otpObj = new Otp({
-      email,
-      otp: hashedOTP,
-    });
+  const otpObj = new Otp({
+    email,
+    otp: hashedOTP,
+  });
 
-    await otpObj.save();
-    res.status(200).json({ otp: otp });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
+  await otpObj.save();
+  logger.info("Tạo OTP thành công");
+  res.status(200).json({ otp: otp });
+});
 
 const login = asyncHandler(async (req, res, next) => {
   const email = req.body.email;
   const originalPassword = req.body.password;
 
   if (!email || !originalPassword) {
+    logger.warn(messages.MSG1);
     throw new Error(messages.MSG1);
   }
 
@@ -46,14 +39,17 @@ const login = asyncHandler(async (req, res, next) => {
   const role = await UserRole.findById(user.roleId);
 
   if (!role) {
-    res.status(404).json({ error: "Not found" });
+    logger.warn("Vai trò người dùng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
   }
 
   if (!user.isActive && role.roleName === "Customer") {
+    logger.warn("Tài khoản chưa được xác thực");
     return res.status(400).json({ message: "Tài khoản chưa được xác thực!" });
   }
 
   if (!user.isActive) {
+    logger.warn(messages.MSG53);
     return res.status(400).json({
       message: messages.MSG53,
     });
@@ -61,6 +57,7 @@ const login = asyncHandler(async (req, res, next) => {
 
   const { accessToken, refreshToken } = await generateTokens(user);
 
+  logger.info(messages.MSG3, user._id);
   return res.status(200).json({
     message: messages.MSG3,
     data: { refreshToken, accessToken },
@@ -71,30 +68,36 @@ const signup = asyncHandler(async (req, res, next) => {
   const { email, fullName, phone, password } = req.body;
 
   if (!email || !fullName || !phone || !password) {
+    logger.warn(messages.MSG1);
     throw new Error(messages.MSG1);
   }
   const exists = await User.findOne({ email: email });
 
-  if (exists && exists.password)
+  if (exists && exists.password) {
+    logger.warn(messages.MSG51);
     return res.status(409).json({ message: messages.MSG51 });
+  }
 
   if (exists) {
     exists.password = password;
     exists.save();
-    return res.status(201).json({ message: messages.MSG16 });
+    logger.info(messages.MSG16);
+    return res.status(201).json({ data: exists._id, message: messages.MSG16 });
   }
 
   const role = await UserRole.findOne({ roleName: "Customer" });
 
   if (!role) {
-    res.status(404).json({ error: "Not found" });
+    logger.warn("Vai trò người dùng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
   }
 
   const roleId = role._id;
   const user = new User({ email, fullName, phone, roleId, password });
 
   await user.save();
-  res.status(201).json({ message: messages.MSG16 });
+  logger.info(messages.MSG16);
+  res.status(201).json({ data: user._id, message: messages.MSG16 });
 });
 
 const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
@@ -116,18 +119,23 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
       <a href="${process.env.URL_CLIENT}/verify/${req.body.id}">Nhấn vào đây để xác nhận email của bạn.</a>
       `,
   });
+  logger.info(messages.MSG4);
   res.status(200).json({ message: messages.MSG4 });
 });
 
 const verifyAccount = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
-  if (!user) return res.status(404).json({ error: "Not found" });
+  if (!user) {
+    logger.warn("Người dùng không tồn tại", req.params.id);
+    return res.status(404).json({ error: "Not found" });
+  }
 
   user.isActive = true;
 
   const { accessToken, refreshToken } = await generateTokens(user);
 
+  logger.info("Xác thực tài khoản thành công");
   res.status(200).json({
     data: { accessToken, refreshToken },
   });
@@ -201,13 +209,13 @@ const refreshToken = asyncHandler(async (req, res, next) => {
 
   await RefreshToken.deleteOne({ _id: storedToken._id });
 
+  logger.info("Refresh token thành công!", user._id);
   res.status(200).json({
     data: {
       accessToken: newAccessToken,
       refreshToken: newRefreshToken,
     },
   });
-  logger.info("Refresh Token thành công!", user._id);
 });
 
 const sendOTP = asyncHandler(async (req, res, next) => {
@@ -232,6 +240,7 @@ const sendOTP = asyncHandler(async (req, res, next) => {
       <div>Mã OTP của bạn: <br>${OTP}</br></div>
       `,
   });
+  logger.info(messages.MSG9);
   res.status(200).json({
     message: messages.MSG9,
   });
@@ -243,12 +252,14 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
   const otpList = await Otp.find({ email: email });
 
   if (otpList.length < 1) {
+    logger.warn("Không tìm thấy mã OTP.");
     return res.status(400).json({ error: "Không tìm thấy mã OTP." });
   }
 
   const check = await bcrypt.compare(otp, otpList[otpList.length - 1].otp);
 
   if (!check) {
+    logger.warn(messages.MSG10);
     return res.status(400).json({ message: messages.MSG10 });
   }
 
@@ -256,6 +267,7 @@ const checkOTPByEmail = asyncHandler(async (req, res, next) => {
 
   const { accessToken, refreshToken } = await generateTokens(user);
 
+  logger.info("Xác nhận OTP thành công!");
   res.status(200).json({ data: { accessToken, refreshToken } });
 });
 
@@ -263,6 +275,7 @@ const forgotPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   user.password = req.body.newPassword;
   await user.save();
+  logger.info(messages.MSG11);
   res.status(200).json({ message: messages.MSG11 });
 });
 
@@ -270,10 +283,14 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   const user = await User.findById(req.user.id);
   const check = await bcrypt.compare(req.body.password, user.password);
 
-  if (!check) return res.status(400).json({ message: messages.MSG13 });
+  if (!check) {
+    logger.warn(messages.MSG13);
+    return res.status(400).json({ message: messages.MSG13 });
+  }
 
   user.password = req.body.newPassword;
   await user.save();
+  logger.info(messages.MSG14);
   res.status(200).json({ message: messages.MSG14 });
 });
 

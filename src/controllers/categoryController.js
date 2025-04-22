@@ -3,6 +3,7 @@ import chatbotController from "./chatbotController.js";
 import { messages } from "../config/messageHelper.js";
 import invalidateCache from "../utils/changeCache.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import logger from "../utils/logger.js";
 
 const getAllCategories = asyncHandler(async (req, res, next) => {
   const query = {};
@@ -19,6 +20,11 @@ const getAllCategories = asyncHandler(async (req, res, next) => {
   const cachedCategories = await req.redisClient.get(cacheKey);
 
   if (cachedCategories) {
+    logger.info("Lấy danh sách danh mục sản phẩm thành công!", {
+      ...query,
+      page,
+      limit,
+    });
     return res.status(200).json(JSON.parse(cachedCategories));
   }
 
@@ -35,7 +41,11 @@ const getAllCategories = asyncHandler(async (req, res, next) => {
   };
 
   await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
-
+  logger.info("Lấy danh sách danh mục sản phẩm thành công!", {
+    ...query,
+    page,
+    limit,
+  });
   res.status(200).json(result);
 });
 
@@ -44,21 +54,29 @@ const getCategoryById = asyncHandler(async (req, res, next) => {
   const cachedCategory = await req.redisClient.get(cacheKey);
 
   if (cachedCategory) {
+    logger.info("Lấy danh mục sản phẩm thành công!");
     return res.status(200).json(JSON.parse(cachedCategory));
   }
 
   const category = await Category.findById(req.params.id);
 
-  if (!category) return res.status(404).json({ error: "Not found" });
+  if (!category) {
+    logger.warn("Danh mục sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
 
   await req.redisClient.setex(cacheKey, 3600, JSON.stringify(category));
+  logger.info("Lấy danh mục sản phẩm thành công!");
   res.status(200).json({ data: category });
 });
 
 const createCategory = asyncHandler(async (req, res, next) => {
   const { name, gender } = req.body;
 
-  if (!name) throw new Error(messages.MSG1);
+  if (!name) {
+    logger.warn(messages.MSG1);
+    throw new Error(messages.MSG1);
+  }
 
   const existingCategory = await Category.findOne({
     name: name,
@@ -66,6 +84,7 @@ const createCategory = asyncHandler(async (req, res, next) => {
   });
 
   if (existingCategory) {
+    logger.warn(messages.MSG56);
     return res.status(409).json({ message: messages.MSG56 });
   }
 
@@ -80,6 +99,7 @@ const createCategory = asyncHandler(async (req, res, next) => {
     newCategory._id.toString()
   );
 
+  logger.info(messages.MSG31, newCategory._id);
   res.status(201).json({
     message: messages.MSG31,
     data: newCategory,
@@ -89,7 +109,10 @@ const createCategory = asyncHandler(async (req, res, next) => {
 const updateCategoryById = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
 
-  if (!category) return res.status(404).json({ error: "Not found" });
+  if (!category) {
+    logger.warn("Danh mục sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
 
   const { name, gender } = req.body;
 
@@ -102,6 +125,7 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
     existingCategory &&
     existingCategory._id.toString() == category._id.toString()
   ) {
+    logger.warn(messages.MSG56);
     return res.status(409).json({ message: messages.MSG56 });
   }
 
@@ -114,6 +138,7 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
   await category.save();
   await invalidateCache(req, "category", "categories", category._id.toString());
 
+  logger.info(messages.MSG26);
   res.status(200).json({
     message: messages.MSG26,
     data: category,
@@ -123,15 +148,23 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
 const updateStatusCategoryById = asyncHandler(async (req, res, next) => {
   const category = await Category.findById(req.params.id);
 
-  if (!category) return res.status(404).json({ error: "Not found" });
+  if (!category) {
+    logger.warn("Danh mục sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
 
   category.isActive = !category.isActive;
 
   await category.save();
   await invalidateCache(req, "category", "categories", category._id.toString());
 
-  if (category.isActive) res.status(200).json({ message: messages.MSG29 });
-  else res.status(200).json({ message: messages.MSG30 });
+  if (category.isActive) {
+    logger.info(messages.MSG29);
+    res.status(200).json({ message: messages.MSG29 });
+  } else {
+    logger.info(messages.MSG30);
+    res.status(200).json({ message: messages.MSG30 });
+  }
 });
 
 export default {

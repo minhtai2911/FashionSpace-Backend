@@ -2,6 +2,7 @@ import Statistic from "../models/statistic.js";
 import Order from "../models/order.js";
 import { orderStatus } from "../config/orderStatus.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import logger from "../utils/logger.js";
 
 const createStatistic = asyncHandler(async (req, res, next) => {
   const { day, month, year } = req.body;
@@ -50,6 +51,7 @@ const createStatistic = asyncHandler(async (req, res, next) => {
   });
 
   await statistic.save();
+  logger.info("Tạo báo cáo thành công!");
   res.status(201).json({ data: statistic });
 });
 
@@ -85,9 +87,12 @@ const getStatistics = asyncHandler(async (req, res, next) => {
     });
   }
 
-  if (!statistics)
+  if (!statistics) {
+    logger.warn("Báo cáo không tồn tại");
     return res.status(404).json({ error: "Báo cáo không tồn tại." });
+  }
 
+  logger.info("Lấy báo cáo thành công!");
   res.status(200).json({ data: statistics });
 });
 

@@ -10,6 +10,7 @@ import sendDeliveryInfo from "../utils/sendDeliveryInfo.js";
 import Product from "../models/product.js";
 import ProductVariant from "../models/productVariant.js";
 import invalidateCache from "../utils/changeCache.js";
+import logger from "../utils/logger.js";
 
 const getAllOrders = asyncHandler(async (req, res, next) => {
   const query = {};
@@ -60,6 +61,7 @@ const getAllOrders = asyncHandler(async (req, res, next) => {
   const totalCount = await Order.countDocuments(query);
   const orders = await Order.aggregate(pipeline);
 
+  logger.info("Lấy danh sách đơn hàng thành công!", { ...query, page, limit });
   res.status(200).json({
     meta: {
       totalCount: totalCount,
@@ -93,6 +95,7 @@ const getAllOrdersByUserId = asyncHandler(async (req, res, next) => {
     .limit(limit)
     .exec();
 
+  logger.info("Lấy danh sách đơn hàng thành công!", { userId, page, limit });
   return res.status(200).json({
     meta: {
       totalCount: totalCount,
@@ -134,8 +137,12 @@ const getOrderById = asyncHandler(async (req, res, next) => {
 
   const order = await Order.aggregate(pipeline);
 
-  if (!order) return res.status(404).json({ error: "Not found" });
+  if (!order) {
+    logger.warn("Đơn hàng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
 
+  logger.info("Lấy đơn hàng thành công");
   res.status(200).json({ data: order });
 });
 
@@ -157,8 +164,10 @@ const createOrder = asyncHandler(async (req, res, next) => {
     orderItems.length === 0 ||
     !userAddressId ||
     !paymentMethod
-  )
+  ) {
+    logger.warn(messages.MSG1);
     throw new Error(messages.MSG1);
+  }
 
   const totalPrice = orderItems.reduce((acc, item) => {
     return acc + item.price * item.quantity;
@@ -181,6 +190,7 @@ const createOrder = asyncHandler(async (req, res, next) => {
 
   chatbotController.updateEntityOrderId(newOrder._id);
   await newOrder.save();
+  logger.info(messages.MSG19);
   res.status(201).json({ message: messages.MSG19, data: newOrder });
 });
 
@@ -189,10 +199,18 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
   const { status, deliveryAddress, expectedDeliveryDate } = req.body;
   const order = await Order.findById(orderId);
 
+  if (!order) {
+    logger.warn("Đơn hàng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
+
   order.expectedDeliveryDate =
     expectedDeliveryDate || order.expectedDeliveryDate;
 
-  if (!status || !deliveryAddress) throw new Error(messages.MSG1);
+  if (!status || !deliveryAddress) {
+    logger.warn(messages.MSG1);
+    throw new Error(messages.MSG1);
+  }
 
   order.deliveryInfo.push({
     status,
@@ -206,7 +224,12 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
       );
       productVariant.stock -= orderItem.quantity;
       await productVariant.save();
-      invalidateCache(req, "productVariant", "productVariants", productVariant._id.toString());
+      invalidateCache(
+        req,
+        "productVariant",
+        "productVariants",
+        productVariant._id.toString()
+      );
     }
   }
 
@@ -217,7 +240,12 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
       );
       productVariant.stock += orderItem.quantity;
       await productVariant.save();
-      invalidateCache(req, "productVariant", "productVariants", productVariant._id.toString());
+      invalidateCache(
+        req,
+        "productVariant",
+        "productVariants",
+        productVariant._id.toString()
+      );
     }
   }
 
@@ -232,6 +260,7 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
   }
 
   await order.save();
+  logger.info(messages.MSG44);
   res.status(200).json({ message: messages.MSG44, data: order });
 });
 
@@ -240,8 +269,14 @@ const updatePaymentStatusById = asyncHandler(async (req, res, next) => {
   const { paymentStatus } = req.body;
   const order = await Order.findById(orderId);
 
+  if (!order) {
+    logger.warn("Đơn hàng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
+
   order.paymentStatus = paymentStatus;
   await order.save();
+  logger.info(messages.MSG40);
   res.status(200).json({ message: messages.MSG40, data: order });
 });
 
@@ -317,6 +352,7 @@ const checkoutWithMoMo = asyncHandler(async (req, res, next) => {
   };
 
   const response = await axios(options);
+  logger.info("Bắt đầu quá trình thanh toán Momo");
   res.status(200).json(response.data);
 });
 
@@ -325,12 +361,16 @@ const callbackMoMo = async (req, res, next) => {
     if (req.body.resultCode === 0) {
       const order = await Order.findById({ _id: req.body.orderId });
 
-      if (!order) throw new Error("Not found");
+      if (!order) {
+        logger.warn("Đơn hàng không tồn tại");
+        throw new Error("Not found");
+      }
 
       order.paymentStatus = paymentStatus.PAID;
       order.save();
     }
   } catch (err) {
+    logger.err(messages.MSG5, err);
     throw new Error({
       error: err.message,
       message: messages.MSG5,
@@ -373,12 +413,17 @@ const checkStatusTransaction = asyncHandler(async (req, res, next) => {
   if (response.data.resultCode === 0) {
     const order = await Order.findById({ _id: req.body.orderId });
 
-    if (!order) return res.status(404).json();
+    if (!order) {
+      logger.warn("Đơn hàng không tồn tại");
+      return res.status(404).json();
+    }
 
     order.paymentStatus = paymentStatus.PAID;
     order.save();
+    logger.info("Thanh toán đơn hàng thành công!");
     return res.status(200).json();
   } else {
+    logger.info("Thanh toán đơn hàng thất bại!");
     return res.status(200).json();
   }
 });
@@ -387,7 +432,13 @@ const sendMailDeliveryInfo = asyncHandler(async (req, res, next) => {
   const { orderId, email } = req.body;
   const order = await Order.findById(orderId);
 
+  if (!order) {
+    logger.warn("Đơn hàng không tồn tại");
+    throw new Error("Not found");
+  }
+
   await sendDeliveryInfo(email, order);
+  logger.info("Gửi email thông báo trạng thái đơn hàng thành công!");
   res.status(200).json({});
 });
 
