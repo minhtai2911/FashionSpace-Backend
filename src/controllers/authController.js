@@ -294,6 +294,19 @@ const resetPassword = asyncHandler(async (req, res, next) => {
   res.status(200).json({ message: messages.MSG14 });
 });
 
+const loginGoogleSuccess = asyncHandler(async (req, res, next) => {
+  const token = req.body.token;
+  const data = await req.redisClient.get(token);
+
+  if (!data) {
+    return res.status(403).json({
+      message: "Token expired",
+    });
+  }
+
+  return res.status(200).json({ data: JSON.parse(data) });
+});
+
 export default {
   login: login,
   signup: signup,
@@ -306,4 +319,5 @@ export default {
   resetPassword: resetPassword,
   verifyAccount: verifyAccount,
   sendMailVerifyAccount: sendMailVerifyAccount,
+  loginGoogleSuccess: loginGoogleSuccess
 };

@@ -3,6 +3,9 @@ import authController from "../controllers/authController.js";
 import passport from "../middlewares/passport.js";
 import dotenv from "dotenv";
 import authMiddleware from "../middlewares/authMiddleware.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import generateTokens from "../utils/generateToken.js";
+import bcrypt from "bcrypt";
 
 const router = Router();
 dotenv.config();
@@ -37,9 +40,24 @@ router.get(
     session: false,
     failureRedirect: `${process.env.URL_CLIENT}/login`,
   }),
-  (req, res) => {
-    res.status(200).json({ data: req.user });
-  }
+  asyncHandler(async (req, res) => {
+    const user = req.user;
+    const salt = await bcrypt.genSalt();
+    const token = await bcrypt.hash(user._id.toString(), salt);
+    const cacheKey = token;
+
+    const { accessToken, refreshToken } = await generateTokens(user);
+
+    await req.redisClient.setex(
+      cacheKey,
+      300,
+      JSON.stringify({ accessToken, refreshToken })
+    );
+
+    res.redirect(`${process.env.URL_CLIENT}/loginGoogle/success/${token}`);
+  })
 );
+
+router.post("/loginGoogleSuccess", authController.loginGoogleSuccess);
 
 export default router;

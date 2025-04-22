@@ -98,7 +98,14 @@ const sensitiveEndpointsLimiter = rateLimit({
 });
 
 app.use("/api/v1/auth/signup", sensitiveEndpointsLimiter);
-app.use("/api/v1/auth", authRoute);
+app.use(
+  "/api/v1/auth",
+  (req, res, next) => {
+    req.redisClient = redisClient;
+    next();
+  },
+  authRoute
+);
 app.use("/api/v1/user", userRoute);
 app.use(
   "/api/v1/product",
