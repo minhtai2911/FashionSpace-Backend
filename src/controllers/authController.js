@@ -330,6 +330,7 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
     user = new User({
       email: email,
       fullName: fullName,
+      phone: phone,
       roleId: role.id,
     });
 
@@ -346,7 +347,7 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
     { new: true }
   );
 
-  const { accessToken, refreshToken } = generateTokens(user);
+  const { accessToken, refreshToken } = await generateTokens(user);
 
   res.status(201).json({ data: { accessToken, refreshToken } });
 });
