@@ -46,7 +46,12 @@ const login = asyncHandler(async (req, res, next) => {
 
   if (!user.isActive && role.roleName === "Customer") {
     logger.warn("Tài khoản chưa được xác thực");
-    return res.status(400).json({ message: "Tài khoản chưa được xác thực!" });
+    return res
+      .status(400)
+      .json({
+        data: { userId: user._id, email: email },
+        message: "Tài khoản chưa được xác thực!",
+      });
   }
 
   if (!user.isActive) {
