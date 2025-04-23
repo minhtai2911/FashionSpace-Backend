@@ -222,6 +222,13 @@ const refreshToken = asyncHandler(async (req, res, next) => {
 const sendOTP = asyncHandler(async (req, res, next) => {
   const OTP = req.body.OTP;
   const email = req.body.email;
+
+  const user = await User.findOne({ email: email });
+  if (!user) {
+    logger.warn(messages.MSG8);
+    return res.status(409).json({ message: messages.MSG8 });
+  }
+
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 587,
@@ -324,6 +331,7 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
     const role = await UserRole.findOne({ roleName: "Customer" });
 
     if (!role) {
+      logger.warn("Vai trò không tồn tại");
       throw new Error("Not found");
     }
 
@@ -349,6 +357,7 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
 
   const { accessToken, refreshToken } = await generateTokens(user);
 
+  logger.info("Tạo tài khoản khách thành công!");
   res.status(201).json({ data: { accessToken, refreshToken } });
 });
 
