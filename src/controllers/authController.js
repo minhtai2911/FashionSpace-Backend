@@ -139,6 +139,8 @@ const verifyAccount = asyncHandler(async (req, res, next) => {
 
   user.isActive = true;
 
+  await user.save();
+
   const { accessToken, refreshToken } = await generateTokens(user);
 
   logger.info("Xác thực tài khoản thành công");

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
+const statisticSchema = new mongoose.Schema({
   day: {
     type: Number,
     required: true,
@@ -29,4 +29,4 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model("Statistic", userSchema);
+export default mongoose.model("Statistic", statisticSchema);

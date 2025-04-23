@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
+const productViewSchema = new mongoose.Schema({
   productId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
@@ -13,4 +13,4 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("ProductView", userSchema);
+export default mongoose.model("ProductView", productViewSchema);
