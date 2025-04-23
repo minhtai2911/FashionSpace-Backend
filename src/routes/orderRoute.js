@@ -11,7 +11,7 @@ router.get(
   orderController.getAllOrders
 );
 router.get("/:id", authMiddleware.verifyToken, orderController.getOrderById);
-router.post("/", orderController.createOrder);
+router.post("/", authMiddleware.verifyToken, orderController.createOrder);
 router.get(
   "/get/userId",
   authMiddleware.verifyToken,

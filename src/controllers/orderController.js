@@ -157,8 +157,9 @@ const createOrder = asyncHandler(async (req, res, next) => {
     paymentMethod,
     deliveryInfo,
     expectedDeliveryDate,
-    userId
   } = req.body;
+
+  const userId = req.user.id;
 
   if (
     !orderItems ||

@@ -346,7 +346,9 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
     { new: true }
   );
 
-  res.status(201).json({ data: user._id });
+  const { accessToken, refreshToken } = generateTokens(user);
+
+  res.status(201).json({ data: { accessToken, refreshToken } });
 });
 
 export default {
