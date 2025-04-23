@@ -11,6 +11,7 @@ const router = Router();
 dotenv.config();
 
 router.post("/login", authController.login);
+router.post("/createGuestAccount", authController.createGuestAccount)
 router.post("/signup", authController.signup);
 router.post("/logout", authMiddleware.verifyToken, authController.logout);
 router.post("/refreshToken", authController.refreshToken);
