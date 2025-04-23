@@ -128,6 +128,7 @@ const getOrderById = asyncHandler(async (req, res, next) => {
       paymentMethod: 1,
       paymentStatus: 1,
       "userInfo.fullName": 1,
+      "userInfo.email": 1,
       deliveryInfo: 1,
       finalPrice: 1,
       createdAt: 1,
