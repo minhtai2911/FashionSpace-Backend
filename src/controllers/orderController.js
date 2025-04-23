@@ -11,6 +11,7 @@ import Product from "../models/product.js";
 import ProductVariant from "../models/productVariant.js";
 import invalidateCache from "../utils/changeCache.js";
 import logger from "../utils/logger.js";
+import axios from "axios";
 
 const getAllOrders = asyncHandler(async (req, res, next) => {
   const query = {};

@@ -8,6 +8,7 @@ import generateTokens from "../utils/generateToken.js";
 import RefreshToken from "../models/refreshToken.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import logger from "../utils/logger.js";
+import { v4 as uuidv4 } from "uuid";
 
 const generateOTP = asyncHandler(async (req, res, next) => {
   const otp = Math.floor(100000 + Math.random() * (999999 - 100000)).toString();
@@ -309,6 +310,45 @@ const loginGoogleSuccess = asyncHandler(async (req, res, next) => {
   return res.status(200).json({ data: JSON.parse(data) });
 });
 
+const createGuestAccount = asyncHandler(async (req, res, next) => {
+  const { email, fullName, phone } = req.body;
+
+  if (!email || !fullName || !phone) {
+    logger.warn(messages.MSG1);
+    throw new Error(messages.MSG1);
+  }
+
+  let user = await User.findOne({ email: email });
+
+  if (!user) {
+    const role = await UserRole.findOne({ roleName: "Customer" });
+
+    if (!role) {
+      throw new Error("Not found");
+    }
+
+    user = new User({
+      email: email,
+      fullName: fullName,
+      roleId: role.id,
+    });
+
+    await user.save();
+  }
+
+  await User.findByIdAndUpdate(
+    user._id,
+    {
+      $set: {
+        googleId: uuidv4(),
+      },
+    },
+    { new: true }
+  );
+
+  res.status(201).json({ data: user._id });
+});
+
 export default {
   login: login,
   signup: signup,
@@ -322,4 +362,5 @@ export default {
   verifyAccount: verifyAccount,
   sendMailVerifyAccount: sendMailVerifyAccount,
   loginGoogleSuccess: loginGoogleSuccess,
+  createGuestAccount: createGuestAccount,
 };
