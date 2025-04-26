@@ -124,7 +124,14 @@ app.use(
   reviewRoute
 );
 app.use("/api/v1/userRole", userRoleRoute);
-app.use("/api/v1/order", orderRoute);
+app.use(
+  "/api/v1/order",
+  (req, res, next) => {
+    req.redisClient = redisClient;
+    next();
+  },
+  orderRoute
+);
 app.use("/api/v1/shoppingCart", shoppingCartRoute);
 app.use(
   "/api/v1/category",

@@ -85,29 +85,41 @@ const createProduct = asyncHandler(async (req, res, next) => {
     discountPrice,
   });
 
-  await newProduct.save();
   invalidateCache(req, "product", "products", newProduct._id.toString());
   logger.info(messages.MSG32);
+  await newProduct.save();
   res.status(201).json({ message: messages.MSG32, data: newProduct });
 });
 
 const getProductById = asyncHandler(async (req, res, next) => {
   const cacheKey = `product:${req.params.id}`;
-  const cachedProduct = await req.redisClient.get(cacheKey);
+  const cachedProduct = await req.redisClient.hgetall(cacheKey);
 
-  if (cachedProduct) {
+  if (Object.keys(cachedProduct).length > 1) {
     logger.info("Lấy sản phẩm thành công!");
-    return res.status(200).json(JSON.parse(cachedProduct));
+    const parsedData = {};
+
+    for (const key in cachedProduct) {
+      try {
+        parsedData[key] = JSON.parse(cachedProduct[key]);
+      } catch (err) {
+        parsedData[key] = cachedProduct[key];
+      }
+    }
+    return res.status(200).json({ data: parsedData });
   }
 
-  const product = await Product.findById(req.params.id);
+  const product = await Product.findById(req.params.id).lean();
 
   if (!product) {
     logger.warn("Sản phẩm không tồn tại");
     return res.status(404).json({ error: "Not found" });
   }
 
-  await req.redisClient.setex(cacheKey, 3600, JSON.stringify(product));
+  for (const key in product) {
+    await req.redisClient.hset(cacheKey, key, JSON.stringify(product[key]));
+  }
+
   logger.info("Lấy sản phẩm thành công!");
   res.status(200).json({ data: product });
 });
@@ -128,9 +140,9 @@ const updateProductById = asyncHandler(async (req, res, next) => {
   updateProduct.price = price || updateProduct.price;
   updateProduct.discountPrice = discountPrice || updateProduct.discountPrice;
 
-  await updateProduct.save();
   invalidateCache(req, "product", "products", updateProduct._id.toString());
   logger.info(messages.MSG33);
+  await updateProduct.save();
   res.status(200).json({ message: messages.MSG33, data: updateProduct });
 });
 
@@ -144,8 +156,8 @@ const updateStatusProductById = asyncHandler(async (req, res, next) => {
 
   product.isActive = !product.isActive;
 
-  await product.save();
   invalidateCache(req, "product", "products", product._id.toString());
+  await product.save();
   if (product.isActive) {
     logger.info(messages.MSG29);
     res.status(200).json({ message: messages.MSG29 });
@@ -172,9 +184,9 @@ const createImages = asyncHandler(async (req, res, next) => {
       publicId: image.public_id,
     });
   }
-  await product.save();
   invalidateCache(req, "product", "products", product._id.toString());
   logger.info("Tạo sản phẩm thành công!");
+  await product.save();
   res.status(201).json({ data: product });
 });
 
@@ -193,9 +205,9 @@ const deleteImageById = asyncHandler(async (req, res, next) => {
   product.images = product.images.filter(
     (image) => image.publicId !== publicId
   );
-  await product.save();
   invalidateCache(req, "product", "products", product._id.toString());
   logger.info("Xóa ảnh của sản phẩm thành công!");
+  await product.save();
   res.status(200).json({ data: product });
 });
 

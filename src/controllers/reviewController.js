@@ -111,22 +111,23 @@ const createReview = asyncHandler(async (req, res, next) => {
       throw new Error("Error");
   }
 
-  await newReview.save();
-
   const product = await Product.findById(productId);
   if (!product) {
     logger.warn("Sản phẩm không tồn tại");
     return res.status(404).json({ error: "Not found" });
   }
 
+  const cacheKey = `product:${product._id}`;
   product.totalReview = product.totalReview + 1;
   product.rating =
     (rating + product.rating * (product.totalReview - 1)) / product.totalReview;
-  await product.save();
-  invalidateCache(req, "product", "products", product._id.toString());
+  await req.redisClient.hincrby(cacheKey, "totalReview", 1);
+  await req.redisClient.hset(cacheKey, "rating", JSON.stringify(product.rating));
   invalidateCache(req, "review", "reviews", newReview._id.toString());
 
   logger.info(messages.MSG20);
+  await product.save();
+  await newReview.save();
   return res.status(201).json({
     message: messages.MSG20,
     data: newReview,
@@ -135,21 +136,33 @@ const createReview = asyncHandler(async (req, res, next) => {
 
 const getReviewById = asyncHandler(async (req, res, next) => {
   const cacheKey = `review:${req.params.id}`;
-  const cachedReview = await req.redisClient.get(cacheKey);
+  const cachedReview = await req.redisClient.hgetall(cacheKey);
 
-  if (cachedReview) {
+  if (Object.keys(cachedReview).length > 1) {
     logger.info("Lấy đánh giá sản phẩm thành công!");
-    return res.status(200).json(JSON.parse(cachedReview));
+    const parsedData = {};
+
+    for (const key in cachedReview) {
+      try {
+        parsedData[key] = JSON.parse(cachedReview[key]);
+      } catch (err) {
+        parsedData[key] = cachedReview[key];
+      }
+    }
+    return res.status(200).json({ data: parsedData });
   }
 
-  const review = await Review.findById(req.params.id);
+  const review = await Review.findById(req.params.id).lean();
 
   if (!review) {
     logger.warn("Đánh giá sản phẩm không tồn tại");
     return res.status(404).json({ error: "Not found" });
   }
 
-  await req.redisClient.setex(cacheKey, 3600, JSON.stringify(review));
+  for (const key in review) {
+    await req.redisClient.hset(cacheKey, key, JSON.stringify(review[key]));
+  }
+
   logger.info("Lấy đánh giá sản phẩm thành công!");
   res.status(200).json({ data: review });
 });
@@ -204,11 +217,14 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
       throw new Error("Error");
   }
 
-  await review.save();
-  await product.save();
-  invalidateCache(req, "product", "products", product._id.toString());
+  const cacheKey = `product:${product._id}`;
+  await req.redisClient.hincrby(cacheKey, "totalReview", 1);
+  await req.redisClient.hset(cacheKey, "rating", JSON.stringify(product.rating));
   invalidateCache(req, "review", "reviews", review._id.toString());
   logger.info(messages.MSG59);
+  await review.save();
+  await product.save();
+
   res.status(200).json({
     message: messages.MSG59,
     data: review,
@@ -229,12 +245,16 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
     return res.status(404).json({ error: "Not found" });
   }
 
+  const cacheKey = `product:${product._id}`;
   product.totalReview = product.totalReview - 1;
   product.rating =
     (product.rating * (product.totalReview + 1) - review.rating) /
     product.totalReview;
-  await product.save();
+  await req.redisClient.hincrby(cacheKey, "totalReview", 1);
+  await req.redisClient.hset(cacheKey, "rating", JSON.stringify(product.rating));
   invalidateCache(req, "review", "reviews", req.params.id);
+
+  await product.save();
   logger.info(messages.MSG60);
   res.status(200).json({ message: messages.MSG60 });
 });
@@ -257,9 +277,9 @@ const createResponse = asyncHandler(async (req, res, next) => {
 
   review.response.push({ userId, content });
   review.status = reviewStatus.REPLIED;
-  review.save();
   invalidateCache(req, "review", "reviews", review._id.toString());
   logger.info(messages.MSG45);
+  review.save();
   res.status(200).json({ message: messages.MSG45, data: review });
 });
 
@@ -273,10 +293,9 @@ const hideReviewById = asyncHandler(async (req, res, next) => {
 
   review.isActive = false;
 
-  await review.save();
-
   invalidateCache(req, "review", "reviews", review._id.toString());
   logger.info(messages.MSG63);
+  await review.save();
   res.status(200).json({ message: messages.MSG63 });
 });
 
@@ -294,6 +313,8 @@ const unhideReviewById = asyncHandler(async (req, res, next) => {
 
   invalidateCache(req, "review", "reviews", review._id.toString());
   logger.info(messages.MSG64);
+
+  await review.save();
   res.status(200).json({ message: messages.MSG64 });
 });
 

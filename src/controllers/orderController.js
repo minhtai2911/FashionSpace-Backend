@@ -9,7 +9,6 @@ import asyncHandler from "../middlewares/asyncHandler.js";
 import sendDeliveryInfo from "../utils/sendDeliveryInfo.js";
 import Product from "../models/product.js";
 import ProductVariant from "../models/productVariant.js";
-import invalidateCache from "../utils/changeCache.js";
 import logger from "../utils/logger.js";
 import axios from "axios";
 
@@ -191,8 +190,8 @@ const createOrder = asyncHandler(async (req, res, next) => {
   });
 
   chatbotController.updateEntityOrderId(newOrder._id);
-  await newOrder.save();
   logger.info(messages.MSG19);
+  await newOrder.save();
   res.status(201).json({ message: messages.MSG19, data: newOrder });
 });
 
@@ -221,48 +220,45 @@ const updateDeliveryInfoById = asyncHandler(async (req, res, next) => {
 
   if (status === orderStatus.ACCEPTED) {
     for (let orderItem of order.orderItems) {
+      const cacheKey = `productVariant:${orderItem.productVariantId}`;
       const productVariant = await ProductVariant.findById(
         orderItem.productVariantId
       );
       productVariant.stock -= orderItem.quantity;
+      await req.redisClient.hincrby(cacheKey, "stock", -orderItem.quantity);
       await productVariant.save();
-      invalidateCache(
-        req,
-        "productVariant",
-        "productVariants",
-        productVariant._id.toString()
-      );
     }
   }
 
   if (status === orderStatus.RETURNED) {
     for (let orderItem of order.orderItems) {
+      const cacheKey = `productVariant:${orderItem.productVariantId}`;
       const productVariant = await ProductVariant.findById(
         orderItem.productVariantId
       );
       productVariant.stock += orderItem.quantity;
+      await req.redisClient.hincrby(cacheKey, "stock", orderItem.quantity);
       await productVariant.save();
-      invalidateCache(
-        req,
-        "productVariant",
-        "productVariants",
-        productVariant._id.toString()
-      );
     }
   }
 
   if (status === orderStatus.SHIPPED) {
     for (let orderItem of order.orderItems) {
+      const cacheKey = `product:${orderItem.productId}`;
       const product = await Product.findById(orderItem.productId);
       product.soldQuantity += orderItem.quantity;
+      await req.redisClient.hincrby(
+        cacheKey,
+        "soldQuantity",
+        orderItem.quantity
+      );
       await product.save();
-      invalidateCache(req, "product", "products", product._id.toString());
     }
     addOrderToReport(order.finalPrice);
   }
 
-  await order.save();
   logger.info(messages.MSG44);
+  await order.save();
   res.status(200).json({ message: messages.MSG44, data: order });
 });
 
@@ -277,8 +273,8 @@ const updatePaymentStatusById = asyncHandler(async (req, res, next) => {
   }
 
   order.paymentStatus = paymentStatus;
-  await order.save();
   logger.info(messages.MSG40);
+  await order.save();
   res.status(200).json({ message: messages.MSG40, data: order });
 });
 
@@ -421,8 +417,8 @@ const checkStatusTransaction = asyncHandler(async (req, res, next) => {
     }
 
     order.paymentStatus = paymentStatus.PAID;
-    order.save();
     logger.info("Thanh toán đơn hàng thành công!");
+    order.save();
     return res.status(200).json();
   } else {
     logger.info("Thanh toán đơn hàng thất bại!");
