@@ -1,6 +1,7 @@
 import ShoppingCart from "../models/shoppingCart.js";
 import { messages } from "../config/messageHelper.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
+import logger from "../utils/logger.js";
 
 const getShoppingCartById = asyncHandler(async (req, res, next) => {
   const shoppingCart = await ShoppingCart.findById(req.params.id);

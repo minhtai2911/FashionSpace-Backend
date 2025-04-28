@@ -84,7 +84,7 @@ const getProductVariantsByProductId = asyncHandler(async (req, res, next) => {
 
   if (cachedProductVariants) {
     logger.info("Lấy danh sách biến thể sản phẩm thành công!");
-    return res.status(200).json(JSON.parse(cachedProductVariants));
+    return res.status(200).json({data: JSON.parse(cachedProductVariants)});
   }
 
   const productVariants = await ProductVariant.find({
