@@ -35,5 +35,7 @@ router.put(
 );
 router.post("/sendDeliveryInfo", orderController.sendMailDeliveryInfo);
 router.post("/checkoutWithVnPay", orderController.checkoutWithVnPay);
+router.post("/checkoutWithZaloPay", orderController.checkoutWithZaloPay);
+router.post("/callbackZaloPay", orderController.callbackZaloPay);
 
 export default router;

@@ -547,6 +547,107 @@ const callbackVnPay = asyncHandler(async (req, res, next) => {
   return res.status(400).json({ message: "Thanh toán thất bại!" });
 });
 
+const checkoutWithZaloPay = asyncHandler(async (req, res, next) => {
+  const app_id = "2553";
+  const key1 = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL";
+  const endpoint = "https://sb-openapi.zalopay.vn/v2/create";
+
+  const embed_data = {
+    redirectUrl: `${process.env.URL_CLIENT}/orderCompleted`,
+  };
+  const orderId = req.body.orderId;
+  const order = await Order.findById(orderId);
+  const amount = req.body.amount;
+
+  let zaloPayParams = {
+    app_id: app_id,
+    app_trans_id: `${new Date()
+      .toISOString()
+      .slice(2, 10)
+      .replace(/-/g, "")}_${orderId}`,
+    app_user: "FoodyRush",
+    app_time: Date.now(),
+    item: JSON.stringify(order.orderItems),
+    embed_data: JSON.stringify(embed_data),
+    amount: amount,
+    callback_url: `${process.env.LINK_NGROK}/api/v1/order/callbackZaloPay`,
+    description: `Thanh toán đơn hàng ${orderId}`,
+    bank_code: "",
+  };
+
+  const data =
+    zaloPayParams.app_id +
+    "|" +
+    zaloPayParams.app_trans_id +
+    "|" +
+    zaloPayParams.app_user +
+    "|" +
+    zaloPayParams.amount +
+    "|" +
+    zaloPayParams.app_time +
+    "|" +
+    zaloPayParams.embed_data +
+    "|" +
+    zaloPayParams.item;
+
+  zaloPayParams["mac"] = crypto
+    .createHmac("sha256", key1)
+    .update(data)
+    .digest("hex");
+
+  const result = await axios.post(endpoint, null, { params: zaloPayParams });
+  return res.status(200).json(result.data);
+});
+
+const callbackZaloPay = async (req, res, next) => {
+  try {
+    const key2 = "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz";
+    const {
+      app_trans_id,
+      amount,
+    } = JSON.parse(req.body.data);
+    const mac = req.body.mac;
+
+    const raw = req.body.data;
+    const orderId = app_trans_id.split("_")[1];
+    const order = await Order.findById(orderId);
+    if (!order) {
+      logger.warn("Đơn hàng không tồn tại");
+      throw new Error("Not found");
+    }
+
+    const expected = crypto
+      .createHmac("sha256", key2)
+      .update(raw)
+      .digest("hex");
+
+    if (expected !== mac) {
+      logger.warn("Mã xác thực không hợp lệ!");
+      throw new Error("Mã xác thực không hợp lệ!");
+    }
+
+    if (order.paymentStatus === paymentStatus.PAID) {
+      logger.warn("Đơn hàng đã được thanh toán trước đó");
+      return;
+    }
+
+    if (order.finalPrice !== amount) {
+      logger.warn("Số tiền thanh toán không khớp với đơn hàng");
+      throw new Error("Số tiền thanh toán không khớp");
+    }
+
+    order.paymentStatus = paymentStatus.PAID;
+    await order.save();
+    logger.info("Thanh toán ZaloPay thành công!");
+  } catch (err) {
+    logger.error("Có lỗi xảy ra trong quá trình thanh toán ZaloPay", err);
+    throw new Error({
+      error: err.message,
+      message: "Có lỗi xảy ra trong quá trình thanh toán ZaloPay",
+    });
+  }
+};
+
 export default {
   getAllOrders: getAllOrders,
   getOrderById: getOrderById,
@@ -560,4 +661,6 @@ export default {
   sendMailDeliveryInfo: sendMailDeliveryInfo,
   checkoutWithVnPay: checkoutWithVnPay,
   callbackVnPay: callbackVnPay,
+  checkoutWithZaloPay: checkoutWithZaloPay,
+  callbackZaloPay: callbackZaloPay,
 };
