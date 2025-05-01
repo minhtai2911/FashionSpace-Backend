@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
-import UserRole from "../models/userRole.js";
 
 const verifyToken = (req, res, next) => {
+  console.log("Middleware verifyToken is running...");
   const authHeader = req.headers["authorization"];
   if (authHeader) {
     const token = authHeader.split(" ")[1];
