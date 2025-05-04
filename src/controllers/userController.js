@@ -177,9 +177,19 @@ const createUser = asyncHandler(async (req, res, next) => {
 
   const exists = await User.findOne({ email: email });
 
-  if (exists.password) {
+  if (exists && !exists.guestId) {
     logger.warn(messages.MSG51);
-    return res.status(400).json({ message: messages.MSG51 });
+    return res.status(409).json({ message: messages.MSG51 });
+  }
+
+  if (exists.guestId) {
+    exists.password = password;
+    exists.email = email;
+    exists.fullName = fullName;
+    exists.phone = phone;
+    exists.save();
+    logger.info(messages.MSG16);
+    return res.status(201).json({ data: exists._id, message: messages.MSG16 });
   }
 
   const role = await UserRole.findOne({ roleName: roleName });

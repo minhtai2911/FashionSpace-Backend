@@ -566,7 +566,7 @@ const checkoutWithZaloPay = asyncHandler(async (req, res, next) => {
       .toISOString()
       .slice(2, 10)
       .replace(/-/g, "")}_${orderId}`,
-    app_user: "FoodyRush",
+    app_user: "FashionSpace",
     app_time: Date.now(),
     item: JSON.stringify(order.orderItems),
     embed_data: JSON.stringify(embed_data),

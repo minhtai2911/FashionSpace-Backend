@@ -8,7 +8,6 @@ import generateTokens from "../utils/generateToken.js";
 import RefreshToken from "../models/refreshToken.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import logger from "../utils/logger.js";
-import { v4 as uuidv4 } from "uuid";
 
 const generateOTP = asyncHandler(async (req, res, next) => {
   const otp = Math.floor(100000 + Math.random() * (999999 - 100000)).toString();
@@ -79,13 +78,16 @@ const signup = asyncHandler(async (req, res, next) => {
   }
   const exists = await User.findOne({ email: email });
 
-  if (exists && exists.password) {
+  if (exists && !exists.guestId) {
     logger.warn(messages.MSG51);
     return res.status(409).json({ message: messages.MSG51 });
   }
 
-  if (exists) {
+  if (exists.guestId) {
     exists.password = password;
+    exists.email = email;
+    exists.fullName = fullName;
+    exists.phone = phone;
     exists.save();
     logger.info(messages.MSG16);
     return res.status(201).json({ data: exists._id, message: messages.MSG16 });
@@ -356,7 +358,7 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
     user._id,
     {
       $set: {
-        googleId: uuidv4(),
+        guestId: true,
       },
     },
     { new: true }
