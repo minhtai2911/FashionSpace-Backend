@@ -360,7 +360,7 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
     user._id,
     {
       $set: {
-        guestId: true,
+        isGuest: true,
       },
     },
     { new: true }
