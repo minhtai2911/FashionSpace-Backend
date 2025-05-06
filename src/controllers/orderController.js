@@ -552,11 +552,11 @@ const checkoutWithZaloPay = asyncHandler(async (req, res, next) => {
   const app_id = "2553";
   const key1 = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL";
   const endpoint = "https://sb-openapi.zalopay.vn/v2/create";
+  const orderId = req.body.orderId;
 
   const embed_data = {
-    redirectUrl: `${process.env.URL_CLIENT}/orderCompleted`,
+    redirectUrl: `${process.env.URL_CLIENT}/orderCompleted?orderId=${orderId}`,
   };
-  const orderId = req.body.orderId;
   const order = await Order.findById(orderId);
   const amount = req.body.amount;
 
