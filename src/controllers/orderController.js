@@ -555,7 +555,7 @@ const checkoutWithZaloPay = asyncHandler(async (req, res, next) => {
   const orderId = req.body.orderId;
 
   const embed_data = {
-    redirectUrl: `${process.env.URL_CLIENT}/orderCompleted?orderId=${orderId}`,
+    redirectUrl: `${process.env.URL_CLIENT}/orderCompleted`,
   };
   const order = await Order.findById(orderId);
   const amount = req.body.amount;
