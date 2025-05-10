@@ -28,6 +28,12 @@ const createUserAddress = asyncHandler(async (req, res, next) => {
 
 const updateUserAddressById = asyncHandler(async (req, res, next) => {
   const updateUserAddress = await UserAddress.findById(req.params.id);
+
+  if (!updateUserAddress) {
+    logger.warn("Địa chỉ giao hàng không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
+
   const { city, district, commune, street, phone } = req.body;
   const userId = req.user.id;
 
