@@ -357,27 +357,19 @@ const checkoutWithMoMo = asyncHandler(async (req, res, next) => {
   res.status(200).json(response.data);
 });
 
-const callbackMoMo = async (req, res, next) => {
-  try {
-    if (req.body.resultCode === 0) {
-      const order = await Order.findById({ _id: req.body.orderId });
+const callbackMoMo = asyncHandler(async (req, res, next) => {
+  if (req.body.resultCode === 0) {
+    const order = await Order.findById({ _id: req.body.orderId });
 
-      if (!order) {
-        logger.warn("Đơn hàng không tồn tại");
-        throw new Error("Not found");
-      }
-
-      order.paymentStatus = paymentStatus.PAID;
-      order.save();
+    if (!order) {
+      logger.warn("Đơn hàng không tồn tại");
+      throw new Error("Not found");
     }
-  } catch (err) {
-    logger.err(messages.MSG5, err);
-    throw new Error({
-      error: err.message,
-      message: messages.MSG5,
-    });
+
+    order.paymentStatus = paymentStatus.PAID;
+    order.save();
   }
-};
+});
 
 const checkStatusTransaction = asyncHandler(async (req, res, next) => {
   const accessKey = "F8BBA842ECF85";
@@ -600,54 +592,40 @@ const checkoutWithZaloPay = asyncHandler(async (req, res, next) => {
   return res.status(200).json(result.data);
 });
 
-const callbackZaloPay = async (req, res, next) => {
-  try {
-    const key2 = "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz";
-    const {
-      app_trans_id,
-      amount,
-    } = JSON.parse(req.body.data);
-    const mac = req.body.mac;
+const callbackZaloPay = asyncHandler(async (req, res, next) => {
+  const key2 = "kLtgPl8HHhfvMuDHPwKfgfsY4Ydm9eIz";
+  const { app_trans_id, amount } = JSON.parse(req.body.data);
+  const mac = req.body.mac;
 
-    const raw = req.body.data;
-    const orderId = app_trans_id.split("_")[1];
-    const order = await Order.findById(orderId);
-    if (!order) {
-      logger.warn("Đơn hàng không tồn tại");
-      throw new Error("Not found");
-    }
-
-    const expected = crypto
-      .createHmac("sha256", key2)
-      .update(raw)
-      .digest("hex");
-
-    if (expected !== mac) {
-      logger.warn("Mã xác thực không hợp lệ!");
-      throw new Error("Mã xác thực không hợp lệ!");
-    }
-
-    if (order.paymentStatus === paymentStatus.PAID) {
-      logger.warn("Đơn hàng đã được thanh toán trước đó");
-      return;
-    }
-
-    if (order.finalPrice !== amount) {
-      logger.warn("Số tiền thanh toán không khớp với đơn hàng");
-      throw new Error("Số tiền thanh toán không khớp");
-    }
-
-    order.paymentStatus = paymentStatus.PAID;
-    await order.save();
-    logger.info("Thanh toán ZaloPay thành công!");
-  } catch (err) {
-    logger.error("Có lỗi xảy ra trong quá trình thanh toán ZaloPay", err);
-    throw new Error({
-      error: err.message,
-      message: "Có lỗi xảy ra trong quá trình thanh toán ZaloPay",
-    });
+  const raw = req.body.data;
+  const orderId = app_trans_id.split("_")[1];
+  const order = await Order.findById(orderId);
+  if (!order) {
+    logger.warn("Đơn hàng không tồn tại");
+    throw new Error("Not found");
   }
-};
+
+  const expected = crypto.createHmac("sha256", key2).update(raw).digest("hex");
+
+  if (expected !== mac) {
+    logger.warn("Mã xác thực không hợp lệ!");
+    throw new Error("Mã xác thực không hợp lệ!");
+  }
+
+  if (order.paymentStatus === paymentStatus.PAID) {
+    logger.warn("Đơn hàng đã được thanh toán trước đó");
+    return;
+  }
+
+  if (order.finalPrice !== amount) {
+    logger.warn("Số tiền thanh toán không khớp với đơn hàng");
+    throw new Error("Số tiền thanh toán không khớp");
+  }
+
+  order.paymentStatus = paymentStatus.PAID;
+  await order.save();
+  logger.info("Thanh toán ZaloPay thành công!");
+});
 
 export default {
   getAllOrders: getAllOrders,

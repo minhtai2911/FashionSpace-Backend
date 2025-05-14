@@ -11,6 +11,7 @@ import { RateLimiterRedis } from "rate-limiter-flexible";
 import { rateLimit } from "express-rate-limit";
 import { RedisStore } from "rate-limit-redis";
 import logger from "./utils/logger.js";
+import * as Sentry from "@sentry/node";
 
 import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
@@ -26,6 +27,7 @@ import statisticRoute from "./routes/statisticRoute.js";
 import recommendationRoute from "./routes/recommendationRoute.js";
 import productViewRoute from "./routes/productViewRoute.js";
 import userAddressRoute from "./routes/userAddressRoute.js";
+import "./config/sentry.js";
 
 const app = express();
 const redisClient = new Redis(process.env.REDIS_URL);
@@ -59,6 +61,7 @@ mongoose
   })
   .catch((err) => {
     logger.error("Database connection error", err);
+    Sentry.captureException(err);
   });
 
 app.use((req, res, next) => {
@@ -69,7 +72,7 @@ app.use((req, res, next) => {
 const rateLimiter = new RateLimiterRedis({
   storeClient: redisClient,
   keyPrefix: "middleware",
-  points: 10,
+  points: 100,
   duration: 1,
 });
 
@@ -155,6 +158,9 @@ app.use("/api/v1/recommendation", recommendationRoute);
 app.use("/api/v1/productView", productViewRoute);
 app.use("/api/v1/userAddress", userAddressRoute);
 
+Sentry.setupExpressErrorHandler(app);
+
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Rejection at", promise, "reason:", reason);
+  Sentry.captureException(reason);
 });
