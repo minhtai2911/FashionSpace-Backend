@@ -5,9 +5,13 @@ import authMiddleware from "../middlewares/authMiddleware.js";
 const router = Router();
 
 router.get(
-  "/",
+  "/for-you",
   authMiddleware.verifyToken,
-  recommendationController.recommend
+  recommendationController.recommendProductsForYou
+);
+router.get(
+  "/similar/:productId",
+  recommendationController.recommendSimilarProducts
 );
 
 export default router;

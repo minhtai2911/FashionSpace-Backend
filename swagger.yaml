@@ -1,0 +1,1469 @@
+openapi: 3.0.3
+info:
+  title: FashionSpace API
+  description: API documentation for the FashionSpace backend.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+tags:
+  - name: User
+    description: Operations related to user management
+  - name: Auth
+    description: Operations related to authentication and authorization
+  - name: UserRole
+    description: Operations related to user roles
+  - name: Product
+    description: Operations related to product management
+  - name: Order 
+    description: Operations related to order management
+  - name: ShoppingCart  
+    description: Operations related to shopping cart management
+  - name: Category
+    description: Operations related to category management
+  - name: Review
+    description: Operations related to product reviews
+  - name: UserAddress
+    description: Operations related to user addresses
+  - name: ProductVariant
+    description: Operations related to product variants
+  - name: Statistic
+    description: Operations related to statistics and reports
+  - name: Chatbot
+    description: Operations related to Chatbot
+  - name: Recommendation
+    description: Operations related to product recommendations
+paths:
+  /v1/user:
+    get:
+      tags:
+       - User
+      summary: Get all users
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: Number of users per page
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "John"
+          description: Search keyword for fullname or email
+        - name: isActive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            example: true
+          description: Filter users based on their active status
+      responses:
+        '200':
+          description: A list of users with pagination metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        description: Total number of users
+                      currentPage:
+                        type: integer
+                        description: Current page number
+                      totalPages:
+                        type: integer
+                        description: Total number of pages
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+              examples:
+               example1:
+                summary: Example response
+                value:
+                  meta:
+                    totalCount: 50
+                    currentPage: 1
+                    totalPages: 25
+                  data:
+                    - _id: "67f559dca07743453ce315a2"
+                      email: "john.doe@example.com"
+                      fullName: "John Doe"
+                      phone: "0123456789"
+                      roleId: "67f558e0d5f5575adf6e5b0b"
+                      password: "$2b$10$Inw34GAXLfhFkaUAa39BZ.zQXify8eEna0WOP.THr4B07hcABWMUW"
+                      googleId: "104961442348689063457"
+                      avatarPath: "https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg"
+                      publicId: "avatar_kn6ynb"
+                      isActive: true
+                      isGuest: false
+                      expiresAt: null
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+                    - _id: "67f559e3a07743453ce315a6"
+                      email: "jane.smith@example.com"
+                      fullName: "Jane Smith"
+                      phone: "0987654321"
+                      roleId: "67f5591dd5f5575adf6e5b0d"
+                      password: "$2b$10$pFTy6NAXbLEqzBQsua/LSuVtTdulQHLcoOysgcyWjq4x6KEz2Wg2u"
+                      googleId: null
+                      avatarPath: "https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg"
+                      publicId: "avatar_kn6ynb"
+                      isActive: true
+                      isGuest: false
+                      expiresAt: null
+                      createdAt: "2023-01-03T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'  
+    post:
+      tags:
+        - User
+      summary: Create a new user
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        description: This field is mandatory
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address
+                fullName:
+                  type: string
+                  description: User's full name
+                phone:
+                  type: string
+                  description: User's phone number
+                password:
+                  type: string
+                  description: User's password
+                roleName:
+                  type: string
+                  description: Role name for the user
+              required:
+                - email
+                - fullName
+                - phone
+                - password
+                - roleName
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  email: "john.doe@example.com"
+                  fullName: "John Doe"
+                  phone: "0123456789"
+                  password: "example@123456"
+                  roleName: "Admin"
+      responses:
+        '201':
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Thêm người dùng thành công!"
+                  data:
+                    $ref: '#/components/schemas/User'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Thêm người dùng thành công!"
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      email: "john.doe@example.com"
+                      fullName: "John Doe"
+                      phone: "0123456789"
+                      roleId: "67f5591dd5f5575adf6e5b0d"
+                      password: "$2b$10$pFTy6NAXbLEqzBQsua/LSuVtTdulQHLcoOysgcyWjq4x6KEz2Wg2u"
+                      googleId: null
+                      avatarPath: "https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg"
+                      publicId: "avatar_kn6ynb"
+                      isActive: true
+                      isGuest: false
+                      expiresAt: null
+                      createdAt: "2023-01-03T12:00:00Z"
+                      updatedAt: "2023-01-04T12:00:00Z"   
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Vui lòng điền đầy đủ thông tin bắt buộc!"
+        '409':
+          description: Conflict - The request could not be completed due to a conflict with the current state of the resource
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Email đã tồn tại."
+        '400':
+          description: Bad Request - The role does not exist
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples: 
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+  /v1/user/{id}:
+    get:
+      tags:
+       - User
+      summary: Get a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the user
+      responses:
+        '200':
+          description: User details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/User'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      email: "john.doe@example.com"
+                      fullName: "John Doe"
+                      phone: "0123456789"
+                      roleId: "67f5591dd5f5575adf6e5b0d"
+                      password: "$2b$10$pFTy6NAXbLEqzBQsua/LSuVtTdulQHLcoOysgcyWjq4x6KEz2Wg2u"
+                      googleId: null
+                      avatarPath: "https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg"
+                      publicId: "avatar_kn6ynb"
+                      isActive: true
+                      isGuest: false
+                      expiresAt: null
+                      createdAt: "2023-01-03T12:00:00Z"
+                      updatedAt: "2023-01-04T12:00:00Z"  
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    put:
+      tags:
+        - User
+      summary: Update a user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the user
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                fullName:
+                  type: string
+                  description: User's full name
+                phone:
+                  type: string
+                  description: User's phone number
+                roleId:
+                  type: string
+                  description: User's role ID
+                avatarPath:
+                  type: string
+                  format: binary
+                  description: User's avatar image file
+              required:
+                - fullName
+                - phone
+                - roleId
+      responses:
+        '200':
+          description: User updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Chỉnh sửa thông tin người dùng thành công!"
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/User'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Chỉnh sửa thông tin người dùng thành công!"
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      email: "john.doe.updated@example.com"
+                      fullName: "John Doe Updated"
+                      phone: "0123456789"
+                      roleId: "67f5591dd5f5575adf6e5b0d"
+                      password: "$2b$10$pFTy6NAXbLEqzBQsua/LSuVtTdulQHLcoOysgcyWjq4x6KEz2Wg2u"
+                      googleId: null
+                      avatarPath: "https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg"
+                      publicId: "avatar_kn6ynb"
+                      isActive: true
+                      isGuest: false
+                      expiresAt: null
+                      createdAt: "2023-01-03T12:00:00Z"
+                      updatedAt: "2023-01-04T12:00:00Z"  
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'  
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /v1/user/archive/{id}:
+    put:
+      tags:
+        - User
+      summary: Archive a user by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the user to be archived
+      responses:
+        '200':
+          description: User archived successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Lưu trữ người dùng thành công!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Lưu trữ người dùng thành công!"
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      email: "john.doe.updated@example.com"
+                      fullName: "John Doe Updated"
+                      phone: "0123456789"
+                      roleId: "67f5591dd5f5575adf6e5b0d"
+                      password: "$2b$10$pFTy6NAXbLEqzBQsua/LSuVtTdulQHLcoOysgcyWjq4x6KEz2Wg2u"
+                      googleId: null
+                      avatarPath: "https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg"
+                      publicId: "avatar_kn6ynb"
+                      isActive: false
+                      isGuest: false
+                      expiresAt: null
+                      createdAt: "2023-01-03T12:00:00Z"
+                      updatedAt: "2023-01-04T12:00:00Z"  
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'  
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+  /v1/userRole:
+    get:
+      tags:
+        - UserRole
+      summary: Get all user roles
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: Number of user roles per page
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "Admin"
+          description: Search keyword for role name or description
+      responses:
+        '200':
+          description: A list of user roles
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        description: Total number of user roles
+                      currentPage:
+                        type: integer
+                        description: Current page number
+                      totalPages:
+                        type: integer
+                        description: Total number of pages   
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserRole'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    meta:
+                      totalCount: 2
+                      currentPage: 1
+                      totalPages: 1
+                    data:
+                      - _id: "67f558e0d5f5575adf6e5b0b"
+                        roleName: "Admin"
+                        description: "Administrator role with full access"
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+                      - _id: "67f5591dd5f5575adf6e5b0d"
+                        roleName: "User"
+                        description: "Regular user role with limited access"
+                        createdAt: "2023-01-03T12:00:00Z"
+                        updatedAt: "2023-01-04T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'  
+  /v1/userRole/{id}:
+    get:
+      tags:
+        - UserRole
+      summary: Get a user role by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f558e0d5f5575adf6e5b0b"
+          description: The ID of the user role to retrieve
+      responses:
+        '200':
+          description: User role retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/UserRole'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f558e0d5f5575adf6e5b0b"
+                      roleName: "Admin"
+                      description: "Administrator role with full access"
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: User role not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'  
+  /v1/userAddress:
+    get:
+      tags:
+        - UserAddress
+      summary: Get all user addresses for a specific user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: Number of user addresses per page
+      responses:
+        '200':
+          description: A list of user addresses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        description: Total number of user addresses
+                      currentPage:
+                        type: integer
+                        description: Current page number
+                      totalPages:
+                        type: integer
+                        description: Total number of pages
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/UserAddress'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    meta:
+                      totalCount: 2
+                      currentPage: 1
+                      totalPages: 1
+                    data:
+                      - _id: "67f559e3a07743453ce315a6"
+                        userId: "67f559e3a07743453ce315a6"
+                        city: "Hà Nội"
+                        district: "Hoàn Kiếm"
+                        commune: "Phố Huế"
+                        street: "123 Phố Huế"
+                        phone: "0123456789"
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+                      - _id: "67f559e3a07743453ce315a7"
+                        userId: "67f559e3a07743453ce315a6"
+                        city: "Hà Nội"
+                        district: "Đống Đa"
+                        commune: "Thái Hà"
+                        street: "456 Thái Hà"
+                        phone: "0987654321"
+                        createdAt: "2023-01-03T12:00:00Z"
+                        updatedAt: "2023-01-04T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError' 
+        '404':
+          description: User address not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+    post:
+        tags:
+          - UserAddress
+        summary: Create a new user address
+        security:
+          - bearerAuth: []
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      city: 
+                        type: string
+                        description: City name
+                      district:
+                        type: string
+                        description: District name
+                      commune:
+                        type: string
+                        description: Commune name
+                      street:
+                        type: string
+                        description: Street name
+                      phone:
+                        type: string
+                        description: Phone number
+                    required:
+                      - city
+                      - district
+                      - commune
+                      - street
+                      - phone
+              examples:
+                example1:
+                  summary: Example request
+                  value:
+                    city: "Hà Nội"
+                    district: "Hoàn Kiếm"
+                    commune: "Phố Huế"
+                    street: "123 Phố Huế"
+                    phone: "0123456789"
+                    createdAt: "2023-01-01T12:00:00Z"
+                    updatedAt: "2023-01-02T12:00:00Z"
+        responses:
+          '201':
+            description: User address created successfully
+            content:
+              application/json:
+                schema:
+                  type: object
+                  properties:
+                    data:
+                      type: object
+                      items:
+                      $ref: '#/components/schemas/UserAddress'
+                examples:
+                  example1:
+                    summary: Example response
+                    value:
+                      data:
+                        _id: "67f559e3a07743453ce315a6"
+                        userId: "67f559e3a07743453ce315a6"
+                        city: "Hà Nội"
+                        district: "Hoàn Kiếm"
+                        commune: "Phố Huế"
+                        street: "123 Phố Huế"
+                        phone: "0123456789"
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"  
+          '401':
+            description: Unauthorized - Access token is missing or invalid
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/TokenError'
+          '403':
+            description: Forbidden - User does not have the required permissions
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: '#/components/schemas/PermissionError'
+                    - $ref: '#/components/schemas/TokenExpiredError'
+          '500':
+            description: Internal Server Error - An unexpected error occurred on the server
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServerError'
+  /v1/userAddress/{id}:
+    get:
+      tags:
+        - UserAddress
+      summary: Get a user address by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the user address to retrieve
+      responses:
+        '200': 
+          description: User address retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/UserAddress'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      city: "Hà Nội"
+                      district: "Hoàn Kiếm"
+                      commune: "Phố Huế"
+                      street: "123 Phố Huế"
+                      phone: "0123456789"
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404': 
+          description: User address not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+            description: Internal Server Error - An unexpected error occurred on the server
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ServerError'
+        '401':
+            description: Unauthorized - Access token is missing or invalid
+            content:
+              application/json:
+                schema: 
+                  $ref: '#/components/schemas/TokenError'
+        '403':
+            description: Forbidden - User does not have the required permissions
+            content:
+              application/json:
+                schema:
+                  oneOf:
+                    - $ref: '#/components/schemas/PermissionError'
+                    - $ref: '#/components/schemas/TokenExpiredError'
+    put: 
+      tags:
+        - UserAddress
+      summary: Update a user address by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the user address to retrieve
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: object
+                  properties:
+                    city: 
+                      type: string
+                      description: City name
+                    district:
+                      type: string
+                      description: District name
+                    commune:
+                      type: string
+                      description: Commune name
+                    street:
+                      type: string
+                      description: Street name
+                    phone:
+                      type: string
+                      description: Phone number
+              required:
+                - city
+                - district
+                - commune
+                - street
+                - phone
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  city: "Hà Nội"
+                  district: "Hoàn Kiếm"
+                  commune: "Phố Huế"
+                  street: "123 Phố Huế"
+                  phone: "0123456789"
+      responses:
+        '200':
+          description: User retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/UserAddress'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      city: "Hà Nội"
+                      district: "Hoàn Kiếm"
+                      commune: "Phố Huế"
+                      street: "123 Phố Huế"
+                      phone: "0123456789"
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404': 
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':  
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+  /v1/category:
+    get:
+      tags:
+        - Category
+      summary: Get all categories
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: Number of categories per page
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "Electronics"
+          description: Search keyword for category name or description
+        - name: isActive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            example: true
+          description: Filter categories by active status
+      responses:
+        '200':
+          description: A list of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        description: Total number of categories
+                      currentPage:
+                        type: integer
+                        description: Current page number
+                      totalPages:
+                        type: integer
+                        description: Total number of pages   
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Category'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    meta:
+                      totalCount: 2
+                      currentPage: 1
+                      totalPages: 1
+                    data:
+                      - _id: "67f559e3a07743453ce315a6"
+                        name: "Hoodie"
+                        gender: "Unisex"
+                        isActive: true
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+                      - _id: "67f559e3a07743453ce315a7"
+                        name: "T-Shirt"
+                        gender: "Unisex"
+                        isActive: true
+                        createdAt: "2023-01-03T12:00:00Z"
+                        updatedAt: "2023-01-03T12:00:00Z"    
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    post:
+      tags:
+        - Category
+      summary: Create a new category
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the category
+                gender:
+                  type: string
+                  description: Gender associated with the category
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  name: "Hoodie"
+                  gender: "Unisex"
+      responses:
+        '201':
+          description: Category created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Thêm danh mục sản phẩm thành công!"
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/Category'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Thêm danh mục sản phẩm thành công!"
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      name: "Hoodie"
+                      gender: "Unisex"
+                      isActive: true
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                 $ref: '#/components/schemas/TokenError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '409':
+          description: Conflict - Category already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Danh mục sản phẩm đã tồn tại!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Danh mục sản phẩm đã tồn tại!"
+  /v1/category/{id}:
+    get:
+      tags:
+        - Category
+      summary: Get a category by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the category to retrieve
+      responses:
+        '200':
+          description: Category retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/Category'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      name: "Hoodie"
+                      gender: "Unisex"
+                      isActive: true
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Category not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Category:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Category ID
+        name:
+          type: string
+          description: Name of the category
+        gender:
+          type: string
+          description: Gender associated with the category
+        isActive:
+          type: boolean
+          description: Indicates if the category is active
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the category was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the category was last updated
+    UserAddress:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Address ID
+        userId:
+          type: string
+          description: Reference to the user ID
+        city: 
+          type: string
+          description: City name
+        district:
+          type: string
+          description: District name
+        commune:
+          type: string
+          description: Commune name
+        street:
+          type: string
+          description: Street name
+        phone:
+          type: string
+          description: Phone number
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the address was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the address was last updated
+    UserRole:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Role ID
+        roleName:
+          type: string
+          description: Role name
+        description:
+          type: string
+          description: Role description
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the role was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the role was last updated
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+        email:
+          type: string
+          format: email
+          description: User's email address
+        fullName:
+          type: string
+          description: User's full name
+        phone:
+          type: string
+          description: User's phone number
+        roleId:
+          type: string
+          description: Reference to the user's role
+        password:
+          type: string
+          description: User's password
+        googleId:
+          type: string
+          description: Google account ID if linked
+        avatarPath:
+          type: string
+          description: URL to the user's avatar
+        publicId:
+          type: string
+          description: Public ID for the avatar in the storage
+        isActive:
+          type: boolean
+          description: Indicates if the user is active
+        isGuest:
+          type: boolean
+          description: Indicates if the user is a guest
+        expiresAt:
+          type: string
+          format: date-time
+          description: Expiration date for the user
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user was last updated
+    PermissionError:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Bạn không có quyền truy cập vào tài nguyên này. Vui lòng liên hệ với quản trị viên."
+    TokenExpiredError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Bạn chưa được xác thực."
+        message:
+          type: string
+          example: "Phiên của bạn đã hết hạn. Vui lòng đăng nhập lại!"
+    TokenError: 
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Token không hợp lệ!"
+    ServerError: 
+      type: object
+      properties:
+        error: 
+          type: string
+          example: "Vui lòng điền đầy đủ thông tin bắt buộc!"
+        message:
+          type: string
+          example: "Đã xảy ra lỗi, vui lòng thử lại!"
+

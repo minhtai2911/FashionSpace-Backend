@@ -3,7 +3,11 @@ import Product from "../models/product.js";
 import ProductView from "../models/productView.js";
 import Order from "../models/order.js";
 import { messages } from "../config/messageHelper.js";
+import natural from "natural";
+import asyncHandler from "../middlewares/asyncHandler.js";
 import logger from "../utils/logger.js";
+
+const TfIdf = natural.TfIdf;
 
 const getUserProductData = async () => {
   try {
@@ -137,7 +141,7 @@ const trainModel = async () => {
   }
 };
 
-const recommend = async (req, res, next) => {
+const recommendProductsForYou = async (req, res, next) => {
   try {
     const { model, userEncoder, productEncoder, productDecoder } =
       await trainModel();
@@ -214,4 +218,121 @@ const recommend = async (req, res, next) => {
   }
 };
 
-export default { recommend: recommend };
+// TF-IDF xử lý description
+const buildTfIdfVectors = (products) => {
+  const tfidf = new TfIdf();
+  products.forEach((p) => {
+    const document = `${p.name} ${p.description}`.toLowerCase().trim();
+    tfidf.addDocument(document);
+  });
+  return products.map((_, i) => {
+    const vector = [];
+    const terms = tfidf.listTerms(i);
+    for (let j = 0; j < 20; j++) vector.push(terms[j]?.tfidf || 0);
+    return vector;
+  });
+};
+
+// Vector hóa sản phẩm
+function buildProductVectors(products) {
+  const categories = [
+    ...new Set(products.map((p) => p.categoryId?.name)),
+  ];
+  const encodeCategory = (categoryName) =>
+    categories.map((c) => (c === categoryName ? 1 : 0));
+  const tfidfVectors = buildTfIdfVectors(products);
+
+  const maxValues = {
+    price: Math.max(...products.map((p) => p.price)),
+    discountPrice: Math.max(...products.map((p) => p.discountPrice)),
+    soldQuantity: Math.max(...products.map((p) => p.soldQuantity)),
+    totalReview: Math.max(...products.map((p) => p.totalReview)),
+  };
+
+  return products.map((p, i) => {
+    const categoryVec = encodeCategory(p.categoryId?.name);
+    const numericVec = [
+      p.price / (maxValues.price || 1),
+      p.discountPrice / (maxValues.discountPrice || 1),
+      p.rating / 5,
+      p.soldQuantity / (maxValues.soldQuantity || 1),
+      p.totalReview / (maxValues.totalReview || 1),
+    ];
+    return {
+      _id: p._id,
+      name: p.name,
+      vector: [...categoryVec, ...numericVec, ...tfidfVectors[i]],
+      raw: p,
+    };
+  });
+}
+
+// Áp dụng trọng số cho vector
+function applyWeights(
+  vector,
+  categorySize,
+  numNumericFields,
+  tfidfWeight = 1.0,
+  numericWeight = 2.0,
+  categoryWeight = 3.0
+) {
+  const categoryPart = vector
+    .slice(0, categorySize)
+    .map((v) => v * categoryWeight);
+  const numericPart = vector
+    .slice(categorySize, categorySize + numNumericFields)
+    .map((v) => v * numericWeight);
+  const tfidfPart = vector
+    .slice(categorySize + numNumericFields)
+    .map((v) => v * tfidfWeight);
+  return [...categoryPart, ...numericPart, ...tfidfPart];
+}
+
+// Tính độ tương đồng cosine
+function cosineSimilarity(vecA, vecB, categorySize, numNumericFields) {
+  const weightedA = applyWeights(vecA, categorySize, numNumericFields);
+  const weightedB = applyWeights(vecB, categorySize, numNumericFields);
+  const a = tf.tensor1d(weightedA);
+  const b = tf.tensor1d(weightedB);
+  const dot = tf.dot(a, b).dataSync()[0];
+  const normA = tf.norm(a).dataSync()[0];
+  const normB = tf.norm(b).dataSync()[0];
+  return dot / (normA * normB);
+}
+
+const recommendSimilarProducts = asyncHandler(async (req, res) => {
+  const targetId = req.params.productId;
+  const allProducts = await Product.find({ isActive: true })
+    .populate("categoryId", "name")
+    .lean();
+  const productVectors = buildProductVectors(allProducts);
+  const categorySize = [
+    ...new Set(allProducts.map((p) => p.categoryId?.toString())),
+  ].length;
+  const numNumericFields = 5;
+
+  const target = productVectors.find((p) => p._id.toString() === targetId);
+  if (!target) return res.status(404).json({ error: "Not found" });
+
+  const related = productVectors
+    .filter((p) => p._id.toString() !== targetId)
+    .map((p) => ({
+      product: p.raw,
+      score: cosineSimilarity(
+        target.vector,
+        p.vector,
+        categorySize,
+        numNumericFields
+      ),
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 5)
+    .map((r) => r.product);
+
+  return res.status(200).json({ data: related });
+});
+
+export default {
+  recommendProductsForYou: recommendProductsForYou,
+  recommendSimilarProducts: recommendSimilarProducts,
+};
