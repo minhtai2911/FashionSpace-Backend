@@ -240,8 +240,13 @@ function buildProductVectors(products) {
   const categories = [
     ...new Set(products.map((p) => p.categoryId?.name)),
   ];
+  const genders = [...new Set(products.map((p) => p.categoryId?.gender))];
+
   const encodeCategory = (categoryName) =>
     categories.map((c) => (c === categoryName ? 1 : 0));
+  const encodeGender = (gender) =>
+  genders.map((g) => (g === gender ? 1 : 0));
+
   const tfidfVectors = buildTfIdfVectors(products);
 
   const maxValues = {
@@ -253,6 +258,7 @@ function buildProductVectors(products) {
 
   return products.map((p, i) => {
     const categoryVec = encodeCategory(p.categoryId?.name);
+    const genderVec = encodeGender(p.categoryId?.gender);
     const numericVec = [
       p.price / (maxValues.price || 1),
       p.discountPrice / (maxValues.discountPrice || 1),
@@ -263,7 +269,7 @@ function buildProductVectors(products) {
     return {
       _id: p._id,
       name: p.name,
-      vector: [...categoryVec, ...numericVec, ...tfidfVectors[i]],
+      vector: [...categoryVec, ...genderVec, ...numericVec, ...tfidfVectors[i]],
       raw: p,
     };
   });
