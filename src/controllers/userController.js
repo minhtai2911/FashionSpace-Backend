@@ -168,9 +168,9 @@ const updateUserById = asyncHandler(async (req, res, next) => {
 });
 
 const createUser = asyncHandler(async (req, res, next) => {
-  const { email, fullName, phone, password, roleName } = req.body;
+  const { email, fullName, phone, password, roleId } = req.body;
 
-  if (!email || !fullName || !phone || !password || !roleName) {
+  if (!email || !fullName || !phone || !password || !roleId) {
     logger.warn(messages.MSG1);
     throw new Error(messages.MSG1);
   }
@@ -194,13 +194,6 @@ const createUser = asyncHandler(async (req, res, next) => {
     return res.status(201).json({ message: messages.MSG22, data: exists._id });
   }
 
-  const role = await UserRole.findOne({ roleName: roleName });
-  if (!role) {
-    logger.warn("Vai trò người dùng không tồn tại");
-    return res.status(400).json({ error: "Not found" });
-  }
-
-  const roleId = role._id;
   const newUser = new User({ email, fullName, phone, roleId, password });
   await newUser.save();
   logger.info(messages.MSG22);
