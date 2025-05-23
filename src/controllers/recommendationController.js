@@ -275,8 +275,8 @@ function applyWeights(
   categorySize,
   numNumericFields,
   tfidfWeight = 1.0,
-  numericWeight = 2.0,
-  categoryWeight = 3.0
+  numericWeight = 3.0,
+  categoryWeight = 5.0
 ) {
   const categoryPart = vector
     .slice(0, categorySize)
