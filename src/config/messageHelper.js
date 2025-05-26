@@ -68,4 +68,5 @@ export const messages = {
   MSG62: "Phản hồi của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!",
   MSG63: "Ẩn đánh giá thành công!",
   MSG64: "Hiển thị đánh giá thành công!",
+  MSG65: "Đánh giá cho sản phẩm này đã tồn tại. Vui lòng kiểm tra lại!",
 };

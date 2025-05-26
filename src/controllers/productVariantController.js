@@ -146,24 +146,20 @@ const updateProductVariantById = asyncHandler(async (req, res, next) => {
   let check = true;
 
   if (
-    req.body.productId == updateProductVariant.productId &&
     req.body.size == updateProductVariant.size &&
     req.body.color == updateProductVariant.color
   ) {
     check = false;
   }
 
-  updateProductVariant.productId =
-    req.body.productId || updateProductVariant.productId;
   updateProductVariant.size = req.body.size || updateProductVariant.size;
   updateProductVariant.color = req.body.color || updateProductVariant.color;
   updateProductVariant.stock = req.body.stock || updateProductVariant.stock;
 
-  const productId = updateProductVariant.productId;
   const size = updateProductVariant.size;
   const color = updateProductVariant.color;
   const existingProductVariant = await ProductVariant.findOne({
-    productId,
+    productId: updateProductVariant.productId,
     size,
     color,
   });
@@ -197,7 +193,7 @@ const deleteProductVariantById = asyncHandler(async (req, res, next) => {
   }
 
   invalidateCache(req, "productVariant", "productVariants", req.params.id);
-  logger.info("Xóa biến thể sản phẩm thành công");
+  logger.info("Xóa biến thể sản phẩm thành công!");
   res.status(200).json();
 });
 

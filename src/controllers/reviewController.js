@@ -79,7 +79,7 @@ const createReview = asyncHandler(async (req, res, next) => {
 
   if (existingReview) {
     logger.warn("Đánh giá đã tồn tại!");
-    return res.status(409).json({});
+    return res.status(409).json({message: messages.MSG65});
   }
 
   const newReview = new Review({

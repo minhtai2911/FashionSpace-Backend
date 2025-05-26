@@ -72,7 +72,7 @@ paths:
           description: Filter users based on their active status
       responses:
         '200':
-          description: A list of users with pagination metadata
+          description: List of users retrieved successfully
           content:
             application/json:
               schema:
@@ -141,15 +141,15 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'  
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'  
+                $ref: '#/components/schemas/PermissionError' 
     post:
       tags:
         - User
@@ -233,15 +233,15 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'
+                $ref: '#/components/schemas/PermissionError'
         '500':
           description: Internal Server Error - An unexpected error occurred on the server
           content:
@@ -425,15 +425,16 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError' 
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'  
+                $ref: '#/components/schemas/PermissionError'
+                  
         '404':
           description: User not found
           content:
@@ -506,15 +507,15 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'  
+                $ref: '#/components/schemas/PermissionError'
         '404':
           description: User not found
           content:
@@ -561,7 +562,7 @@ paths:
           description: Search keyword for role name or description
       responses:
         '200':
-          description: A list of user roles
+          description: List of user roles retrieved successfully
           content:
             application/json:
               schema:
@@ -613,15 +614,15 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'  
+                $ref: '#/components/schemas/PermissionError' 
   /v1/userRole/{id}:
     get:
       tags:
@@ -680,15 +681,15 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'  
+                $ref: '#/components/schemas/PermissionError'
   /v1/userAddress:
     get:
       tags:
@@ -713,7 +714,7 @@ paths:
           description: Number of user addresses per page
       responses:
         '200':
-          description: A list of user addresses
+          description: User addresses retrieved successfully
           content:
             application/json:
               schema:
@@ -773,15 +774,15 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+               oneOf:
+                 - $ref: '#/components/schemas/TokenError'
+                 - $ref: '#/components/schemas/TokenExpiredError'
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError' 
+                $ref: '#/components/schemas/PermissionError' 
         '404':
           description: User address not found
           content:
@@ -876,15 +877,15 @@ paths:
             content:
               application/json:
                 schema: 
-                  $ref: '#/components/schemas/TokenError'
+                  oneOf:
+                    - $ref: '#/components/schemas/TokenError'
+                    - $ref: '#/components/schemas/TokenExpiredError'
           '403':
             description: Forbidden - User does not have the required permissions
             content:
               application/json:
                 schema:
-                  oneOf:
-                    - $ref: '#/components/schemas/PermissionError'
-                    - $ref: '#/components/schemas/TokenExpiredError'
+                  $ref: '#/components/schemas/PermissionError'
           '500':
             description: Internal Server Error - An unexpected error occurred on the server
             content:
@@ -958,15 +959,15 @@ paths:
             content:
               application/json:
                 schema: 
-                  $ref: '#/components/schemas/TokenError'
+                  oneOf:
+                    - $ref: '#/components/schemas/TokenError'
+                    - $ref: '#/components/schemas/TokenExpiredError'
         '403':
             description: Forbidden - User does not have the required permissions
             content:
               application/json:
                 schema:
-                  oneOf:
-                    - $ref: '#/components/schemas/PermissionError'
-                    - $ref: '#/components/schemas/TokenExpiredError'
+                  $ref: '#/components/schemas/PermissionError'    
     put: 
       tags:
         - UserAddress
@@ -1068,15 +1069,15 @@ paths:
           content:
             application/json:
               schema: 
-                $ref: '#/components/schemas/TokenError'
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'
+                $ref: '#/components/schemas/PermissionError'
   /v1/category:
     get:
       tags:
@@ -1113,7 +1114,7 @@ paths:
           description: Filter categories by active status
       responses:
         '200':
-          description: A list of categories
+          description: List of categories retrieved successfully
           content:
             application/json:
               schema:
@@ -1219,15 +1220,15 @@ paths:
           content:
             application/json:
               schema: 
-                 $ref: '#/components/schemas/TokenError'
+               oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
         '403':
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
-              schema:
-                oneOf:
-                  - $ref: '#/components/schemas/PermissionError'
-                  - $ref: '#/components/schemas/TokenExpiredError'
+              schema:              
+                $ref: '#/components/schemas/PermissionError'
         '500':
           description: Internal Server Error - An unexpected error occurred on the server
           content:
@@ -1306,6 +1307,2081 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ServerError'
+  /v1/shoppingCart: 
+    get:
+      tags:
+        - ShoppingCart
+      summary: Get all shopping carts by userId
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: Number of categories per page
+      responses:
+        '200':
+          description: Shopping carts retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        description: Total number of shopping carts
+                      currentPage:
+                        type: integer
+                        description: Current page number
+                      totalPages:
+                        type: integer
+                        description: Total number of pages   
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ShoppingCart'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    meta:
+                      totalCount: 2
+                      currentPage: 1
+                      totalPages: 1
+                    data:
+                      - _id: "67f559e3a07743453ce315a6"
+                        userId: "67f559e3a07743453ce315a6"
+                        productVariantId: "67f559e3a07743453ce315a6"
+                        quantity: 2
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+                      - _id: "67f559e3a07743453ce315a7"
+                        userId: "67f559e3a07743453ce315a6"
+                        productVariantId: "67f559e3a07743453ce315a7"
+                        quantity: 1
+                        createdAt: "2023-01-03T12:00:00Z"
+                        updatedAt: "2023-01-04T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'    
+    post: 
+      tags:
+        - ShoppingCart
+      summary: Create a new shopping cart
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productVariantId:
+                  type: string
+                  description: Reference to the product variant ID
+                quantity:
+                  type: integer
+                  description: Quantity of the product variant in the cart
+              required:
+                - productVariantId
+                - quantity
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  productVariantId: "67f559e3a07743453ce315a6"
+                  quantity: 2
+      responses:
+        '201':
+          description: Shopping cart created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Thêm giỏ hàng thành công!"
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/ShoppingCart'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Thêm giỏ hàng thành công!"
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      productVariantId: "67f559e3a07743453ce315a6"
+                      quantity: 2
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '500': 
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /v1/shoppingCart/{id}:
+    get:
+      tags:
+        - ShoppingCart
+      summary: Get a shopping cart by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the shopping cart to retrieve
+      responses:
+        '200':
+          description: Shopping cart retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/ShoppingCart'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      productVariantId: "67f559e3a07743453ce315a6"
+                      quantity: 2
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Shopping cart not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+    put:
+      tags:
+        - ShoppingCart
+      summary: Update Shopping Cart Quantity by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the shopping cart to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+                  description: New quantity of the product variant in the cart
+              required:
+                - quantity
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  quantity: 3
+      responses:
+        '200':
+          description: Shopping cart updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/ShoppingCart'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      productVariantId: "67f559e3a07743453ce315a6"
+                      quantity: 3
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Shopping cart not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+    delete: 
+      tags:
+        - ShoppingCart
+      summary: Delete a shopping cart by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the shopping cart to delete
+      responses:
+        '200':
+          description: Shopping cart deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Xoá giỏ hàng thành công!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Xoá giỏ hàng thành công!"
+        '404':
+          description: Shopping cart not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+  /v1/productVariant/productId/{id}: 
+    get:
+      tags:
+        - ProductVariant
+      summary: Get all product variants by productId
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+      responses:
+        '200':
+          description: List of product variants retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/ProductVariant'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      - _id: "67f559e3a07743453ce315a6"
+                        productId: "67f559e3a07743453ce315a6"
+                        color: "Red"
+                        size: "M"
+                        stock: 100
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+                      - _id: "67f559e3a07743453ce315a7"
+                        productId: "67f559e3a07743453ce315a6"
+                        color: "Blue"
+                        size: "L"
+                        stock: 50
+                        createdAt: "2023-01-03T12:00:00Z"
+                        updatedAt: "2023-01-04T12:00:00Z"
+        '500' :
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /v1/productVariant/get/productInfo:
+    get:
+      tags:
+        - ProductVariant
+      summary: Get product variant by Product Information
+      parameters:
+        - name: productId
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+        - name: color
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "Red"
+        - name: size
+          in: query
+          required: true
+          schema:
+            type: string
+            example: "M"
+      responses:
+        '200':
+          description: Product variant retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:  
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/ProductVariant'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      - _id: "67f559e3a07743453ce315a6"
+                        productId: "67f559e3a07743453ce315a6"
+                        color: "Red"
+                        size: "M"
+                        stock: 100
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /v1/productVariant/{id}:
+    get:
+      tags:
+        - ProductVariant
+      summary: Get a product variant by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the product variant to retrieve
+      responses:
+        '200':
+          description: Product variant retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/ProductVariant'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      productId: "67f559e3a07743453ce315a6"
+                      color: "Red"
+                      size: "M"
+                      stock: 100
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Product variant not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    put:
+      tags:
+        - ProductVariant
+      summary: Update a product variant by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the product variant to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                color:
+                  type: string
+                  description: Color of the product variant
+                size:
+                  type: string
+                  description: Size of the product variant
+                stock:
+                  type: integer
+                  description: Stock quantity of the product variant
+              required:
+                - color
+                - size
+                - stock
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  color: "Red"
+                  size: "M"
+                  stock: 150
+      responses:
+        '200':
+          description: Product variant updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/ProductVariant'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      productId: "67f559e3a07743453ce315a6"
+                      color: "Red"
+                      size: "M"
+                      stock: 150
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Product variant not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+        '409': 
+          description: Conflict - Product variant already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sản phẩm với kích cỡ và màu sắc này đã tồn tại. Vui lòng kiểm tra lại!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Sản phẩm với kích cỡ và màu sắc này đã tồn tại. Vui lòng kiểm tra lại!"
+    delete: 
+      tags:
+        - ProductVariant
+      summary: Delete a product variant by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the product variant to delete
+      responses:
+        '200':
+          description: Product variant deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Xóa biến thể sản phẩm thành công!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Xóa biến thể sản phẩm thành công!"
+        '404':
+          description: Product variant not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+  /v1/productVariant: 
+    post: 
+      tags:
+        - ProductVariant
+      summary: Create a new product variant
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                  description: Reference to the product ID
+                color:
+                  type: string
+                  description: Color of the product variant
+                size:
+                  type: string
+                  description: Size of the product variant
+                stock:
+                  type: integer
+                  description: Stock quantity of the product variant
+              required:
+                - productId
+                - color
+                - size
+                - stock
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  productId: "67f559e3a07743453ce315a6"
+                  color: "Red"
+                  size: "M"
+                  stock: 100
+      responses:
+        '201':
+          description: Product variant created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    items:
+                      $ref: '#/components/schemas/ProductVariant'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      productId: "67f559e3a07743453ce315a6"
+                      color: "Red"
+                      size: "M"
+                      stock: 100
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '409':
+          description: Conflict - Product variant already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sản phẩm với kích cỡ và màu sắc này đã tồn tại. Vui lòng kiểm tra lại!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Sản phẩm với kích cỡ và màu sắc này đã tồn tại. Vui lòng kiểm tra lại!"
+  /v1/product: 
+    get:
+      tags:
+        - Product
+      summary: Get all products
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: Number of products per page
+        - name: categoryId
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: Filter products by category ID
+        - name: sortBy
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "price"
+          description: Sort products by a specific field (e.g., price, rating)
+        - name: sortOrder
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "asc"
+          description: Sort order (asc or desc)
+        - name: search
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "hoodie"
+          description: Search term to filter products by name or description
+        - name: isActive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            example: true
+          description: Filter products by active status
+        - name: minPrice
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+            example: 10.00
+          description: Minimum price to filter products
+        - name: maxPrice
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+            example: 100.00
+          description: Maximum price to filter products
+      responses:
+        '200':
+          description: List of products retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        description: Total number of products
+                      currentPage:
+                        type: integer
+                        description: Current page number
+                      totalPages:
+                        type: integer
+                        description: Total number of pages   
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Product'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    meta:
+                      totalCount: 2
+                      currentPage: 1
+                      totalPages: 1
+                    data:
+                      - _id: "67f559e3a07743453ce315a6"
+                        name: "Hoodie"
+                        description: "A comfortable hoodie"
+                        price: 29.99
+                        categoryId: "67f559e3a07743453ce315a6"
+                        images:
+                          - url: "https://example.com/image1.jpg"
+                            publicId: "image1"
+                        discountPrice: 24.99
+                        rating: 4.5
+                        soldQuantity: 1000
+                        totalReview: 200
+                        isActive: true
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+                      - _id: "67f559e3a07743453ce315a7"
+                        name: "T-Shirt"
+                        description: "A stylish t-shirt"
+                        price: 19.99
+                        categoryId: "67f559e3a07743453ce315a6"
+                        images:
+                          - url: "https://example.com/image2.jpg"
+                            publicId: "image2"
+                        discountPrice: 15.99
+                        rating: 4.0
+                        soldQuantity: 500
+                        totalReview: 100
+                        isActive: true
+                        createdAt: "2023-01-03T12:00:00Z"
+                        updatedAt: "2023-01-04T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    post:
+      tags:
+        - Product
+      summary: Create a new product
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the product
+                description:
+                  type: string
+                  description: Description of the product
+                price:
+                  type: number
+                  format: float
+                  description: Price of the product
+                categoryId:
+                  type: string
+                  description: Reference to the category ID
+                discountPrice:
+                  type: number
+                  format: float
+                  description: Discounted price of the product
+              required:
+                - name
+                - price
+                - categoryId
+                - description
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  name: "Hoodie"
+                  description: "A comfortable hoodie"
+                  price: 29.99
+                  categoryId: "67f559e3a07743453ce315a6"
+                  discountPrice: 24.99
+      responses:
+        '201':
+          description: Product created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Thêm sản phẩm thành công!"
+                  data:
+                    $ref: '#/components/schemas/Product'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Thêm sản phẩm thành công!"
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      name: "Hoodie"
+                      description: "A comfortable hoodie"
+                      price: 29.99
+                      categoryId: "67f559e3a07743453ce315a6"
+                      discountPrice: 24.99
+                      isActive: true
+                      rating: 4.5
+                      soldQuantity: 1000
+                      totalReview: 200
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+  /v1/product/{id}:
+    get:
+      tags:
+        - Product
+      summary: Get a product by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the product to retrieve
+      responses:
+        '200':
+          description: Product retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      name: "Hoodie"
+                      description: "A comfortable hoodie"
+                      price: 29.99
+                      categoryId: "67f559e3a07743453ce315a6"
+                      discountPrice: 24.99
+                      images:
+                        - url: "https://example.com/image1.jpg"
+                          publicId: "image1"
+                      isActive: true
+                      rating: 4.5
+                      soldQuantity: 1000
+                      totalReview: 200
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    put:
+      tags:
+        - Product
+      summary: Update a product by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the product to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Name of the product
+                description:
+                  type: string
+                  description: Description of the product
+                price:
+                  type: number
+                  format: float
+                  description: Price of the product
+                categoryId:
+                  type: string
+                  description: Reference to the category ID
+                discountPrice:
+                  type: number
+                  format: float
+                  description: Discounted price of the product
+              required:
+                - name
+                - price
+                - categoryId
+                - description
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  name: "Updated Hoodie"
+                  description: "An updated comfortable hoodie"
+                  price: 34.99
+                  categoryId: "67f559e3a07743453ce315a6"
+                  discountPrice: 29.99
+      responses:
+        '200':
+          description: Product updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      name: "Updated Hoodie"
+                      description: "An updated comfortable hoodie"
+                      price: 34.99
+                      categoryId: "67f559e3a07743453ce315a6"
+                      discountPrice: 29.99
+                      images:
+                        - url: "https://example.com/image1.jpg"
+                          publicId: "image1"
+                      isActive: true
+                      rating: 4.5
+                      soldQuantity: 1000
+                      totalReview: 200
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+  /v1/product/archive/{id}: 
+    put:
+      tags:
+        - Product
+      summary: Archive a product by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the product to archive
+      responses:
+        '200':
+          description: Product archived successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sản phẩm đã được lưu trữ thành công!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Sản phẩm đã được lưu trữ thành công!"
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+  /v1/product/images: 
+    post:
+      tags:
+        - Product
+      summary: Upload product images
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                  description: The ID of the product to which the images belong
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+      responses:
+        '201':
+          description: Images uploaded successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:                 
+                    $ref: '#/components/schemas/Product'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      name: "Hoodie"
+                      description: "A comfortable hoodie"
+                      price: 29.99
+                      categoryId: "67f559e3a07743453ce315a6"
+                      images:
+                        - url: "https://example.com/image1.jpg"
+                          publicId: "image1"
+                        - url: "https://example.com/image2.jpg"
+                          publicId: "image2"
+                      discountPrice: 24.99
+                      rating: 4.5
+                      soldQuantity: 1000
+                      totalReview: 200
+                      isActive: true
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '404': 
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+  /v1/product/images/{productId}/{publicId}:
+    delete:
+      tags:
+        - Product
+      summary: Delete a product image
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the product from which the image will be deleted
+        - name: publicId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "image1"
+          description: The public ID of the image to delete
+      responses:
+        '200':
+          description: Image deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Product'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      name: "Hoodie"
+                      description: "A comfortable hoodie"
+                      price: 29.99
+                      categoryId: "67f559e3a07743453ce315a6"
+                      images:
+                        - url: "https://example.com/image2.jpg"
+                          publicId: "image2"
+                      discountPrice: 24.99
+                      rating: 4.5
+                      soldQuantity: 1000
+                      totalReview: 200
+                      isActive: true
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+  /v1/review: 
+    get:
+      tags:
+        - Review
+      summary: Get all reviews
+      parameters:
+        - name: page
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+          description: Page number for pagination
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 10
+          description: Number of reviews per page
+        - name: productId
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: Filter reviews by product ID
+        - name: userId
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: Filter reviews by user ID
+        - name: orderId
+          in: query
+          required: false
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: Filter reviews by order ID
+        - name: rating
+          in: query
+          required: false
+          schema:
+            type: number
+            format: float
+            example: 4.5
+          description: Filter reviews by rating
+        - name: isActive
+          in: query
+          required: false
+          schema:
+            type: boolean
+            example: true
+          description: Filter reviews by active status
+        - name: status
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: ["Chưa trả lời", "Đã trả lời"]
+            example: "Chưa trả lời"
+          description: Filter reviews by status (Chưa trả lời or Đã trả lời)
+      responses:
+        '200':
+          description: List of reviews retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  meta:
+                    type: object
+                    properties:
+                      totalCount:
+                        type: integer
+                        description: Total number of reviews
+                      currentPage:
+                        type: integer
+                        description: Current page number
+                      totalPages:
+                        type: integer
+                        description: Total number of pages   
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Review'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    meta:
+                      totalCount: 2
+                      currentPage: 1
+                      totalPages: 1 
+                    data:
+                      - _id: "67f559e3a07743453ce315a6"
+                        productId: "67f559e3a07743453ce315a6"
+                        userId: "67f559e3a07743453ce315a6"
+                        orderId: "67f559e3a07743453ce315a6"
+                        rating: 4.5
+                        content: "Great product!"
+                        status: "Chưa trả lời"
+                        response: []
+                        isActive: true
+                        type: "Tích cực"
+                        createdAt: "2023-01-01T12:00:00Z"
+                        updatedAt: "2023-01-02T12:00:00Z"
+                      - _id: "67f559e3a07743453ce315a7"
+                        productId: "67f559e3a07743453ce315a6"
+                        userId: "67f559e3a07743453ce315a6"
+                        orderId: "67f559e3a07743453ce315a6"
+                        rating: 2.0
+                        content: "Not satisfied with the quality."
+                        status: "Đã trả lời"
+                        response:
+                          - userId: "67f559e3a07743453ce315a6"
+                            content: "We're sorry to hear that. Please contact support."
+                            createdAt: "2023-01-03T12:00:00Z"
+                        isActive: true
+                        type: "Tiêu cực"
+                        createdAt: "2023-01-03T12:00:00Z"
+                        updatedAt: "2023-01-04T12:00:00Z"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    post:   
+      tags:
+        - Review
+      summary: Create a new review
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                productId:
+                  type: string
+                  description: Reference to the product ID
+                orderId:
+                  type: string
+                  description: Reference to the order ID
+                rating:
+                  type: number
+                  format: float
+                  description: Rating given by the user
+                content:
+                  type: string
+                  description: Review content
+              required:
+                - productId
+                - orderId
+                - rating
+                - content
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  productId: "67f559e3a07743453ce315a6"
+                  orderId: "67f559e3a07743453ce315a6"
+                  rating: 4.5
+                  content: "Great product!"
+      responses:
+        '201':
+          description: Review created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Review'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      productId: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      orderId: "67f559e3a07743453ce315a6"
+                      rating: 4.5
+                      content: "Great product!"
+                      status: "Chưa trả lời"
+                      response: []
+                      isActive: true
+                      type: "Tích cực"
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '409':
+          description: Conflict - Review already exists for the product and order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Đánh giá cho sản phẩm này đã tồn tại. Vui lòng kiểm tra lại!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Đánh giá cho sản phẩm này đã tồn tại. Vui lòng kiểm tra lại!" 
+  /v1/review/{id}:
+    get:
+      tags:
+        - Review
+      summary: Get a review by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the review to retrieve
+      responses:
+        '200':
+          description: Review retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Review'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      productId: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      orderId: "67f559e3a07743453ce315a6"
+                      rating: 4.5
+                      content: "Great product!"
+                      status: "Chưa trả lời"
+                      response: []
+                      isActive: true
+                      type: "Tích cực"
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+    put:
+      tags:
+        - Review
+      summary: Update a review by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the review to update
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: number
+                  format: float
+                  description: Updated rating given by the user
+                content:
+                  type: string
+                  description: Updated review content
+              required:
+                - rating
+                - content
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  rating: 5.0
+                  content: "Updated review content!"
+      responses:
+        '200':
+          description: Review updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Cập nhật đánh giá thành công!"
+                  data:
+                    $ref: '#/components/schemas/Review'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    _id: "67f559e3a07743453ce315a6"
+                    productId: "67f559e3a07743453ce315a6"
+                    userId: "67f559e3a07743453ce315a6"
+                    orderId: "67f559e3a07743453ce315a6"
+                    rating: 5.0
+                    content: "Updated review content!"
+                    status: "Chưa trả lời"
+                    response: []
+                    isActive: true
+                    type: "Tích cực"
+                    createdAt: "2023-01-01T12:00:00Z"
+                    updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403':
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+  /v1/review/response: 
+    post: 
+      tags:
+        - Review
+      summary: Respond to a review
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reviewId:
+                  type: string
+                  description: The ID of the review to respond to
+                content:
+                  type: string
+                  description: Response content
+              required:
+                - reviewId
+                - content
+            examples:
+              example1:
+                summary: Example request
+                value:
+                  reviewId: "67f559e3a07743453ce315a6"
+                  content: "Thank you for your feedback!"
+      responses:
+        '200':
+          description: Response added successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Phản hồi đánh giá thành công!"
+                  data:
+                    $ref: '#/components/schemas/Review'
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Phản hồi đánh giá thành công!"
+                    data:
+                      _id: "67f559e3a07743453ce315a6"
+                      productId: "67f559e3a07743453ce315a6"
+                      userId: "67f559e3a07743453ce315a6"
+                      orderId: "67f559e3a07743453ce315a6"
+                      rating: 4.5
+                      content: "Great product!"
+                      status: "Đã trả lời"
+                      response:
+                        - userId: "67f559e3a07743453ce315a6"
+                          content: "Thank you for your feedback!"
+                          createdAt: "2023-01-03T12:00:00Z"
+                      isActive: true
+                      type: "Tích cực"
+                      createdAt: "2023-01-01T12:00:00Z"
+                      updatedAt: "2023-01-02T12:00:00Z"
+        '404':
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"  
+        '500': 
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401':
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/PermissionError'
+                  - type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "Phản hồi của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!"
+  /v1/review/hide/{id}:
+    put:
+      tags:
+        - Review
+      summary: Hide a review by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the review to hide
+      responses:
+        '200':
+          description: Review hidden successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Ẩn đánh giá thành công!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Ẩn đánh giá thành công!"
+        '404':
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
+  /v1/review/unhide/{id}: 
+    put:
+      tags:
+        - Review
+      summary: Unhide a review by ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "67f559e3a07743453ce315a6"
+          description: The ID of the review to unhide
+      responses:
+        '200':
+          description: Review unhidden successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hiển thị đánh giá thành công!"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    message: "Hiển thị đánh giá thành công!"
+        '404':
+          description: Review not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: "Not found"
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    error: "Not found"
+        '500':
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ServerError'
+        '401': 
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema: 
+                oneOf:
+                  - $ref: '#/components/schemas/TokenError'
+                  - $ref: '#/components/schemas/TokenExpiredError'
+        '403': 
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PermissionError'
 components:
   securitySchemes:
     bearerAuth:
@@ -1313,6 +3389,166 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    Review:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Review ID
+        productId:
+          type: string
+          description: Reference to the product ID
+        userId:
+          type: string
+          description: Reference to the user ID
+        orderId:
+          type: string
+          description: Reference to the order ID
+        rating:
+          type: number
+          format: float
+          description: Rating given by the user
+        content:
+          type: string
+          description: Review content
+        status:
+          type: string
+          enum: ["Chưa trả lời", "Đã trả lời"]
+          description: Status of the review
+        response:
+          type: array
+          items:
+            type: object
+            properties:
+              userId:
+                type: string
+                description: Reference to the user ID who responded
+              content:
+                type: string
+                description: Response content
+              createdAt:
+                type: string
+                format: date-time
+                description: Timestamp when the response was created
+        isActive:
+          type: boolean
+          description: Indicates if the review is active
+        type: 
+          type: string
+          enum: ["Tích cực", "Tiêu cực"]
+          description: Type of the review
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the review was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the review was last updated
+    Product: 
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Product ID
+        name:
+          type: string
+          description: Name of the product
+        description:
+          type: string
+          description: Description of the product
+        price:
+          type: number
+          format: float
+          description: Price of the product
+        categoryId:
+          type: string
+          description: Reference to the category ID
+        images:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                description: URL of the product image
+              publicId:
+                type: string
+                description: Public ID for the image in the storage
+        discountPrice:
+          type: number
+          format: float
+          description: Discounted price of the product
+        rating: 
+          type: number
+          format: float
+          description: Average rating of the product
+        soldQuantity:
+          type: integer
+          description: Total quantity of the product sold
+        totalReview:
+          type: integer
+          description: Total number of reviews for the product
+        isActive:
+          type: boolean
+          description: Indicates if the product is active
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the product was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the product was last updated
+    ProductVariant:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Product variant ID
+        productId:
+          type: string
+          description: Reference to the product ID
+        color:
+          type: string
+          description: Color of the product variant
+        size:
+          type: string
+          description: Size of the product variant
+        stock:
+          type: integer
+          description: Stock quantity of the product variant
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the product variant was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the product variant was last updated
+    ShoppingCart: 
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Shopping cart ID
+        userId:
+          type: string
+          description: Reference to the user ID
+        productVariantId:
+          type: string
+          description: Reference to the product variant ID
+        quantity:
+          type: integer
+          description: Quantity of the product variant in the cart
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the cart was created
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the cart was last updated
     Category:
       type: object
       properties:
