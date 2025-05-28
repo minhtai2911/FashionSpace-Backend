@@ -116,7 +116,7 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
 
   if (!user) {
     logger.warn(messages.MSG8);
-    return res.status(409).json({ message: messages.MSG8 });
+    return res.status(400).json({ message: messages.MSG8 });
   }
 
   const transporter = nodemailer.createTransport({
@@ -165,9 +165,9 @@ const logout = asyncHandler(async (req, res, next) => {
   const { refreshToken } = req.body;
 
   if (!refreshToken) {
-    logger.warn("Refresh token null");
+    logger.warn("Refresh token bị thiếu hoặc không hợp lệ");
     return res.status(400).json({
-      message: "Refresh token null",
+      message: "Refresh token bị thiếu hoặc không hợp lệ",
     });
   }
 
@@ -177,9 +177,9 @@ const logout = asyncHandler(async (req, res, next) => {
   });
 
   if (!storedToken) {
-    logger.warn("Refresh token không hợp lệ");
+    logger.warn("Refresh token bị thiếu hoặc không hợp lệ");
     return res.status(400).json({
-      message: "Refresh token không hợp lệ",
+      message: "Refresh token bị thiếu hoặc không hợp lệ",
     });
   }
 
@@ -191,36 +191,35 @@ const logout = asyncHandler(async (req, res, next) => {
 const refreshToken = asyncHandler(async (req, res, next) => {
   const { refreshToken } = req.body;
   if (!refreshToken) {
-    logger.warn("Refresh token null");
+    logger.warn("Refresh token bị thiếu hoặc không hợp lệ");
     return res.status(400).json({
-      message: "Refresh token null",
+      message: "Refresh token bị thiếu hoặc không hợp lệ",
     });
   }
 
   const storedToken = await RefreshToken.findOne({ token: refreshToken });
 
   if (!storedToken) {
-    logger.warn("Refresh token không hợp lệ");
+    logger.warn("Refresh token bị thiếu hoặc không hợp lệ");
     return res.status(400).json({
-      message: "Refresh token không hợp lệ",
+      message: "Refresh token bị thiếu hoặc không hợp lệ",
     });
   }
 
   if (!storedToken || storedToken.expiresAt < new Date()) {
-    logger.warn("Refresh token đã quá hạn");
+    logger.warn("Refresh token hết hạn");
 
     return res.status(401).json({
-      message: `Refresh token đã quá hạn`,
+      message: `Refresh token hết hạn`,
     });
   }
 
   const user = await User.findById(storedToken.userId);
 
   if (!user) {
-    logger.warn("Không tìm thấy user");
-
-    return res.status(401).json({
-      message: `Không tìm thấy user`,
+    logger.warn("Not found");
+    return res.status(404).json({ 
+      error: `Not found`,
     });
   }
 
@@ -245,7 +244,7 @@ const sendOTP = asyncHandler(async (req, res, next) => {
   const user = await User.findOne({ email: email });
   if (!user) {
     logger.warn(messages.MSG8);
-    return res.status(409).json({ message: messages.MSG8 });
+    return res.status(400).json({ message: messages.MSG8 });
   }
 
   const transporter = nodemailer.createTransport({

@@ -462,7 +462,7 @@ const sendMailDeliveryInfo = asyncHandler(async (req, res, next) => {
 
   await sendDeliveryInfo(email, order);
   logger.info("Gửi email thông báo trạng thái đơn hàng thành công!");
-  res.status(200).json({});
+  res.status(200).json({ message: messages.MSG66 });
 });
 
 const checkoutWithVnPay = asyncHandler(async (req, res, next) => {

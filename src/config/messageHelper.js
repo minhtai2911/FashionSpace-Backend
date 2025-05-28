@@ -69,4 +69,5 @@ export const messages = {
   MSG63: "Ẩn đánh giá thành công!",
   MSG64: "Hiển thị đánh giá thành công!",
   MSG65: "Đánh giá cho sản phẩm này đã tồn tại. Vui lòng kiểm tra lại!",
+  MSG66: "Gửi email thông báo trạng thái đơn hàng thành công!"
 };
