@@ -15,7 +15,6 @@ router.post("/createGuestAccount", authController.createGuestAccount)
 router.post("/signup", authController.signup);
 router.post("/logout", authMiddleware.verifyToken, authController.logout);
 router.post("/refreshToken", authController.refreshToken);
-router.post("/generateOTP", authController.generateOTP);
 router.post("/sendOTP", authController.sendOTP);
 router.post("/checkOTPByEmail", authController.checkOTPByEmail);
 router.post(

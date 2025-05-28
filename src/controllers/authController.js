@@ -9,12 +9,11 @@ import RefreshToken from "../models/refreshToken.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import logger from "../utils/logger.js";
 
-const generateOTP = asyncHandler(async (req, res, next) => {
+const generateOTP = async (email) => {
   const otp = Math.floor(100000 + Math.random() * (999999 - 100000)).toString();
 
   const salt = await bcrypt.genSalt();
   const hashedOTP = await bcrypt.hash(otp, salt);
-  const email = req.body.email;
 
   const otpObj = new Otp({
     email,
@@ -23,8 +22,8 @@ const generateOTP = asyncHandler(async (req, res, next) => {
 
   await otpObj.save();
   logger.info("Tạo OTP thành công");
-  res.status(200).json({ otp: otp });
-});
+  return otp;
+};
 
 const login = asyncHandler(async (req, res, next) => {
   const email = req.body.email;
@@ -238,14 +237,14 @@ const refreshToken = asyncHandler(async (req, res, next) => {
 });
 
 const sendOTP = asyncHandler(async (req, res, next) => {
-  const OTP = req.body.OTP;
   const email = req.body.email;
-
   const user = await User.findOne({ email: email });
   if (!user) {
     logger.warn(messages.MSG8);
     return res.status(400).json({ message: messages.MSG8 });
   }
+
+  const OTP = await generateOTP(email);
 
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
@@ -384,7 +383,6 @@ export default {
   signup: signup,
   logout: logout,
   refreshToken: refreshToken,
-  generateOTP: generateOTP,
   sendOTP: sendOTP,
   checkOTPByEmail: checkOTPByEmail,
   forgotPassword: forgotPassword,
