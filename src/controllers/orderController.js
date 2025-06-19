@@ -700,11 +700,6 @@ const checkStatusTransactionZaloPay = asyncHandler(async (req, res, next) => {
         .json({ message: "Đơn hàng đã được thanh toán trước đó" });
     }
 
-    if (order.finalPrice !== amount) {
-      logger.warn("Số tiền thanh toán không khớp với đơn hàng");
-      throw new Error("Số tiền thanh toán không khớp");
-    }
-
     order.paymentStatus = paymentStatus.PAID;
     await order.save();
     logger.info("Thanh toán ZaloPay thành công!");
