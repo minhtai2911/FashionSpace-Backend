@@ -580,6 +580,10 @@ const checkoutWithZaloPay = asyncHandler(async (req, res, next) => {
     redirectUrl: `${process.env.URL_CLIENT}/orderCompleted`,
   };
   const order = await Order.findById(orderId);
+  if (!order) {
+    logger.warn("Đơn hàng không tồn tại");
+    return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+  }
   const amount = req.body.amount;
 
   let zaloPayParams = {
@@ -657,6 +661,26 @@ const callbackZaloPay = asyncHandler(async (req, res, next) => {
   logger.info("Thanh toán ZaloPay thành công!");
 });
 
+const checkStatusTransactionZaloPay = asyncHandler(async (req, res, next) => {
+  const app_id = "2553";
+  const key1 = "PcY4iZIKFCIdgZvA6ueMcMHHUbRLYjPL";
+  const endpoint = "https://sb-openapi.zalopay.vn/v2/query";
+
+  const { app_trans_id } = req.body;
+
+  const data = `${app_id}|${app_trans_id}|${key1}`;
+  const mac = crypto.createHmac("sha256", key1).update(data).digest("hex");
+
+  const params = {
+    app_id,
+    app_trans_id,
+    mac,
+  };
+
+  const result = await axios.post(endpoint, null, { params });
+  return res.status(200).json(result.data);
+});
+
 export default {
   getAllOrders: getAllOrders,
   getOrderById: getOrderById,
@@ -672,4 +696,5 @@ export default {
   callbackVnPay: callbackVnPay,
   checkoutWithZaloPay: checkoutWithZaloPay,
   callbackZaloPay: callbackZaloPay,
+  checkStatusTransactionZaloPay: checkStatusTransactionZaloPay,
 };
