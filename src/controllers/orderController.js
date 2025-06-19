@@ -678,7 +678,38 @@ const checkStatusTransactionZaloPay = asyncHandler(async (req, res, next) => {
   };
 
   const result = await axios.post(endpoint, null, { params });
-  return res.status(200).json(result.data);
+
+  if (result.data.return_code !== 1) {
+    logger.warn("Truy vấn giao dịch thất bại!");
+    return res.status(400).json({ message: "Truy vấn giao dịch thất bại!" });
+  }
+
+  if (result.data.data.status === 1) {
+    const orderId = app_trans_id.split("_")[1];
+    const order = await Order.findById(orderId);
+
+    if (!order) {
+      logger.warn("Đơn hàng không tồn tại");
+      return res.status(404).json({ message: "Đơn hàng không tồn tại" });
+    }
+
+    if (order.paymentStatus === paymentStatus.PAID) {
+      logger.warn("Đơn hàng đã được thanh toán trước đó");
+      return res
+        .status(400)
+        .json({ message: "Đơn hàng đã được thanh toán trước đó" });
+    }
+
+    if (order.finalPrice !== amount) {
+      logger.warn("Số tiền thanh toán không khớp với đơn hàng");
+      throw new Error("Số tiền thanh toán không khớp");
+    }
+
+    order.paymentStatus = paymentStatus.PAID;
+    await order.save();
+    logger.info("Thanh toán ZaloPay thành công!");
+    return res.status(200).json({ message: "Thanh toán thành công!" });
+  }
 });
 
 export default {
