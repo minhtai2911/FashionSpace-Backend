@@ -1,212 +1,207 @@
 import ProductVariant from "../models/productVariant.js";
-import ProductColor from "../models/productColor.js";
-import ProductSize from "../models/productSize.js";
 import { messages } from "../config/messageHelper.js";
+import invalidateCache from "../utils/changeCache.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import logger from "../utils/logger.js";
 
-const getProductVariants = async (req, res, next) => {
-  try {
-    const productVariants = await ProductVariant.find({});
+const getProductVariantById = asyncHandler(async (req, res, next) => {
+  const cacheKey = `productVariant:${req.params.id}`;
+  const cachedProductVariant = await req.redisClient.hgetall(cacheKey);
 
-    if (!productVariants) return res.status(404).json({ error: "Not found" });
+  if (Object.keys(cachedProductVariant).length > 1) {
+    logger.info("Lấy biến thể sản phẩm thành công!");
+    const parsedData = {};
 
-    res.status(200).json({ data: productVariants });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
-
-const getProductVariantById = async (req, res, next) => {
-  try {
-    const productVariant = await ProductVariant.findById(req.params.id);
-
-    if (!productVariant) return res.status(404).json({ error: "Not found" });
-
-    res.status(200).json({ data: productVariant });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
-
-const getProductVariantByProductIdColorIdSizeId = async (req, res, next) => {
-  try {
-    const productVariant = await ProductVariant.findOne({
-      productId: req.params.productId,
-      colorId: req.params.colorId,
-      sizeId: req.params.sizeId,
-    });
-    if (!productVariant) return res.status(404).json({ error: "Not found" });
-
-    res.status(200).json({ data: productVariant });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
-const getProductVariantsByProductId = async (req, res, next) => {
-  try {
-    const productVariant = await ProductVariant.find({
-      productId: req.params.id,
-    });
-
-    if (!productVariant) return res.status(404).json({ error: "Not found" });
-    res.status(200).json({ data: productVariant });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
-  }
-};
-
-const createProductVariant = async (req, res, next) => {
-  try {
-    const { productId, sizeId, colorId, quantity } = req.body;
-
-    if (!productId || !sizeId || !colorId || !quantity)
-      throw new Error(messages.MSG1);
-
-    const existingProductVariant = await ProductVariant.findOne({
-      productId,
-      sizeId,
-      colorId,
-    });
-
-    if (existingProductVariant) {
-      const color = await ProductColor.findById(existingProductVariant.colorId);
-      if (!color) return res.status(404).json({ error: "Not found" });
-      const size = await ProductSize.findById(existingProductVariant.sizeId);
-      if (!size) return res.status(404).json({ error: "Not found" });
-
-      return res.status(409).json({
-        message: `Sản phẩm với kích cỡ ${size.size} và màu sắc ${color.color} đã tồn tại. Vui lòng kiểm tra lại!`,
-      });
+    for (const key in cachedProductVariant) {
+      try {
+        parsedData[key] = JSON.parse(cachedProductVariant[key]);
+      } catch (err) {
+        parsedData[key] = cachedProductVariant[key];
+      }
     }
-
-    const newProductVariant = new ProductVariant({
-      productId,
-      sizeId,
-      colorId,
-      quantity,
-    });
-
-    await newProductVariant.save();
-    res.status(201).json({ data: newProductVariant });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+    return res.status(200).json({ data: parsedData });
   }
-};
 
-const updateProductVariantById = async (req, res, next) => {
-  try {
-    const updateProductVariant = await ProductVariant.findById(req.params.id);
+  const productVariant = await ProductVariant.findById(req.params.id).lean();
 
-    if (!updateProductVariant)
-      return res.status(404).json({ error: "Not found" });
-    
-    let check = true;
+  if (!productVariant) {
+    logger.warn("Biến thể sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
 
-    if (
-      req.body.productId == updateProductVariant.productId &&
-      req.body.sizeId == updateProductVariant.sizeId &&
-      req.body.colorId == updateProductVariant.colorId
-    ) {
-      check = false;
+  for (const key in productVariant) {
+    await req.redisClient.hset(cacheKey, key, JSON.stringify(productVariant[key]));
+  }
+
+  logger.info("Lấy biến thể sản phẩm thành công!");
+  res.status(200).json({ data: productVariant });
+});
+
+const getProductVariantByProductInfo = asyncHandler(async (req, res, next) => {
+  const query = {};
+
+  if (req.query.productId) query.productId = req.query.productId;
+  else throw new Error(messages.MSG1);
+  if (req.query.color) query.color = req.query.color;
+  else throw new Error(messages.MSG1);
+  if (req.query.size) query.size = req.query.size;
+  else throw new Error(messages.MSG1);
+
+  const cacheKey = `productVariant:${query.productId}:${query.color}:${query.size}`;
+  const cachedProductVariant = await req.redisClient.hgetall(cacheKey);
+
+  if (Object.keys(cachedProductVariant).length > 1) {
+    logger.info("Lấy biến thể sản phẩm thành công!", query);
+    const parsedData = {};
+
+    for (const key in cachedProductVariant) {
+      try {
+        parsedData[key] = JSON.parse(cachedProductVariant[key]);
+      } catch (err) {
+        parsedData[key] = cachedProductVariant[key];
+      }
     }
+    return res.status(200).json({ data: parsedData });
+  }
+  const productVariant = await ProductVariant.findOne(query).lean();
 
-    updateProductVariant.productId =
-      req.body.productId || updateProductVariant.productId;
-    updateProductVariant.sizeId =
-      req.body.sizeId || updateProductVariant.sizeId;
-    updateProductVariant.colorId =
-      req.body.colorId || updateProductVariant.colorId;
-    updateProductVariant.quantity =
-      req.body.quantity || updateProductVariant.quantity;
+  if (!productVariant) {
+    logger.warn("Biến thể sản phẩm không tồn tại", query);
+    return res.status(404).json({ error: "Not found" });
+  }
 
-    const productId = updateProductVariant.productId;
-    const sizeId = updateProductVariant.sizeId;
-    const colorId = updateProductVariant.colorId;
-    const existingProductVariant = await ProductVariant.findOne({
-      productId,
-      sizeId,
-      colorId,
-    });
+  for (const key in productVariant) {
+    await req.redisClient.hset(cacheKey, key, JSON.stringify(productVariant[key]));
+  }
 
-    if (existingProductVariant && check) {
-      const color = await ProductColor.findById(existingProductVariant.colorId);
-      if (!color) return res.status(404).json({ error: "Not found" });
-      const size = await ProductSize.findById(existingProductVariant.sizeId);
-      if (!size) return res.status(404).json({ error: "Not found" });
+  logger.info("Lấy biến thể sản phẩm thành công!", query);
+  res.status(200).json({ data: productVariant });
+});
 
-      return res.status(409).json({
-        message: `Sản phẩm với kích cỡ ${size.size} và màu sắc ${color.color} đã tồn tại. Vui lòng kiểm tra lại!`,
-      });
-    }
+const getProductVariantsByProductId = asyncHandler(async (req, res, next) => {
+  const cacheKey = `productVariants:${req.params.id}`;
+  const cachedProductVariants = await req.redisClient.get(cacheKey);
 
-    await updateProductVariant.save();
-    res.status(200).json({ data: updateProductVariant });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
+  if (cachedProductVariants) {
+    logger.info("Lấy danh sách biến thể sản phẩm thành công!");
+    return res.status(200).json({data: JSON.parse(cachedProductVariants)});
+  }
+
+  const productVariants = await ProductVariant.find({
+    productId: req.params.id,
+  });
+
+  await req.redisClient.setex(cacheKey, 300, JSON.stringify(productVariants));
+  logger.info("Lấy danh sách biến thể sản phẩm thành công!");
+  res.status(200).json({ data: productVariants });
+});
+
+const createProductVariant = asyncHandler(async (req, res, next) => {
+  const { productId, size, color, stock } = req.body;
+
+  if (!productId || !size || !color || !stock) {
+    logger.warn(messages.MSG1);
+    throw new Error(messages.MSG1);
+  }
+
+  const existingProductVariant = await ProductVariant.findOne({
+    productId,
+    size,
+    color,
+  });
+
+  if (existingProductVariant) {
+    logger.warn(messages.MSG57);
+    return res.status(409).json({
+      message: messages.MSG57,
     });
   }
-};
 
-const deleteProductVariantById = async (req, res, next) => {
-  try {
-    const deleteProductVariant = await ProductVariant.findByIdAndDelete(
-      req.params.id
-    );
+  const newProductVariant = new ProductVariant({
+    productId,
+    size,
+    color,
+    stock,
+  });
 
-    if (!deleteProductVariant)
-      return res.status(404).json({ error: "Not found" });
+  invalidateCache(
+    req,
+    "productVariant",
+    "productVariants",
+    newProductVariant._id.toString()
+  );
+  logger.info("Tạo biến thể sản phẩm thành công!");
+  await newProductVariant.save();
+  res.status(201).json({ data: newProductVariant });
+});
 
-    res.status(200).json();
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
+const updateProductVariantById = asyncHandler(async (req, res, next) => {
+  const updateProductVariant = await ProductVariant.findById(req.params.id);
+
+  if (!updateProductVariant) {
+    logger.warn("Biến thể sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  let check = true;
+
+  if (
+    req.body.size == updateProductVariant.size &&
+    req.body.color == updateProductVariant.color
+  ) {
+    check = false;
+  }
+
+  updateProductVariant.size = req.body.size || updateProductVariant.size;
+  updateProductVariant.color = req.body.color || updateProductVariant.color;
+  updateProductVariant.stock = req.body.stock || updateProductVariant.stock;
+
+  const size = updateProductVariant.size;
+  const color = updateProductVariant.color;
+  const existingProductVariant = await ProductVariant.findOne({
+    productId: updateProductVariant.productId,
+    size,
+    color,
+  });
+
+  if (existingProductVariant && check) {
+    logger.warn(messages.MSG57);
+    return res.status(409).json({
+      message: messages.MSG57,
     });
   }
-};
 
-const deleteProductVariantsByProductId = async (req, res, next) => {
-  try {
-    const deleteProductVariants = await ProductVariant.deleteMany({
-      productId: req.params.id,
-    });
+  invalidateCache(
+    req,
+    "productVariant",
+    "productVariants",
+    updateProductVariant._id.toString()
+  );
+  logger.info("Cập nhật biến thể sản phẩm thành công!");
+  await updateProductVariant.save();
+  res.status(200).json({ data: updateProductVariant });
+});
 
-    if (!deleteProductVariants)
-      return res.status(404).json({ error: "Not found" });
+const deleteProductVariantById = asyncHandler(async (req, res, next) => {
+  const deleteProductVariant = await ProductVariant.findByIdAndDelete(
+    req.params.id
+  );
 
-    res.status(200).json();
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  if (!deleteProductVariant) {
+    logger.warn("Biến thể sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
   }
-};
+
+  invalidateCache(req, "productVariant", "productVariants", req.params.id);
+  logger.info("Xóa biến thể sản phẩm thành công!");
+  res.status(200).json();
+});
 
 export default {
-  getProductVariants: getProductVariants,
   getProductVariantById: getProductVariantById,
   getProductVariantsByProductId: getProductVariantsByProductId,
   createProductVariant: createProductVariant,
   updateProductVariantById: updateProductVariantById,
   deleteProductVariantById: deleteProductVariantById,
-  deleteProductVariantsByProductId: deleteProductVariantsByProductId,
-  getProductVariantByProductIdColorIdSizeId:
-    getProductVariantByProductIdColorIdSizeId,
+  getProductVariantByProductInfo: getProductVariantByProductInfo,
 };

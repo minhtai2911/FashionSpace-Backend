@@ -1,25 +1,26 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  productId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "Product",
+const productVariantSchema = new mongoose.Schema(
+  {
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "Product",
+    },
+    size: {
+      type: String,
+      required: true,
+    },
+    color: {
+      type: String,
+      required: true,
+    },
+    stock: {
+      type: Number,
+      required: true,
+    },
   },
-  sizeId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "Size",
-  },
-  colorId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "Color",
-  },
-  quantity: {
-    type: Number,
-    required: true,
-  }
-});
+  { timestamps: true }
+);
 
-export default mongoose.model("ProductVariant", userSchema);
+export default mongoose.model("ProductVariant", productVariantSchema);

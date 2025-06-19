@@ -1,14 +1,22 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: true,
+const categorySchema = new mongoose.Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+    },
+    gender: {
+      type: String,
+      enum: ["Nam", "Nữ", "Unisex"],
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
-  gender: {
-    type: String,
-    default: null,
-  }
-});
+  { timestamps: true }
+);
 
-export default mongoose.model("Category", userSchema);
+export default mongoose.model("Category", categorySchema);

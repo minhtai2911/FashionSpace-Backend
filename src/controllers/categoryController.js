@@ -1,130 +1,176 @@
 import Category from "../models/category.js";
-import ProductSize from "../models/productSize.js";
-import Product from "../models/product.js";
 import chatbotController from "./chatbotController.js";
 import { messages } from "../config/messageHelper.js";
+import invalidateCache from "../utils/changeCache.js";
+import asyncHandler from "../middlewares/asyncHandler.js";
+import logger from "../utils/logger.js";
 
-const getAllCategories = async (req, res, next) => {
-  try {
-    const category = await Category.find({});
+const getAllCategories = asyncHandler(async (req, res, next) => {
+  const query = {};
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
 
-    if (!category) return res.status(404).json({ error: "Not found" });
+  if (req.query.isActive) query.isActive = req.query.isActive;
+  if (req.query.search) query.name = new RegExp(req.query.search, "i");
 
-    res.status(200).json({ data: category });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
+  const cacheKey = `categories:${page}:${limit}:${query.isActive || "null"}:${
+    query.name || "null"
+  }`;
+  const cachedCategories = await req.redisClient.get(cacheKey);
+
+  if (cachedCategories) {
+    logger.info("Lấy danh sách danh mục sản phẩm thành công!", {
+      ...query,
+      page,
+      limit,
     });
+    return res.status(200).json(JSON.parse(cachedCategories));
   }
-};
 
-const getCategoryById = async (req, res, next) => {
-  try {
-    const category = await Category.findById(req.params.id);
+  const totalCount = await Category.countDocuments(query);
+  const category = await Category.find(query).skip(skip).limit(limit).exec();
 
-    if (!category) return res.status(404).json({ error: "Not found" });
+  const result = {
+    meta: {
+      totalCount: totalCount,
+      currentPage: page,
+      totalPages: Math.ceil(totalCount / limit),
+    },
+    data: category,
+  };
 
-    res.status(200).json({ data: category });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
+  logger.info("Lấy danh sách danh mục sản phẩm thành công!", {
+    ...query,
+    page,
+    limit,
+  });
+  res.status(200).json(result);
+});
+
+const getCategoryById = asyncHandler(async (req, res, next) => {
+  const cacheKey = `category:${req.params.id}`;
+  const cachedCategory = await req.redisClient.get(cacheKey);
+
+  if (cachedCategory) {
+    logger.info("Lấy danh mục sản phẩm thành công!");
+    return res.status(200).json(JSON.parse(cachedCategory));
   }
-};
 
-const createCategory = async (req, res, next) => {
-  try {
-    const { name, gender } = req.body;
+  const category = await Category.findById(req.params.id);
 
-    if (!name) throw new Error(messages.MSG1);
-    const newCategory = new Category({ name, gender });
-
-    const existingCategory = await Category.findOne({name: name, gender: gender});
-    if (existingCategory) {
-      return res.status(409).json({ message: messages.MSG56 });
-    }
-
-    await newCategory.save();
-    chatbotController.updateEntityCategory(name, [name]);
-    res.status(201).json({
-      message: messages.MSG31,
-      data: newCategory,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  if (!category) {
+    logger.warn("Danh mục sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
   }
-};
 
-const updateCategoryById = async (req, res, next) => {
-  try {
-    const category = await Category.findById(req.params.id);
+  await req.redisClient.setex(cacheKey, 3600, JSON.stringify(category));
+  logger.info("Lấy danh mục sản phẩm thành công!");
+  res.status(200).json({ data: category });
+});
 
-    if (!category) return res.status(404).json({ error: "Not found" });
+const createCategory = asyncHandler(async (req, res, next) => {
+  const { name, gender } = req.body;
 
-    const { name, gender } = req.body;
-
-    const existingCategory = await Category.findOne({name: name, gender: gender});
-    if (existingCategory) {
-      return res.status(409).json({ message: messages.MSG56 });
-    }
-
-    chatbotController.deleteEntityCategory(category.name);
-    chatbotController.updateEntityCategory(name, [name]);
-
-    category.name = name || category.name;
-    category.gender = gender || category.gender;
-
-    await category.save();
-    res.status(200).json({
-      message: messages.MSG26,
-      data: category,
-    });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
+  if (!name) {
+    logger.warn(messages.MSG1);
+    throw new Error(messages.MSG1);
   }
-};
 
-const deleteCategoryById = async (req, res, next) => {
-  try {
-    const productSize = await ProductSize.find({ categoryId: req.params.id });
+  const existingCategory = await Category.findOne({
+    name: name,
+    gender: gender,
+  });
 
-    if (productSize)
-      return res.status(400).json({
-        message: messages.MSG29,
-      });
+  if (existingCategory) {
+    logger.warn(messages.MSG56);
+    return res.status(409).json({ message: messages.MSG56 });
+  }
 
-    const product = await Product.find({ categoryId: req.params.id });
+  const newCategory = new Category({ name, gender });
 
-    if (product)
-      return res.status(400).json({
-        message: messages.MSG28,
-      });
+  chatbotController.updateEntityCategory(name, [name]);
+  await newCategory.save();
+  await invalidateCache(
+    req,
+    "category",
+    "categories",
+    newCategory._id.toString()
+  );
 
-    const category = await Category.findByIdAndDelete(req.params.id);
+  logger.info(messages.MSG31, newCategory._id);
+  res.status(201).json({
+    message: messages.MSG31,
+    data: newCategory,
+  });
+});
 
-    if (!category) return res.status(404).json({ error: "Not found" });
-    chatbotController.deleteEntityCategory(category.name);
+const updateCategoryById = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
+
+  if (!category) {
+    logger.warn("Danh mục sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  const { name, gender } = req.body;
+
+  const existingCategory = await Category.findOne({
+    name: name,
+    gender: gender,
+  });
+
+  if (
+    existingCategory &&
+    existingCategory._id.toString() == category._id.toString()
+  ) {
+    logger.warn(messages.MSG56);
+    return res.status(409).json({ message: messages.MSG56 });
+  }
+
+  chatbotController.deleteEntityCategory(category.name);
+  chatbotController.updateEntityCategory(name, [name]);
+
+  category.name = name || category.name;
+  category.gender = gender || category.gender;
+
+  await category.save();
+  await invalidateCache(req, "category", "categories", category._id.toString());
+
+  logger.info(messages.MSG26);
+  res.status(200).json({
+    message: messages.MSG26,
+    data: category,
+  });
+});
+
+const updateStatusCategoryById = asyncHandler(async (req, res, next) => {
+  const category = await Category.findById(req.params.id);
+
+  if (!category) {
+    logger.warn("Danh mục sản phẩm không tồn tại");
+    return res.status(404).json({ error: "Not found" });
+  }
+
+  category.isActive = !category.isActive;
+
+  await category.save();
+  await invalidateCache(req, "category", "categories", category._id.toString());
+
+  if (category.isActive) {
+    logger.info(messages.MSG29);
+    res.status(200).json({ message: messages.MSG29 });
+  } else {
+    logger.info(messages.MSG30);
     res.status(200).json({ message: messages.MSG30 });
-  } catch (err) {
-    res.status(500).json({
-      error: err.message,
-      message: messages.MSG5,
-    });
   }
-};
+});
 
 export default {
   getAllCategories: getAllCategories,
   getCategoryById: getCategoryById,
   createCategory: createCategory,
   updateCategoryById: updateCategoryById,
-  deleteCategoryById: deleteCategoryById,
+  updateStatusCategoryById: updateStatusCategoryById,
 };

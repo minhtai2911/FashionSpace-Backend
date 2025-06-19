@@ -1,54 +1,70 @@
 import mongoose from "mongoose";
 import validator from "validator";
 import bcrypt from "bcrypt";
-import path from "path";
-import dotenv from "dotenv";
 import { messages } from "../config/messageHelper.js";
-dotenv.config();
 
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: (value) => {
-      return validator.isEmail(value);
+const userSchema = new mongoose.Schema(
+  {
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      validate: (value) => {
+        return validator.isEmail(value);
+      },
     },
-  },
-  fullName: {
-    type: String,
-    required: true,
-  },
-  phone: {
-    type: String,
-    validate: (value) => {
-      return validator.isMobilePhone(value, "vi-VN");
+    fullName: {
+      type: String,
+      required: true,
     },
+    phone: {
+      type: String,
+      validate: (value) => {
+        return validator.isMobilePhone(value, "vi-VN");
+      },
+    },
+    roleId: {
+      type: mongoose.Schema.Types.ObjectId,
+      require: true,
+      ref: "UserRole",
+    },
+    password: {
+      type: String,
+    },
+    googleId: {
+      type: String,
+    },
+    avatarPath: {
+      type: String,
+      default: `https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg`,
+    },
+    publicId: {
+      type: String,
+      default: `avatar_kn6ynb`,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    isGuest: {
+      type: Boolean,
+      default: false,
+    },
+    expiresAt: {
+      type: Date, 
+    },
+
   },
-  roleId: {
-    type: mongoose.Schema.Types.ObjectId,
-    require: true,
-    ref: "Role",
-  },
-  password: {
-    type: String,
-    required: true,
-  },
-  avatarPath: {
-    type: String,
-    default: path.join(process.env.URL_SERVER + "/avatars//avatar.jpg"),
-  },
-  isActive: {
-    type: Boolean,
-    default: false,
-  },
-  refreshToken: {
-    type: String,
-    default: "",
-  },
-});
+  { timestamps: true }
+);
+
+userSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 userSchema.pre("save", async function (next) {
+  if (this.isGuest === true && !this.expiresAt) {
+    const expirationTime = 30; 
+    this.expiresAt = Date.now() + expirationTime * 24 * 60 * 60 * 1000;  
+  }
   if (this.password) {
     const salt = await bcrypt.genSalt();
     this.password = await bcrypt.hash(this.password, salt);
@@ -57,19 +73,21 @@ userSchema.pre("save", async function (next) {
 });
 
 userSchema.statics.login = async function (email, password) {
-  const user = await this.findOne({ email });
-  if (user) {
-    const auth = await bcrypt.compare(password, user.password);
-    if (auth) {
-      return user;
+  try {
+    const user = await this.findOne({ email });
+    if (!user) {
+      throw new Error(messages.MSG2);
     }
-    throw new Error(
-      messages.MSG2
-    );
+
+    const check = await bcrypt.compare(password, user.password);
+    if (!check) {
+      throw new Error(messages.MSG2);
+    }
+    
+    return user;
+  } catch (err) {
+    throw new Error(messages.MSG2);
   }
-  throw new Error(
-    messages.MSG2
-  );
 };
 
 export default mongoose.model("User", userSchema);

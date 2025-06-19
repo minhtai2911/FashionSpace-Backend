@@ -26,11 +26,9 @@ export const messages = {
   MSG25: "Bạn có chắc chắn muốn lưu trữ người dùng không?",
   MSG26: "Chỉnh sửa danh mục sản phẩm thành công!",
   MSG27: "Lưu trữ người dùng thành công!",
-  MSG28:
-    "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với sản phẩm.",
-  MSG29:
-    "Không thể xóa danh mục sản phẩm khi nó đang được liên kết với các kích cỡ sản phẩm.",
-  MSG30: "Xóa danh mục sản phẩm thành công!",
+  MSG28: "Khôi phục danh mục sản phẩm thành công!",
+  MSG29: "Khôi phục sản phẩm thành công!",
+  MSG30: "Lưu trữ danh mục sản phẩm thành công!",
   MSG31: "Thêm danh mục sản phẩm thành công!",
   MSG32: "Thêm sản phẩm thành công!",
   MSG33: "Chỉnh sửa sản phẩm thành công!",
@@ -41,7 +39,7 @@ export const messages = {
     "Không thể xóa kích cỡ sản phẩm khi nó đang được liên kết với các sản phẩm.",
   MSG38: "Xóa kích cỡ sản phẩm thành công!",
   MSG39: "Chỉnh sửa kích cỡ sản phẩm thành công!",
-  MSG40: "Thêm màu sắc sản phẩm thành công!",
+  MSG40: "Cập nhật trạng thái thanh toán thành công!",
   MSG41:
     "Không thể xóa màu sản phẩm khi nó đang được liên kết với các sản phẩm.",
   MSG42: "Xóa màu sắc sản phẩm thành công!",
@@ -56,8 +54,20 @@ export const messages = {
   MSG50: "Số điện thoại bạn nhập không hợp lệ. Vui lòng kiểm tra lại.",
   MSG51: "Email đã tồn tại.",
   MSG52: "Đơn hàng đã được hủy thành công!",
-  MSG53: "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên.",
+  MSG53:
+    "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên.",
   MSG54: "Kích cỡ sản phẩm đã tồn tại!",
   MSG55: "Màu sắc sản phẩm đã tồn tại!",
   MSG56: "Danh mục sản phẩm đã tồn tại!",
+  MSG57:
+    "Sản phẩm với kích cỡ và màu sắc này đã tồn tại. Vui lòng kiểm tra lại!",
+  MSG58: "Khôi phục người dùng thành công!",
+  MSG59: "Đánh giá của bạn đã được cập nhật thành công!",
+  MSG60: "Xóa đánh giá thành công!",
+  MSG61: "Đánh giá của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!",
+  MSG62: "Phản hồi của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!",
+  MSG63: "Ẩn đánh giá thành công!",
+  MSG64: "Hiển thị đánh giá thành công!",
+  MSG65: "Đánh giá cho sản phẩm này đã tồn tại. Vui lòng kiểm tra lại!",
+  MSG66: "Gửi email thông báo trạng thái đơn hàng thành công!"
 };

@@ -1,21 +1,24 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
-    ref: "User"
+const shoppingCartSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      ref: "User",
+    },
+    productVariantId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "ProductVariant",
+      required: true,
+    },
+    quantity: {
+      type: Number,
+      required: true,
+      min: 1,
+    },
   },
-  productVariantId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "ProductVariant",
-    required: true,
-  },
-  quantity: {
-    type: Number,
-    required: true,
-    min: 1,
-  },
-});
+  { timestamps: true }
+);
 
-export default mongoose.model("ShoppingCart", userSchema);
+export default mongoose.model("ShoppingCart", shoppingCartSchema);
