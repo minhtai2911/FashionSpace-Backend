@@ -684,7 +684,7 @@ const checkStatusTransactionZaloPay = asyncHandler(async (req, res, next) => {
     return res.status(400).json({ message: "Truy vấn giao dịch thất bại!" });
   }
 
-  if (result.data.data.status === 1) {
+  if (result.data.return_code === 1) {
     const orderId = app_trans_id.split("_")[1];
     const order = await Order.findById(orderId);
 
