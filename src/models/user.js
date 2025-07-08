@@ -36,11 +36,11 @@ const userSchema = new mongoose.Schema(
     },
     avatarPath: {
       type: String,
-      default: `https://res.cloudinary.com/dffy6tds8/image/upload/v1744127926/avatar_kn6ynb.jpg`,
+      default: "",
     },
     publicId: {
       type: String,
-      default: `avatar_kn6ynb`,
+      default: "",
     },
     isActive: {
       type: Boolean,

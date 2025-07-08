@@ -44,12 +44,10 @@ const login = asyncHandler(async (req, res, next) => {
 
   if (!user.isActive && role.roleName === "Customer") {
     logger.warn("Tài khoản chưa được xác thực");
-    return res
-      .status(400)
-      .json({
-        data: { userId: user._id, email: email },
-        message: "Tài khoản chưa được xác thực!",
-      });
+    return res.status(400).json({
+      data: { userId: user._id, email: email },
+      message: "Tài khoản chưa được xác thực!",
+    });
   }
 
   if (!user.isActive) {
@@ -133,7 +131,9 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
     to: `${email}`,
     subject: "YÊU CẦU XÁC NHẬN THÔNG TIN ĐĂNG KÝ TÀI KHOẢN TỪ FASHION SPACE",
     html: `
-      <a href="${process.env.URL_CLIENT}/verify/${user._id.toString()}">Nhấn vào đây để xác nhận email của bạn.</a>
+      <a href="${
+        process.env.URL_CLIENT
+      }/verify/${user._id.toString()}">Nhấn vào đây để xác nhận email của bạn.</a>
       `,
   });
   logger.info(messages.MSG4);
@@ -217,7 +217,7 @@ const refreshToken = asyncHandler(async (req, res, next) => {
 
   if (!user) {
     logger.warn("Not found");
-    return res.status(404).json({ 
+    return res.status(404).json({
       error: `Not found`,
     });
   }
@@ -356,21 +356,12 @@ const createGuestAccount = asyncHandler(async (req, res, next) => {
       email: email,
       fullName: fullName,
       phone: phone,
+      isGuest: true,
       roleId: role.id,
     });
 
     await user.save();
   }
-
-  await User.findByIdAndUpdate(
-    user._id,
-    {
-      $set: {
-        isGuest: true,
-      },
-    },
-    { new: true }
-  );
 
   const { accessToken, refreshToken } = await generateTokens(user);
 
