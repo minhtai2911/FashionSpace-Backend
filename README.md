@@ -83,7 +83,7 @@ npm install
 cp .env.example .env
 ```
 
-> Điền các giá trị: `PORT`, `MONGO_URI`, `JWT_SECRET`, `CLOUDINARY_API_KEY`,...
+> Điền các giá trị: `PORT`, `DB_URL`, `ACCESS_TOKEN_SECRET`, `CLOUDINARY_API_KEY`,...
 
 ### 4. Khởi chạy:
 
