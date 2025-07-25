@@ -34,7 +34,7 @@ tags:
   - name: Recommendation
     description: Operations related to product recommendations
 paths:
-  /v1/user:
+  /api/v1/user:
     get:
       tags:
         - User
@@ -282,7 +282,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /v1/user/{id}:
+  /api/v1/user/{id}:
     get:
       tags:
         - User
@@ -456,7 +456,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/user/archive/{id}:
+  /api/v1/user/archive/{id}:
     put:
       tags:
         - User
@@ -531,7 +531,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /v1/userRole:
+  /api/v1/userRole:
     get:
       tags:
         - UserRole
@@ -623,7 +623,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/userRole/{id}:
+  /api/v1/userRole/{id}:
     get:
       tags:
         - UserRole
@@ -690,7 +690,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/userAddress:
+  /api/v1/userAddress:
     get:
       tags:
         - UserAddress
@@ -892,7 +892,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/userAddress/{id}:
+  /api/v1/userAddress/{id}:
     get:
       tags:
         - UserAddress
@@ -1078,7 +1078,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/category:
+  /api/v1/category:
     get:
       tags:
         - Category
@@ -1250,7 +1250,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Danh mục sản phẩm đã tồn tại!"
-  /v1/category/{id}:
+  /api/v1/category/{id}:
     get:
       tags:
         - Category
@@ -1307,7 +1307,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/shoppingCart:
+  /api/v1/shoppingCart:
     get:
       tags:
         - ShoppingCart
@@ -1457,7 +1457,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/shoppingCart/{id}:
+  /api/v1/shoppingCart/{id}:
     get:
       tags:
         - ShoppingCart
@@ -1666,7 +1666,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-  /v1/productVariant/productId/{id}:
+  /api/v1/productVariant/productId/{id}:
     get:
       tags:
         - ProductVariant
@@ -1715,7 +1715,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/productVariant/get/productInfo:
+  /api/v1/productVariant/get/productInfo:
     get:
       tags:
         - ProductVariant
@@ -1769,7 +1769,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/productVariant/{id}:
+  /api/v1/productVariant/{id}:
     get:
       tags:
         - ProductVariant
@@ -2002,7 +2002,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/productVariant:
+  /api/v1/productVariant:
     post:
       tags:
         - ProductVariant
@@ -2100,7 +2100,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Sản phẩm với kích cỡ và màu sắc này đã tồn tại. Vui lòng kiểm tra lại!"
-  /v1/product:
+  /api/v1/product:
     get:
       tags:
         - Product
@@ -2335,7 +2335,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/product/{id}:
+  /api/v1/product/{id}:
     get:
       tags:
         - Product
@@ -2511,7 +2511,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/product/archive/{id}:
+  /api/v1/product/archive/{id}:
     put:
       tags:
         - Product
@@ -2577,7 +2577,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/product/images:
+  /api/v1/product/images:
     post:
       tags:
         - Product
@@ -2666,7 +2666,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/product/images/{productId}/{publicId}:
+  /api/v1/product/images/{productId}/{publicId}:
     delete:
       tags:
         - Product
@@ -2753,7 +2753,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/review:
+  /api/v1/review:
     get:
       tags:
         - Review
@@ -2984,7 +2984,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Đánh giá cho sản phẩm này đã tồn tại. Vui lòng kiểm tra lại!"
-  /v1/review/{id}:
+  /api/v1/review/{id}:
     get:
       tags:
         - Review
@@ -3146,7 +3146,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/review/response:
+  /api/v1/review/response:
     post:
       tags:
         - Review
@@ -3250,7 +3250,7 @@ paths:
                       message:
                         type: string
                         example: "Phản hồi của bạn vi phạm quy tắc cộng đồng. Vui lòng thử lại!"
-  /v1/review/hide/{id}:
+  /api/v1/review/hide/{id}:
     put:
       tags:
         - Review
@@ -3316,7 +3316,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/review/unhide/{id}:
+  /api/v1/review/unhide/{id}:
     put:
       tags:
         - Review
@@ -3382,7 +3382,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/order:
+  /api/v1/order:
     post:
       tags:
         - Order
@@ -3671,7 +3671,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/order/{id}: 
+  /api/v1/order/{id}: 
     get:
       tags:
         - Order
@@ -3751,7 +3751,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-  /v1/order/get/userId: 
+  /api/v1/order/get/userId: 
     get:
       tags:
         - Order
@@ -3841,7 +3841,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-  /v1/order/deliveryInfo/{id}:
+  /api/v1/order/deliveryInfo/{id}:
     put: 
       tags:
         - Order
@@ -3971,7 +3971,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /v1/order/sendDeliveryInfo:
+  /api/v1/order/sendDeliveryInfo:
     post:
       tags:
         - Order
@@ -4038,7 +4038,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /v1/order/checkoutWithMoMo: 
+  /api/v1/order/checkoutWithMoMo: 
     post:
       tags:
         - Order
@@ -4091,7 +4091,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/order/checkoutWithVnPay:
+  /api/v1/order/checkoutWithVnPay:
     post:
       tags:
         - Order
@@ -4144,7 +4144,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/order/checkoutWithZaloPay:
+  /api/v1/order/checkoutWithZaloPay:
     post:
       tags:
         - Order
@@ -4197,7 +4197,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/statistic:
+  /api/v1/statistic:
     get:
       tags:
         - Statistic
@@ -4268,7 +4268,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /v1/chatbot:
+  /api/v1/chatbot:
     post:
       tags:
         - Chatbot
@@ -4342,7 +4342,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/recommendation/for-you:
+  /api/v1/recommendation/for-you:
     get:
       tags:
         - Recommendation
@@ -4395,7 +4395,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-  /v1/recommendation/similar/{productId}:
+  /api/v1/recommendation/similar/{productId}:
     get:
       tags:
         - Recommendation
@@ -4461,7 +4461,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /v1/auth/login: 
+  /api/v1/auth/login: 
     post:
       tags:
         - Auth
@@ -4538,7 +4538,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ với quản trị viên."
-  /v1/auth/signup:
+  /api/v1/auth/signup:
     post:
       tags:
         - Auth
@@ -4617,7 +4617,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Email đã tồn tại."
-  /v1/auth/createGuestAccount:
+  /api/v1/auth/createGuestAccount:
     post:
       tags:
         - Auth
@@ -4680,7 +4680,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/auth/logout:
+  /api/v1/auth/logout:
     post:
       tags:
         - Auth
@@ -4749,7 +4749,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Refresh token bị thiếu hoặc không hợp lệ"
-  /v1/auth/refreshToken:
+  /api/v1/auth/refreshToken:
     post:
       tags:
         - Auth
@@ -4841,7 +4841,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Not found"
-  /v1/auth/generateOTP:
+  /api/v1/auth/generateOTP:
     post:
       tags:
         - Auth
@@ -4886,7 +4886,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-  /v1/auth/sendOTP:
+  /api/v1/auth/sendOTP:
     post:
       tags:
         - Auth
@@ -4941,7 +4941,7 @@ paths:
                   message:
                     type: string
                     example: "Email không tồn tại."
-  /v1/auth/checkOTPByEmail:
+  /api/v1/auth/checkOTPByEmail:
     post:
       tags:
         - Auth
@@ -5014,7 +5014,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Mã OTP không hợp lệ."
-  /v1/auth/forgotPassword:
+  /api/v1/auth/forgotPassword:
     post:
       tags:
         - Auth
@@ -5068,7 +5068,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-  /v1/auth/resetPassword:
+  /api/v1/auth/resetPassword:
     post:
       tags:
         - Auth
@@ -5127,7 +5127,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-  /v1/auth/verifyAccount/{id}:
+  /api/v1/auth/verifyAccount/{id}:
     get:
       tags:
         - Auth
@@ -5185,7 +5185,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /v1/auth/sendMailVerifyAccount:
+  /api/v1/auth/sendMailVerifyAccount:
     post:
       tags:
         - Auth
@@ -5247,7 +5247,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Email không tồn tại."
-  /v1/auth/loginGoogleSuccess:
+  /api/v1/auth/loginGoogleSuccess:
     post:
       tags:
         - Auth
