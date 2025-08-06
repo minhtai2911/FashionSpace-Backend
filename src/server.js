@@ -60,9 +60,9 @@ mongoose
   .then(() => {
     logger.info("Database connected successful!");
     if (process.env.NODE_ENV === "production") {
-      app.listen(process.env.PROD_PORT, () => {
+      app.listen(process.env.PORT, () => {
         logger.info(
-          `Production: Server is running on port ${process.env.PROD_PORT}`
+          `Production: Server is running on port ${process.env.PORT}`
         );
         logger.info(
           `Documentation is available at https://fashionspace-api.onrender.com/api-docs`
