@@ -17,8 +17,8 @@ export const initDatabase = asyncHandler(async () => {
   }
 
   // Create a default admin user
-  const adminEmail = "admin@gmail.com";
-  const adminPassword = "admin123";
+  const adminEmail = process.env.ADMIN_EMAIL;
+  const adminPassword = process.env.ADMIN_PASSWORD;
   const user = await User.findOne({ email: adminEmail });
   if (!user) {
     const userRole = await UserRole.findOne({ roleName: "Admin" });
