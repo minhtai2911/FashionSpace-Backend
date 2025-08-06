@@ -1,100 +1,107 @@
 # FashionSpace-Backend
 
-RESTful API backend cho hệ thống thương mại điện tử thời trang **FashionSpace** — hỗ trợ đầy đủ các nghiệp vụ như quản lý người dùng, danh mục sản phẩm, sản phẩm, đơn hàng, đánh giá, giỏ hàng, thanh toán trực tuyến và thống kê. Tích hợp chatbot Dialogflow và hệ thống khuyến nghị sản phẩm cá nhân hóa dựa trên hành vi của người dùng. Đồng thời cung cấp hệ thống phân tích đánh giá tiêu cực/tích cực giúp quản trị viên hiểu rõ hơn về mức độ hài lòng và xu hướng phản hồi khách hàng.
+A RESTful API backend for the **FashionSpace** fashion e-commerce platform — fully supporting key operations such as user management, product categories, products, orders, reviews, shopping cart, online payments, and analytics. Integrated with Dialogflow chatbot and a personalized product recommendation system based on user behavior. Also includes sentiment analysis to help admins better understand customer satisfaction and feedback trends.
 
 ---
 
-## Mục lục
+## Table of Contents
 
-* [Giới thiệu](#giới-thiệu)
-* [Tính năng chính](#tính-năng-chính)
-* [Công nghệ sử dụng](#công-nghệ-sử-dụng)
-* [Cài đặt & Chạy dự án](#cài-đặt--chạy-dự-án)
-* [Tài liệu API (Swagger)](#tài-liệu-api-swagger)
-
----
-
-## Giới thiệu
-
-**FashionSpace‑Backend** là hệ thống RESTful API hỗ trợ toàn bộ hoạt động của nền tảng thương mại điện tử thời trang. Dự án được xây dựng nhằm mục đích:
-
-* Hỗ trợ hai vai trò chính: **Admin** và **Khách hàng**. Ngoài ra còn có tài khoản **Nhân viên** hỗ trợ quản lý đơn hàng và phản hồi đánh giá người dùng.
-* Đáp ứng các chức năng từ quản lý sản phẩm, danh mục sản phẩm, đơn hàng, đánh giá, giỏ hàng, thanh toán trực tuyến đến thống kê doanh thu.
-* Cung cấp API rõ ràng, dễ test thông qua Swagger UI.
+* [Introduction](#introduction)
+* [Main Features](#main-features)
+* [Tech Stack](#tech-stack)
+* [Setup & Run](#setup--run)
+* [API Documentation (Swagger)](#api-documentation-swagger)
 
 ---
 
-## Tính năng chính
+## Introduction
 
-### Khách hàng
+**FashionSpace‑Backend** is a RESTful API system that powers the backend of the FashionSpace e-commerce platform. The project aims to:
 
-* Đăng ký/Đăng nhập, quên mật khẩu, đổi mật khẩu, cập nhật thông tin cá nhân.
-* Xem danh sách sản phẩm, tìm kiếm theo tên/danh mục, bộ lọc theo đánh giá, giá cả.
-* Quản lý giỏ hàng, tạo và theo dõi đơn hàng.
-* Đánh giá sản phẩm.
-* Nhận tư vấn thông qua chatbot
-
-### Quản trị viên (Admin)
-
-* Thêm/sửa/lưu trữ sản phẩm và danh mục.
-* Quản lý người dùng toàn hệ thống.
-* Thống kê doanh thu theo thời gian.
-
-### Nhân viên
-
-* Quản lý đơn hàng.
-* Quản lý đánh giá.
+* Support three main user roles: **Admin**, **Customer**, and **Staff** (for order and review management).
+* Enable full functionality from managing products, categories, orders, reviews, carts, payments to revenue analytics.
+* Provide well-documented and testable APIs via Swagger UI.
 
 ---
 
-## Công nghệ sử dụng
+## Main Features
 
-* **Node.js** + **Express.js**: Xây dựng RESTful API.
-* **MongoDB** + **Mongoose**: Lưu trữ dữ liệu NoSQL.
-* **JWT (JSON Web Token)** + **OAuth2**: Xác thực và phân quyền.
-* **Dialogflow**: Chatbot tư vấn.
-* **Tensorflow**: Hệ thống khuyến nghị sản phẩm.
-* **Hugging Face**: Phân tích đánh giá bình luận tiêu cực/tích cực.
-* **Redis**: Cache dữ liệu.
-* **Swagger UI**: Tài liệu hóa API.
-* **Dotenv**: Quản lý biến môi trường.
-* **Multer & Cloudinary**: Upload và lưu trữ ảnh sản phẩm.
+### Customer
+
+* Register/Login, forgot password, change password, update profile.
+* Browse product listings, search by name or category, filter by rating and price.
+* Manage shopping cart, create and track orders.
+* Submit product reviews.
+* Get assistance via chatbot (Dialogflow).
+
+### Administrator (Admin)
+
+* Create, update, archive products and categories.
+* Manage all users on the system.
+* View and analyze revenue statistics by time.
+
+### Staff
+
+* Manage customer orders.
+* Review and moderate customer feedback.
 
 ---
 
-## Cài đặt & Chạy dự án
+## Tech Stack
 
-### 1. Clone dự án:
+* **Node.js** + **Express.js** — Build the RESTful API.
+* **MongoDB** + **Mongoose** — NoSQL database for data storage.
+* **JWT (JSON Web Token)** + **OAuth2** — Authentication & authorization.
+* **Dialogflow** — AI chatbot integration for customer interaction.
+* **Tensorflow** — Personalized product recommendation system.
+* **Hugging Face** — Sentiment analysis of customer reviews.
+* **Redis** — Data caching for performance.
+* **Swagger UI** — API documentation and testing.
+* **Dotenv** — Manage environment variables.
+* **Multer & Cloudinary** — Image upload and cloud storage.
+
+---
+
+## Setup & Run
+
+### 1. Clone the repository:
 
 ```bash
 git clone https://github.com/minhtai2911/FashionSpace-Backend.git
 cd FashionSpace-Backend
 ```
 
-### 2. Cài dependencies:
+### 2. Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 3. Tạo file `.env` từ mẫu:
+### 3. Create the .env file from the example:
 
 ```bash
 cp .env.example .env
 ```
 
-> Điền các giá trị: `PORT`, `DB_URL`, `ACCESS_TOKEN_SECRET`, `CLOUDINARY_API_KEY`,...
+> Fill in required values such as: `PORT`, `DB_URL`, `ACCESS_TOKEN_SECRET`, `CLOUDINARY_API_KEY`,...
 
-### 4. Khởi chạy:
+### 4. Start the server:
 
 ```bash
-npm run dev        # chế độ development
-npm start          # chế độ production
+npm run dev          # chế độ development
+npm run production   # chế độ production
 ```
 
 ---
 
-## Tài liệu API (Swagger)
+## API Documentation (Swagger)
 
-* Truy cập: `http://localhost:8000/api-docs`
-* Tài liệu rõ ràng theo từng nhóm chức năng.
+* Access it at: `https://fashionspace-api.onrender.com/api-docs/`
+* Clean and well-organized API grouped by features.
+* Use the following admin credentials to test protected routes:
+
+```bash
+Email: admin@gmail.com
+Password: admin@123
+```
+
