@@ -79,7 +79,7 @@ const createReview = asyncHandler(async (req, res, next) => {
 
   if (existingReview) {
     logger.warn("Đánh giá đã tồn tại!");
-    return res.status(409).json({message: messages.MSG65});
+    return res.status(409).json({ message: messages.MSG65 });
   }
 
   const newReview = new Review({
@@ -95,20 +95,25 @@ const createReview = asyncHandler(async (req, res, next) => {
     return res.status(403).json({ message: messages.MSG61 });
   }
 
-  const sentiment = await analyzeSentiment(newReview.content);
+  try {
+    const sentiment = await analyzeSentiment(newReview.content);
 
-  switch (sentiment) {
-    case "NEG":
-      newReview.type = "Tiêu cực";
-      break;
-    case "NEU":
-      newReview.type = "Trung lập";
-      break;
-    case "POS":
-      newReview.type = "Tích cực";
-      break;
-    default:
-      throw new Error("Error");
+    switch (sentiment) {
+      case "NEG":
+        newReview.type = "Tiêu cực";
+        break;
+      case "NEU":
+        newReview.type = "Trung lập";
+        break;
+      case "POS":
+        newReview.type = "Tích cực";
+        break;
+      default:
+        newReview.type = "Không khả dụng";
+    }
+  } catch (error) {
+    logger.error("Error analyzing sentiment", error);
+    return res.status(500).json({ message: "Error analyzing sentiment" });
   }
 
   const product = await Product.findById(productId);
@@ -122,7 +127,11 @@ const createReview = asyncHandler(async (req, res, next) => {
   product.rating =
     (rating + product.rating * (product.totalReview - 1)) / product.totalReview;
   await req.redisClient.hincrby(cacheKey, "totalReview", 1);
-  await req.redisClient.hset(cacheKey, "rating", JSON.stringify(product.rating));
+  await req.redisClient.hset(
+    cacheKey,
+    "rating",
+    JSON.stringify(product.rating)
+  );
   invalidateCache(req, "review", "reviews", newReview._id.toString());
 
   logger.info(messages.MSG20);
@@ -219,7 +228,11 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
 
   const cacheKey = `product:${product._id}`;
   await req.redisClient.hincrby(cacheKey, "totalReview", 1);
-  await req.redisClient.hset(cacheKey, "rating", JSON.stringify(product.rating));
+  await req.redisClient.hset(
+    cacheKey,
+    "rating",
+    JSON.stringify(product.rating)
+  );
   invalidateCache(req, "review", "reviews", review._id.toString());
   logger.info(messages.MSG59);
   await review.save();
@@ -251,7 +264,11 @@ const deleteReviewById = asyncHandler(async (req, res, next) => {
     (product.rating * (product.totalReview + 1) - review.rating) /
     product.totalReview;
   await req.redisClient.hincrby(cacheKey, "totalReview", 1);
-  await req.redisClient.hset(cacheKey, "rating", JSON.stringify(product.rating));
+  await req.redisClient.hset(
+    cacheKey,
+    "rating",
+    JSON.stringify(product.rating)
+  );
   invalidateCache(req, "review", "reviews", req.params.id);
 
   await product.save();

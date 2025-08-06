@@ -21,4 +21,5 @@ const shoppingCartSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("ShoppingCart", shoppingCartSchema);
+const ShoppingCart = mongoose.models.ShoppingCart || mongoose.model("ShoppingCart", shoppingCartSchema);
+export default ShoppingCart;

@@ -13,4 +13,5 @@ const productViewSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("ProductView", productViewSchema);
+const ProductView = mongoose.models.ProductView || mongoose.model("ProductView", productViewSchema);
+export default ProductView;

@@ -29,6 +29,7 @@ import statisticRoute from "./routes/statisticRoute.js";
 import recommendationRoute from "./routes/recommendationRoute.js";
 import productViewRoute from "./routes/productViewRoute.js";
 import userAddressRoute from "./routes/userAddressRoute.js";
+import { initDatabase } from "./config/initDatabase.js";
 
 const file = fs.readFileSync("./swagger.yaml", "utf8");
 const swaggerDocument = YAML.parse(file);
@@ -60,7 +61,9 @@ mongoose
     logger.info("Database connected successful!");
     if (process.env.NODE_ENV === "production") {
       app.listen(process.env.PROD_PORT, () => {
-        logger.info(`Production: Server is running on port ${process.env.PROD_PORT}`);
+        logger.info(
+          `Production: Server is running on port ${process.env.PROD_PORT}`
+        );
         logger.info(
           `Documentation is available at https://fashionspace-api.onrender.com/api-docs`
         );
@@ -73,6 +76,7 @@ mongoose
         );
       });
     }
+    initDatabase();
   })
   .catch((err) => {
     logger.error("Database connection error", err);

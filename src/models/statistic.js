@@ -29,4 +29,5 @@ const statisticSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model("Statistic", statisticSchema);
+const Statistic = mongoose.models.Statistic || mongoose.model("Statistic", statisticSchema);
+export default Statistic;

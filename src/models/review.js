@@ -54,10 +54,11 @@ const reviewSchema = new mongoose.Schema(
     type: {
       type: String,
       required: true,
-      enum: ["Tiêu cực", "Tích cực", "Trung lập"],
+      enum: ["Tiêu cực", "Tích cực", "Trung lập", "Không khả dụng"],
     },
   },
   { timestamps: true }
 );
 
-export default mongoose.model("Review", reviewSchema);
+const Review = mongoose.models.Review || mongoose.model("Review", reviewSchema);
+export default Review;

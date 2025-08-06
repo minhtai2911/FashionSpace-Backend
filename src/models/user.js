@@ -53,7 +53,6 @@ const userSchema = new mongoose.Schema(
     expiresAt: {
       type: Date, 
     },
-
   },
   { timestamps: true }
 );
@@ -90,4 +89,5 @@ userSchema.statics.login = async function (email, password) {
   }
 };
 
-export default mongoose.model("User", userSchema);
+const User = mongoose.models.User || mongoose.model("User", userSchema);
+export default User;

@@ -31,4 +31,5 @@ const userAddressSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-export default mongoose.model("UserAddress", userAddressSchema);
+const UserAddress = mongoose.models.UserAddress || mongoose.model("UserAddress", userAddressSchema);
+export default UserAddress;
