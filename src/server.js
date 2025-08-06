@@ -11,7 +11,6 @@ import { RateLimiterRedis } from "rate-limiter-flexible";
 import { rateLimit } from "express-rate-limit";
 import { RedisStore } from "rate-limit-redis";
 import logger from "./utils/logger.js";
-import * as Sentry from "@sentry/node";
 import YAML from "yaml";
 import fs from "fs";
 import swaggerUi from "swagger-ui-express";
@@ -30,10 +29,9 @@ import statisticRoute from "./routes/statisticRoute.js";
 import recommendationRoute from "./routes/recommendationRoute.js";
 import productViewRoute from "./routes/productViewRoute.js";
 import userAddressRoute from "./routes/userAddressRoute.js";
-import "./config/sentry.js";
 
-const file  = fs.readFileSync('./swagger.yaml', 'utf8')
-const swaggerDocument = YAML.parse(file)
+const file = fs.readFileSync("./swagger.yaml", "utf8");
+const swaggerDocument = YAML.parse(file);
 const app = express();
 const redisClient = new Redis(process.env.REDIS_URL);
 
@@ -60,14 +58,24 @@ mongoose
   .connect(DB_URL)
   .then(() => {
     logger.info("Database connected successful!");
-    app.listen(PORT, () => {
-      logger.info(`Server is running on port ${PORT}`);
-      logger.info(`Documentation is available at http://localhost:${PORT}/api-docs`);
-    });
+    if (process.env.NODE_ENV === "production") {
+      app.listen(process.env.PROD_PORT, () => {
+        logger.info(`Production: Server is running on port ${process.env.PROD_PORT}`);
+        logger.info(
+          `Documentation is available at https://fashionspace-api.onrender.com/api-docs`
+        );
+      });
+    } else {
+      app.listen(PORT, () => {
+        logger.info(`Dev: Server is running on port ${PORT}`);
+        logger.info(
+          `Documentation is available at http://localhost:${PORT}/api-docs`
+        );
+      });
+    }
   })
   .catch((err) => {
     logger.error("Database connection error", err);
-    Sentry.captureException(err);
   });
 
 app.use((req, res, next) => {
@@ -163,11 +171,8 @@ app.use("/api/v1/statistic", statisticRoute);
 app.use("/api/v1/recommendation", recommendationRoute);
 app.use("/api/v1/productView", productViewRoute);
 app.use("/api/v1/userAddress", userAddressRoute);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
-Sentry.setupExpressErrorHandler(app);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 process.on("unhandledRejection", (reason, promise) => {
   logger.error("Unhandled Rejection at", promise, "reason:", reason);
-  Sentry.captureException(reason);
 });
