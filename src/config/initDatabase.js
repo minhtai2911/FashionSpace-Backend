@@ -26,7 +26,7 @@ export const initDatabase = asyncHandler(async () => {
       logger.error("Admin role does not exist. Cannot create admin user.");
       return;
     }
-    const adminUser = await User.create({
+    const adminUser = new User({
       email: adminEmail,
       fullName: "Admin",
       phone: "0987654321",
@@ -34,6 +34,7 @@ export const initDatabase = asyncHandler(async () => {
       password: adminPassword,
       isActive: true,
     });
+    await adminUser.save();
     logger.info(`Default admin user created: ${adminEmail}`);
   } else {
     logger.info(`Default admin user already exists: ${adminEmail}`);
