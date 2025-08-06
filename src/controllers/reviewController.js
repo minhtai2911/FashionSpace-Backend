@@ -112,8 +112,7 @@ const createReview = asyncHandler(async (req, res, next) => {
         newReview.type = "Không khả dụng";
     }
   } catch (error) {
-    logger.error("Error analyzing sentiment", error);
-    return res.status(500).json({ message: "Error analyzing sentiment" });
+    newReview.type = "Không khả dụng";
   }
 
   const product = await Product.findById(productId);
@@ -210,20 +209,24 @@ const updateReviewById = asyncHandler(async (req, res, next) => {
     return res.status(403).json({ message: messages.MSG61 });
   }
 
-  const sentiment = await analyzeSentiment(review.content);
+  try {
+    const sentiment = await analyzeSentiment(review.content);
 
-  switch (sentiment) {
-    case "NEG":
-      review.type = "Tiêu cực";
-      break;
-    case "NEU":
-      review.type = "Trung lập";
-      break;
-    case "POS":
-      review.type = "Tích cực";
-      break;
-    default:
-      throw new Error("Error");
+    switch (sentiment) {
+      case "NEG":
+        review.type = "Tiêu cực";
+        break;
+      case "NEU":
+        review.type = "Trung lập";
+        break;
+      case "POS":
+        review.type = "Tích cực";
+        break;
+      default:
+        review.type = "Không khả dụng";
+    }
+  } catch (error) {
+    review.type = "Không khả dụng";
   }
 
   const cacheKey = `product:${product._id}`;
