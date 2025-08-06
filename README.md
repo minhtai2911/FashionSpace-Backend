@@ -98,10 +98,3 @@ npm run production   # chế độ production
 
 * Access it at: `https://fashionspace-api.onrender.com/api-docs/`
 * Clean and well-organized API grouped by features.
-* Use the following admin credentials to test protected routes:
-
-```bash
-Email: admin@gmail.com
-Password: admin@123
-```
-
