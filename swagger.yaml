@@ -3537,7 +3537,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-    get: 
+    get:
       tags:
         - Order
       summary: Get all orders
@@ -3573,7 +3573,7 @@ paths:
             enum: ["Chưa thanh toán", "Đã thanh toán"]
             example: "Chưa thanh toán"
           description: Filter orders by payment status
-        - name: search 
+        - name: search
           in: query
           required: false
           schema:
@@ -3653,13 +3653,13 @@ paths:
                         expectedDeliveryDate: "2023-01-07T12:00:00Z"
                         createdAt: "2023-01-01T12:00:00Z"
                         updatedAt: "2023-01-02T12:00:00Z"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -3667,13 +3667,13 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-        '403':
+        "403":
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-  /api/v1/order/{id}: 
+  /api/v1/order/{id}:
     get:
       tags:
         - Order
@@ -3724,7 +3724,7 @@ paths:
                       expectedDeliveryDate: "2023-01-07T12:00:00Z"
                       createdAt: "2023-01-01T12:00:00Z"
                       updatedAt: "2023-01-02T12:00:00Z"
-        '404':
+        "404":
           description: Order not found
           content:
             application/json:
@@ -3739,13 +3739,13 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-        '500':
-          description: Internal Server Error - An unexpected error occurred on the server 
+        "500":
+          description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -3753,7 +3753,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-  /api/v1/order/get/userId: 
+  /api/v1/order/get/userId:
     get:
       tags:
         - Order
@@ -3829,13 +3829,13 @@ paths:
                         expectedDeliveryDate: "2023-01-07T12:00:00Z"
                         createdAt: "2023-01-01T12:00:00Z"
                         updatedAt: "2023-01-02T12:00:00Z"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -3844,7 +3844,7 @@ paths:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
   /api/v1/order/deliveryInfo/{id}:
-    put: 
+    put:
       tags:
         - Order
       summary: Update delivery information for an order
@@ -3938,13 +3938,13 @@ paths:
                       expectedDeliveryDate: "2023-01-07T12:00:00Z"
                       createdAt: "2023-01-01T12:00:00Z"
                       updatedAt: "2023-01-02T12:00:00Z"
-        '500':  
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -3952,13 +3952,13 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-        '403':
+        "403":
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/PermissionError"
-        '404':
+        "404":
           description: Order not found
           content:
             application/json:
@@ -4019,13 +4019,13 @@ paths:
                   summary: Example response
                   value:
                     message: "Gửi email thông báo trạng thái đơn hàng thành công!"
-        '500': 
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '404':
+        "404":
           description: Order not found
           content:
             application/json:
@@ -4040,7 +4040,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /api/v1/order/checkoutWithMoMo: 
+  /api/v1/order/checkoutWithMoMo:
     post:
       tags:
         - Order
@@ -4087,7 +4087,7 @@ paths:
                   summary: Example response
                   value:
                     url: "https://momo.vn/checkout/67f559e3a07743453ce315a6"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
@@ -4140,7 +4140,7 @@ paths:
                   summary: Example response
                   value:
                     url: "https://vnpay.vn/checkout/67f559e3a07743453ce315a6"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
@@ -4193,7 +4193,7 @@ paths:
                   summary: Example response
                   value:
                     url: "https://zalopay.vn/checkout/67f559e3a07743453ce315a6"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
@@ -4250,13 +4250,13 @@ paths:
                         year: 2023
                         totalOrder: 10
                         totalRevenue: 500.00
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -4264,7 +4264,62 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-        '403':
+        "403":
+          description: Forbidden - User does not have the required permissions
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PermissionError"
+  /api/v1/statistic/overview:
+    get:
+      tags:
+        - Statistic
+      summary: Get overview statistics
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Overview statistics retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      userCount:
+                        type: integer
+                        example: 100
+                      productCount:
+                        type: integer
+                        example: 50
+                      orderCount:
+                        type: integer
+                        example: 200
+              examples:
+                example1:
+                  summary: Example response
+                  value:
+                    data:
+                      userCount: 100
+                      productCount: 50
+                      orderCount: 200
+        "500":
+          description: Internal Server Error - An unexpected error occurred on the server
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServerError"
+        "401":
+          description: Unauthorized - Access token is missing or invalid
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/TokenError"
+                  - $ref: "#/components/schemas/TokenExpiredError"
+        "403":
           description: Forbidden - User does not have the required permissions
           content:
             application/json:
@@ -4312,7 +4367,7 @@ paths:
                   messageEnd:
                     type: string
                     description: The end message from the chatbot
-                  type: 
+                  type:
                     type: string
                     description: Type of the response (e.g., "product", "text")
               examples:
@@ -4338,7 +4393,7 @@ paths:
                         updatedAt: "2023-01-02T12:00:00Z"
                     messageEnd: "Nếu bạn cần thêm thông tin chi tiết về từng sản phẩm hoặc muốn biết thêm về các mẫu khác, hãy cho mình biết nhé! FashionSpace luôn sẵn sàng hỗ trợ bạn!"
                     type: "Product"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
@@ -4383,13 +4438,13 @@ paths:
                         isActive: true
                         createdAt: "2023-01-01T12:00:00Z"
                         updatedAt: "2023-01-02T12:00:00Z"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -4442,13 +4497,13 @@ paths:
                         isActive: true
                         createdAt: "2023-01-01T12:00:00Z"
                         updatedAt: "2023-01-02T12:00:00Z"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '404':
+        "404":
           description: Product not found
           content:
             application/json:
@@ -4463,7 +4518,7 @@ paths:
                   summary: Example response
                   value:
                     error: "Not found"
-  /api/v1/auth/login: 
+  /api/v1/auth/login:
     post:
       tags:
         - Auth
@@ -4502,7 +4557,7 @@ paths:
                   message:
                     type: string
                     example: "Đăng nhập thành công!"
-                  data: 
+                  data:
                     type: object
                     properties:
                       accessToken:
@@ -4519,13 +4574,13 @@ paths:
                     data:
                       accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                       refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '400':
+        "400":
           description: Bad Request
           content:
             application/json:
@@ -4562,7 +4617,7 @@ paths:
                 fullName:
                   type: string
                   description: User's full name
-                phone: 
+                phone:
                   type: string
                   description: User's phone number
               required:
@@ -4589,7 +4644,7 @@ paths:
                   message:
                     type: string
                     example: "Đăng ký thành công!"
-                  data: 
+                  data:
                     type: string
                     example: "67f559e3a07743453ce315a6"
               examples:
@@ -4598,13 +4653,13 @@ paths:
                   value:
                     message: "Đăng ký thành công!"
                     data: "67f559e3a07743453ce315a6"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '409':
+        "409":
           description: Conflict - Email already exists
           content:
             application/json:
@@ -4638,7 +4693,7 @@ paths:
                 fullName:
                   type: string
                   description: Guest's full name
-                phone: 
+                phone:
                   type: string
                   description: Guest's phone number
               required:
@@ -4660,7 +4715,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: 
+                  data:
                     type: object
                     properties:
                       accessToken:
@@ -4676,7 +4731,7 @@ paths:
                     data:
                       accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                       refreshToken: "d1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
@@ -4722,13 +4777,13 @@ paths:
                   summary: Example response
                   value:
                     message: "Đăng xuất thành công!"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -4736,7 +4791,7 @@ paths:
                 oneOf:
                   - $ref: "#/components/schemas/TokenError"
                   - $ref: "#/components/schemas/TokenExpiredError"
-        '400': 
+        "400":
           description: Bad Request - Refresh token is invalid or missing
           content:
             application/json:
@@ -4797,13 +4852,13 @@ paths:
                     data:
                       accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                       refreshToken: "d1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Refresh token is expired
           content:
             application/json:
@@ -4813,7 +4868,7 @@ paths:
                   message:
                     type: string
                     example: "Refresh token đã hết hạn"
-        '400':
+        "400":
           description: Bad Request - Refresh token is invalid or missing
           content:
             application/json:
@@ -4828,7 +4883,7 @@ paths:
                   summary: Example response
                   value:
                     message: "Refresh token bị thiếu hoặc không hợp lệ"
-        '404':
+        "404":
           description: Not Found - User not found
           content:
             application/json:
@@ -4882,7 +4937,7 @@ paths:
                   summary: Example response
                   value:
                     otp: "123456"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
@@ -4927,15 +4982,15 @@ paths:
                   summary: Example response
                   value:
                     message: "Mã OTP đã được gửi thành công!"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '400': 
+        "400":
           description: Bad request - Email not exist
-          content: 
+          content:
             application/json:
               schema:
                 type: object
@@ -4979,7 +5034,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: 
+                  data:
                     type: object
                     properties:
                       accessToken:
@@ -4995,13 +5050,13 @@ paths:
                     data:
                       accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                       refreshToken: "d1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '400':
+        "400":
           description: Bad Request - Invalid OTP or email
           content:
             application/json:
@@ -5022,7 +5077,7 @@ paths:
         - Auth
       summary: Reset user password using OTP
       security:
-        - bearerAuth: [] 
+        - bearerAuth: []
       requestBody:
         required: true
         content:
@@ -5056,13 +5111,13 @@ paths:
                   summary: Example response
                   value:
                     message: "Đặt lại mật khẩu thành công!"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -5115,13 +5170,13 @@ paths:
                   summary: Example response
                   value:
                     message: "Đổi mật khẩu thành công!"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '401':
+        "401":
           description: Unauthorized - Access token is missing or invalid
           content:
             application/json:
@@ -5150,10 +5205,10 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: 
+                  data:
                     type: object
                     properties:
-                      accessToken: 
+                      accessToken:
                         type: string
                         description: JWT access token for the user
                       refreshToken:
@@ -5166,13 +5221,13 @@ paths:
                     data:
                       accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                       refreshToken: "d1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '404':
+        "404":
           description: User not found
           content:
             application/json:
@@ -5228,13 +5283,13 @@ paths:
                   summary: Example response
                   value:
                     message: "Liên kết xác thực đã được gửi thành công!"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '400':
+        "400":
           description: Bad Request - Email not exist
           content:
             application/json:
@@ -5274,7 +5329,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  data: 
+                  data:
                     type: object
                     properties:
                       accessToken:
@@ -5290,13 +5345,13 @@ paths:
                     data:
                       accessToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
                       refreshToken: "d1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0"
-        '500':
+        "500":
           description: Internal Server Error - An unexpected error occurred on the server
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ServerError"
-        '403':
+        "403":
           description: Forbidden - Invalid ID token
           content:
             application/json:

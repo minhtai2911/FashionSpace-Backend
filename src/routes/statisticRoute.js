@@ -18,4 +18,11 @@ router.get(
   statisticController.getStatistics
 );
 
+router.get(
+  "/overview",
+  authMiddleware.verifyToken,
+  authMiddleware.checkPermission(["Admin"]),
+  statisticController.getOverview
+);
+
 export default router;

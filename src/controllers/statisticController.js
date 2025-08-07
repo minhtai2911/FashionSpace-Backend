@@ -1,8 +1,11 @@
 import Statistic from "../models/statistic.js";
 import Order from "../models/order.js";
+import Product from "../models/product.js";
+import User from "../models/user.js";
 import { orderStatus } from "../config/orderStatus.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import logger from "../utils/logger.js";
+import { data } from "@tensorflow/tfjs";
 
 const createStatistic = asyncHandler(async (req, res, next) => {
   const { day, month, year } = req.body;
@@ -129,7 +132,24 @@ export const addOrderToReport = async (finalPrice) => {
   }
 };
 
+const getOverview = asyncHandler(async (req, res, next) => {
+  userCount = await User.countDocuments();
+  productCount = await Product.countDocuments();
+  orderCount = await Order.countDocuments({
+    status: orderStatus.SHIPPED,
+  });
+
+  res.status(200).json({
+    data: {
+      userCount: userCount,
+      productCount: productCount,
+      orderCount: orderCount,
+    },
+  });
+});
+
 export default {
   createStatistic: createStatistic,
   getStatistics: getStatistics,
+  getOverview: getOverview,
 };
