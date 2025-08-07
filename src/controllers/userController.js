@@ -121,7 +121,7 @@ const updateUserById = asyncHandler(async (req, res, next) => {
   }
 
   if (req.file) {
-    if (user.publicId != "avatar_kn6ynb") {
+    if (user.publicId) {
       await cloudinary.deleteImageFromCloudinary(user.publicId);
     }
 
