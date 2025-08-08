@@ -136,7 +136,7 @@ const getOverview = asyncHandler(async (req, res, next) => {
   const userCount = await User.countDocuments();
   const productCount = await Product.countDocuments();
   const orderCount = await Order.countDocuments({
-    status: orderStatus.SHIPPED,
+    deliveryInfo: { $elemMatch: { status: orderStatus.SHIPPED } },
   });
 
   res.status(200).json({
