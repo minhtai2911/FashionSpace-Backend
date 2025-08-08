@@ -10,7 +10,7 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
-  let sortBy = "name";
+  let sortBy = "price";
   let sortOrder = "asc";
 
   if (req.query.isActive) query.isActive = req.query.isActive;
@@ -22,24 +22,6 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
   if (req.query.search) query.name = new RegExp(req.query.search, "i");
   if (req.query.sortBy) sortBy = req.query.sortBy;
   if (req.query.sortOrder) sortOrder = req.query.sortOrder;
-
-  const cacheKey = `products:${page}:${limit}:${sortOrder}:${sortBy}:${
-    query.isActive || "null"
-  }:${req.query.minPrice || "null"}:${req.query.maxPrice || "null"}:${
-    query.name || "null"
-  }:${req.query.categoryIds || "null"}`;
-  const cachedProducts = await req.redisClient.get(cacheKey);
-
-  if (cachedProducts) {
-    logger.info("Lấy danh sách sản phẩm thành công!", {
-      ...query,
-      sortBy,
-      sortOrder,
-      page,
-      limit,
-    });
-    return res.status(200).json(JSON.parse(cachedProducts));
-  }
 
   const totalCount = await Product.countDocuments(query);
 
@@ -58,8 +40,6 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
     },
     data: products,
   };
-
-  await req.redisClient.setex(cacheKey, 300, JSON.stringify(result));
 
   logger.info("Lấy danh sách sản phẩm thành công!", {
     ...query,
