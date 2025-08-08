@@ -123,7 +123,7 @@ const updateCategoryById = asyncHandler(async (req, res, next) => {
 
   if (
     existingCategory &&
-    existingCategory._id.toString() == category._id.toString()
+    existingCategory._id.toString() !== category._id.toString()
   ) {
     logger.warn(messages.MSG56);
     return res.status(409).json({ message: messages.MSG56 });
