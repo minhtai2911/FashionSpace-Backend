@@ -133,9 +133,9 @@ export const addOrderToReport = async (finalPrice) => {
 };
 
 const getOverview = asyncHandler(async (req, res, next) => {
-  userCount = await User.countDocuments();
-  productCount = await Product.countDocuments();
-  orderCount = await Order.countDocuments({
+  const userCount = await User.countDocuments();
+  const productCount = await Product.countDocuments();
+  const orderCount = await Order.countDocuments({
     status: orderStatus.SHIPPED,
   });
 
