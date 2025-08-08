@@ -27,6 +27,7 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
 
   const products = await Product.find(query)
     .populate("categoryId", "name")
+    .collation({ locale: "vi", strength: 1 })
     .sort({ [sortBy]: sortOrder })
     .skip(skip)
     .limit(limit)
