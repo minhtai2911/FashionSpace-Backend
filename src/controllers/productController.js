@@ -26,7 +26,7 @@ const getAllProducts = asyncHandler(async (req, res, next) => {
   const totalCount = await Product.countDocuments(query);
 
   const products = await Product.find(query)
-    .populate("categoryId", "name")
+    .populate("categoryId", "name gender")
     .collation({ locale: "vi", strength: 1 })
     .sort({ [sortBy]: sortOrder })
     .skip(skip)
