@@ -1,22 +1,13 @@
-import nodemailer from "nodemailer";
 import deliveryInfoComponent from "../config/deliveryInfoComponent.js";
 
 const sendDeliveryInfo = async (email, order) => {
   try {
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASSWORD,
-      },
-    });
-
     const htmlDeliveryInfo = await deliveryInfoComponent(order);
 
-    const info = await transporter.sendMail({
-      from: `Fashion Space <${process.env.EMAIL_USER}>`,
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    resend.emails.send({
+      from: "Fashion Space <onboarding@resend.dev>",
       to: `${email}`,
       subject: `THÔNG TIN ĐƠN HÀNG ${order._id} CỦA BẠN ĐÃ ĐƯỢC CẬP NHẬT - FASHION SPACE`,
       html: htmlDeliveryInfo,

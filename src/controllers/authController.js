@@ -1,13 +1,13 @@
 import User from "../models/user.js";
 import UserRole from "../models/userRole.js";
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
 import Otp from "../models/otp.js";
 import { messages } from "../config/messageHelper.js";
 import generateTokens from "../utils/generateToken.js";
 import RefreshToken from "../models/refreshToken.js";
 import asyncHandler from "../middlewares/asyncHandler.js";
 import logger from "../utils/logger.js";
+import { Resend } from "resend";
 
 const generateOTP = async (email) => {
   const otp = Math.floor(100000 + Math.random() * (999999 - 100000)).toString();
@@ -116,18 +116,10 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
     return res.status(400).json({ message: messages.MSG8 });
   }
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
+  const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const info = await transporter.sendMail({
-    from: `Fashion Space <${process.env.EMAIL_USER}>`,
+  resend.emails.send({
+    from: "Fashion Space <onboarding@resend.dev>",
     to: `${email}`,
     subject: "YÊU CẦU XÁC NHẬN THÔNG TIN ĐĂNG KÝ TÀI KHOẢN TỪ FASHION SPACE",
     html: `
@@ -136,6 +128,7 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
       }/verify/${user._id.toString()}">Nhấn vào đây để xác nhận email của bạn.</a>
       `,
   });
+
   logger.info(messages.MSG4);
   res.status(200).json({ message: messages.MSG4 });
 });
@@ -246,17 +239,10 @@ const sendOTP = asyncHandler(async (req, res, next) => {
 
   const OTP = await generateOTP(email);
 
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASSWORD,
-    },
-  });
-  const info = await transporter.sendMail({
-    from: `Fashion Space <${process.env.EMAIL_USER}>`,
+  const resend = new Resend(process.env.RESEND_API_KEY);
+
+  resend.emails.send({
+    from: "Fashion Space <onboarding@resend.dev>",
     to: `${email}`,
     subject: "YÊU CẦU ĐẶT LẠI MẬT KHẨU TỪ FASHION SPACE",
     html: `
@@ -265,6 +251,7 @@ const sendOTP = asyncHandler(async (req, res, next) => {
       <div>Mã OTP của bạn: <br>${OTP}</br></div>
       `,
   });
+
   logger.info(messages.MSG9);
   res.status(200).json({
     message: messages.MSG9,
