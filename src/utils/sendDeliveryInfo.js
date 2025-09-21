@@ -6,7 +6,7 @@ const sendDeliveryInfo = async (email, order) => {
 
     const resend = new Resend(process.env.RESEND_API_KEY);
 
-    resend.emails.send({
+    await resend.emails.send({
       from: "Fashion Space <onboarding@resend.dev>",
       to: `${email}`,
       subject: `THÔNG TIN ĐƠN HÀNG ${order._id} CỦA BẠN ĐÃ ĐƯỢC CẬP NHẬT - FASHION SPACE`,

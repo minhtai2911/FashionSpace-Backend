@@ -118,7 +118,7 @@ const sendMailVerifyAccount = asyncHandler(async (req, res, next) => {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  resend.emails.send({
+  await resend.emails.send({
     from: "Fashion Space <onboarding@resend.dev>",
     to: `${email}`,
     subject: "YÊU CẦU XÁC NHẬN THÔNG TIN ĐĂNG KÝ TÀI KHOẢN TỪ FASHION SPACE",
@@ -241,7 +241,7 @@ const sendOTP = asyncHandler(async (req, res, next) => {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  resend.emails.send({
+  await resend.emails.send({
     from: "Fashion Space <onboarding@resend.dev>",
     to: `${email}`,
     subject: "YÊU CẦU ĐẶT LẠI MẬT KHẨU TỪ FASHION SPACE",
